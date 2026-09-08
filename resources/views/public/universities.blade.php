@@ -1,0 +1,8 @@
+<x-layouts.site :title="__('site.universities')">
+    <x-page-heading :title="__('site.universities')" :description="__('site.universities_copy')"/>
+    <div class="shell py-10">
+        <form class="mb-8 grid items-end gap-4 sm:grid-cols-[2fr_1fr_auto]" method="get"><label><span class="field-label">{{ __('site.search') }}</span><input class="field" name="search" maxlength="150" value="{{ request('search') }}" placeholder="{{ __('site.university') }} / {{ __('site.student') }}"></label><label><span class="field-label">{{ __('site.year') }}</span><select class="field" name="year"><option value="">{{ __('site.all_years') }}</option>@foreach($years as $y)<option value="{{ $y->id }}" @selected(request('year') == $y->id)>{{ $y->name }}</option>@endforeach</select></label><button class="btn btn-primary"><x-site-icon name="search" class="size-4"/>{{ __('site.search') }}</button></form>
+        <div class="overflow-x-auto rounded border border-line"><table class="data-table min-w-[640px]"><thead><tr><th>{{ __('site.year') }}</th><th>{{ __('site.student') }}</th><th>{{ __('site.university') }}</th><th>{{ __('site.program') }}</th><th>{{ __('site.country') }}</th></tr></thead><tbody>@forelse($acceptances as $item)<tr><td>{{ $item->academicYear->name }}</td><td>{{ $item->student_name }}</td><td class="font-semibold text-jts">{{ $item->university_name }}</td><td>{{ $item->program_name }}</td><td>{{ $item->country }}</td></tr>@empty<tr><td colspan="5">{{ __('site.no_results') }}</td></tr>@endforelse</tbody></table></div>
+        <div class="mt-8">{{ $acceptances->links() }}</div>
+    </div>
+</x-layouts.site>

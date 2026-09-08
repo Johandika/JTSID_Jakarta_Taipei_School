@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+@source '../views/**/*.blade.php';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', 'Microsoft JhengHei', ui-sans-serif, system-ui, sans-serif;
+    --color-jts: #176443;
+    --color-ink: #202922;
+    --color-muted: #607067;
+    --color-line: #dfe5e1;
+    --color-accent: #efcf5d;
+}
+
+@layer base {
+    * { letter-spacing: 0; }
+    body { @apply bg-white text-ink antialiased; }
+    button, a, input, select { -webkit-tap-highlight-color: transparent; }
+    button, select { cursor: pointer; }
+    button:disabled { cursor: default; }
+    :focus-visible { outline: 3px solid #b08b0f; outline-offset: 4px; }
+    h1, h2, h3, p, a { overflow-wrap: anywhere; }
+    [x-cloak] { display: none !important; }
+}
+@layer components {
+    .shell { @apply mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-12; }
+    .btn { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded px-5 py-3 text-sm font-semibold transition-colors; }
+    .btn-primary { @apply bg-jts text-white hover:bg-[#104a31]; }
+    .btn-light { @apply bg-white text-jts hover:bg-gray-100; }
+    .btn-outline { @apply border border-line text-ink hover:bg-gray-50; }
+    .icon-btn { @apply inline-flex size-10 shrink-0 items-center justify-center rounded border border-line bg-white text-ink hover:bg-gray-50; }
+    .eyebrow { @apply mb-3 flex items-center gap-2 text-xs font-bold uppercase text-jts; }
+    .eyebrow::before { content: ''; @apply inline-block h-px w-7 bg-current; }
+    .section-title { @apply text-3xl font-semibold leading-tight sm:text-4xl; }
+    .field { @apply min-h-11 w-full rounded border border-line bg-white px-3 py-2.5 text-sm text-ink focus:border-jts; }
+    .field-label { @apply mb-2 block text-xs font-semibold text-muted; }
+    .text-link { @apply inline-flex items-center gap-2 text-sm font-semibold text-jts hover:underline; }
+    .prose { @apply text-base leading-8 text-muted; }
+    .prose h2 { @apply mb-4 mt-10 text-2xl font-semibold text-ink; }
+    .prose h3 { @apply mb-3 mt-7 text-xl font-semibold text-ink; }
+    .prose p { @apply mb-5; }
+    .prose ul { @apply mb-5 list-disc space-y-2 pl-6; }
+    .prose ol { @apply mb-5 list-decimal space-y-2 pl-6; }
+    .prose a { @apply text-jts underline; }
+    .prose blockquote { @apply my-6 border-l-4 border-accent pl-5 italic; }
+    .prose img { @apply my-6 max-w-full rounded; }
+    .page-heading { @apply border-b border-line bg-[#f4f7f5] py-10 sm:py-14; }
+    .data-table { @apply relative w-full text-left text-sm; }
+    .data-table th { @apply border-b border-line bg-[#f4f7f5] px-5 py-4 text-xs font-semibold text-muted; }
+    .data-table td { @apply border-b border-line px-5 py-5; }
+    .data-table tr:hover td { @apply bg-gray-50; }
+}
