@@ -4,3 +4,10 @@ node_modules
 .env
 tmp
 web.pdf
+public/storage
+storage/app/public
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/testing/*
+storage/framework/views/*
+storage/logs/*

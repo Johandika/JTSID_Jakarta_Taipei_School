@@ -54,6 +54,24 @@ Rebuilding assets is enough for local testing; no Vite server is required. For l
 
 The local PHP server uses four workers. After changing `.env`, run `docker compose restart app`.
 
+## Image version
+
+Set the Docker image version in `.env`:
+
+```env
+APP_VERSION=1.0.2
+```
+
+The local compose file tags builds as `johandika/jtsid:${APP_VERSION}`. Build and push the same version with PowerShell:
+
+```powershell
+$env:APP_VERSION = (Get-Content .env | Select-String '^APP_VERSION=').ToString().Split('=')[1].Trim()
+docker build -f Dockerfile.prod -t "johandika/jtsid:$env:APP_VERSION" .
+docker push "johandika/jtsid:$env:APP_VERSION"
+```
+
+For production, use the same `APP_VERSION` value in the production env file so `docker compose pull` gets the intended image tag.
+
 ## Verification
 
 ```powershell
