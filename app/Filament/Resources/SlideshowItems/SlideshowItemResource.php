@@ -32,7 +32,7 @@ class SlideshowItemResource extends CmsResource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([TextInput::make('topic')->required()->unique(ignoreRecord: true)->maxLength(191), CmsFields::image('image', 1024)->required(),
-            CmsFields::safeUrl('link_url'), TextInput::make('sort_order')->integer()->minValue(0)->default(0)->required(),
+            CmsFields::schoolLevels(), CmsFields::safeUrl('link_url'), TextInput::make('sort_order')->integer()->minValue(0)->default(0)->required(),
             Toggle::make('is_active')->default(true)])->columns(2);
     }
 

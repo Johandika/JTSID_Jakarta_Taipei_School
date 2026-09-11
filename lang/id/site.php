@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'browse_level' => 'Informasi sesuai jenjang',
+    'level_hint' => 'Pilih jenjang untuk menyaring informasi. Informasi umum tetap ditampilkan.',
+    'all_levels' => 'Semua',
+    'school_wide' => 'Seluruh sekolah',
+    'announcement' => 'Pengumuman',
+    'continue_site' => 'Lanjut ke website',
     'home' => 'Beranda',
     'about' => 'Tentang JTS',
     'academics' => 'Akademik',

@@ -4,10 +4,11 @@ use App\Http\Controllers\ContentController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\HomeController;
 use App\Http\Middleware\SetLocale;
+use App\Http\Middleware\SetSchoolLevel;
 use Illuminate\Support\Facades\Route;
 
 foreach (['en' => '', 'zh' => 'zh', 'id' => 'id'] as $locale => $prefix) {
-    Route::prefix($prefix)->name($locale.'.')->middleware(SetLocale::class)->group(function () {
+    Route::prefix($prefix)->name($locale.'.')->middleware([SetLocale::class, SetSchoolLevel::class])->group(function () {
         Route::get('/', HomeController::class)->name('home');
         Route::get('/news', [ContentController::class, 'news'])->name('news');
         Route::get('/news/{slug}', [ContentController::class, 'post'])->name('post');

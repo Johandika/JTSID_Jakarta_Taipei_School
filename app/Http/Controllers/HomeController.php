@@ -11,9 +11,9 @@ class HomeController extends Controller
     public function __invoke()
     {
         return view('public.home', [
-            'posts' => Post::published()->with(['translations', 'category', 'department'])->orderByDesc('upload_date')->limit(3)->get(),
-            'resources' => SubjectResource::published()->with(['translations', 'type', 'gradeLevel'])->orderByDesc('upload_date')->limit(4)->get(),
-            'slides' => SlideshowItem::where('is_active', true)->orderBy('sort_order')->limit(10)->get(),
+            'posts' => Post::published()->forSchoolLevel()->with(['translations', 'category', 'department'])->orderByDesc('upload_date')->limit(3)->get(),
+            'resources' => SubjectResource::published()->forSchoolLevel()->with(['translations', 'type'])->orderByDesc('upload_date')->limit(4)->get(),
+            'slides' => SlideshowItem::where('is_active', true)->forSchoolLevel()->orderBy('sort_order')->limit(10)->get(),
         ]);
     }
 }

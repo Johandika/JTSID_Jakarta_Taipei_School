@@ -33,12 +33,12 @@ class PostResource extends CmsResource
         return $schema->components([TextInput::make('topic')->required()->maxLength(191),
             TextInput::make('slug')->required()->unique(ignoreRecord: true)->maxLength(191)->rules(['regex:/^[a-z0-9]+(?:-[a-z0-9]+)*$/']),
             CmsFields::department(), Select::make('category_id')->relationship('category', 'name')->required(),
-            CmsFields::uploadDate(), CmsFields::image(), CmsFields::document(), CmsFields::publishing(), CmsFields::translations()])->columns(2);
+            CmsFields::schoolLevels(), CmsFields::uploadDate(), CmsFields::image(), CmsFields::document(), CmsFields::publishing(), CmsFields::translations()])->columns(2);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([TextColumn::make('topic')->searchable(), TextColumn::make('department.name'), TextColumn::make('category.name'), TextColumn::make('status')->badge(), TextColumn::make('upload_date')->date()->sortable(), TextColumn::make('translation_status')->label('Translations')])
+        return $table->columns([TextColumn::make('topic')->searchable(), TextColumn::make('school_level_label')->label('School levels'), TextColumn::make('department.name'), TextColumn::make('category.name'), TextColumn::make('status')->badge(), TextColumn::make('upload_date')->date()->sortable(), TextColumn::make('translation_status')->label('Translations')])
             ->filters([SelectFilter::make('status')->options(['draft' => 'Draft', 'published' => 'Published', 'archived' => 'Archived'])])
             ->defaultSort('upload_date', 'desc')
             ->recordActions([EditAction::make(), DeleteAction::make()])

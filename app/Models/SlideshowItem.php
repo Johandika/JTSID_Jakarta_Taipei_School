@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSchoolLevels;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 
 class SlideshowItem extends CmsModel
 {
+    use HasSchoolLevels;
+
     public function save(array $options = [])
     {
         return DB::transaction(function () use ($options) {

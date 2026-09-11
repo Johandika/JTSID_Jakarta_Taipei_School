@@ -7,6 +7,7 @@ use App\Models\GradeLevel;
 use App\Models\Post;
 use App\Models\PostCategory;
 use App\Models\SubjectResource;
+use App\Support\SchoolLevel;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -24,6 +25,9 @@ class ContentCatalog extends Component
 
     #[Locked]
     public string $locale = 'en';
+
+    #[Locked]
+    public string $schoolLevel = 'all';
 
     #[Url]
     public string $search = '';
@@ -45,6 +49,7 @@ class ContentCatalog extends Component
         $this->kind = $kind;
         $this->type = $type;
         $this->locale = app()->getLocale();
+        $this->schoolLevel = SchoolLevel::selected();
     }
 
     public function hydrate(): void
@@ -66,7 +71,7 @@ class ContentCatalog extends Component
     public function render()
     {
         app()->setLocale($this->locale);
-        $query = ($this->kind === 'news' ? Post::query() : SubjectResource::query())->published()->with(['translations', 'department']);
+        $query = ($this->kind === 'news' ? Post::query() : SubjectResource::query())->published()->forSchoolLevel($this->schoolLevel)->with(['translations', 'department']);
         if ($this->search !== '') {
             $search = '%'.mb_substr($this->search, 0, 150).'%';
             $query->where(fn ($q) => $q->where('topic', 'ilike', $search)
@@ -86,7 +91,7 @@ class ContentCatalog extends Component
                 $query->whereHas('type', fn ($q) => $q->where('code', $this->type));
             }
             if (ctype_digit($this->grade)) {
-                $query->where('grade_level_id', $this->grade);
+                $query->forSchoolLevel(GradeLevel::find($this->grade)?->code);
             }
         }
 

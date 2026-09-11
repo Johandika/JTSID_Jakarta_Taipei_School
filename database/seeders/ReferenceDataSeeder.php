@@ -21,7 +21,7 @@ class ReferenceDataSeeder extends Seeder
         foreach (['secretary' => 'Secretary Office', 'academic' => 'Academic Office', 'student_affairs' => 'Student Affairs', 'languages' => 'International Languages', 'kindergarten' => 'Kindergarten', 'clc' => 'Chinese Learning Center', 'general_affairs' => 'General Affairs', 'accounting' => 'Accounting', 'hr' => 'Human Resources'] as $code => $name) {
             Department::firstOrCreate(compact('code'), compact('name'));
         }
-        foreach (['news' => 'News', 'media' => 'Media', 'activity' => 'Campus Activities', 'exchange' => 'International Exchange', 'newsletter' => 'Newsletter', 'admission_notice' => 'Admission Notices', 'achievement' => 'Student Achievement'] as $code => $name) {
+        foreach (['news' => 'News', 'media' => 'Media', 'activity' => 'Campus Activities', 'exchange' => 'International Exchange', 'newsletter' => 'Newsletter', 'admission_notice' => 'Admission Notices', 'achievement' => 'Student Achievement', 'announcement' => 'Announcements'] as $code => $name) {
             PostCategory::firstOrCreate(compact('code'), compact('name'));
         }
         foreach (['tk' => 'TK', 'sd' => 'SD', 'smp' => 'SMP', 'sma' => 'SMA'] as $code => $name) {

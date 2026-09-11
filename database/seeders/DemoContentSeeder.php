@@ -121,7 +121,7 @@ class DemoContentSeeder extends Seeder
         foreach (SubjectResourceType::all() as $type) {
             foreach (GradeLevel::all() as $grade) {
                 $resource = SubjectResource::create(['topic' => $grade->name.' '.$type->name.' 2026 / 2027', 'type_id' => $type->id,
-                    'grade_level_id' => $grade->id, 'department_id' => $department->id, 'file_path' => $file,
+                    'grade_level_id' => $grade->id, 'school_levels' => [$grade->code], 'department_id' => $department->id, 'file_path' => $file,
                     'upload_date' => today()->subDays($type->id), 'published_at' => now()->subDay(), 'status' => 'published']);
                 foreach (['en', 'id', 'zh-TW'] as $locale) {
                     $resource->translations()->create(['locale' => $locale, 'title' => $grade->name.' '.__('site.'.$type->code, [], $locale).' 2026 / 2027', 'body' => $this->sampleNotice($locale)]);

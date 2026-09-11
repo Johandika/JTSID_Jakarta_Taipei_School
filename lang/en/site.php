@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'browse_level' => 'Browse by school level',
+    'level_hint' => 'Choose a level to filter information. School-wide updates are always included.',
+    'all_levels' => 'All',
+    'school_wide' => 'Whole school',
+    'announcement' => 'Announcements',
+    'continue_site' => 'Continue to website',
     'home' => 'Home',
     'about' => 'About JTS',
     'academics' => 'Academics',

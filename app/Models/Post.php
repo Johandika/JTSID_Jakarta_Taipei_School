@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSchoolLevels;
 use App\Models\Concerns\HasTranslations;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Post extends CmsModel
 {
+    use HasSchoolLevels;
     use HasTranslations;
 
     public function department(): BelongsTo

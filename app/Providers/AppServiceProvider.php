@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\AcademicYear;
+use App\Models\AnnouncementPopup;
 use App\Models\AuditLog;
 use App\Models\ContactChannel;
 use App\Models\Department;
@@ -46,13 +47,14 @@ class AppServiceProvider extends ServiceProvider
         foreach ([Post::class, SubjectResource::class, StaffProfile::class, UniversityAcceptance::class] as $model) {
             Gate::policy($model, ContentPolicy::class);
         }
-        foreach ([Page::class, MenuItem::class, SlideshowItem::class, ContactChannel::class, Department::class, AcademicYear::class] as $model) {
+        foreach ([AnnouncementPopup::class, Page::class, MenuItem::class, SlideshowItem::class, ContactChannel::class, Department::class, AcademicYear::class] as $model) {
             Gate::policy($model, GlobalContentPolicy::class);
         }
         Gate::policy(User::class, UserPolicy::class);
         View::composer('components.layouts.site', function ($view) {
             $view->with('navigation', MenuItem::where('is_active', true)->whereNull('parent_id')->with(['translations', 'children.translations'])->orderBy('sort_order')->get());
             $view->with('contacts', ContactChannel::orderBy('sort_order')->get());
+            $view->with('announcementPopup', AnnouncementPopup::visible()->orderBy('sort_order')->orderByDesc('id')->first());
         });
         Event::listen(Login::class, function ($event) {
             $event->user->forceFill(['last_login_at' => now()])->saveQuietly();

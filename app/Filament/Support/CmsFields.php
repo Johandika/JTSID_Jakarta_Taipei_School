@@ -2,6 +2,7 @@
 
 namespace App\Filament\Support;
 
+use App\Support\SchoolLevel;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\FileUpload;
@@ -15,6 +16,14 @@ use Illuminate\Database\Eloquent\Builder;
 
 class CmsFields
 {
+    public static function schoolLevels(): Select
+    {
+        return Select::make('school_levels')->label('School levels')->multiple()
+            ->options(SchoolLevel::OPTIONS)->default([])
+            ->helperText('Leave empty for the whole school, or select one or more levels (TK, SD, SMP, SMA).')
+            ->rules(['array'])->columnSpanFull();
+    }
+
     public static function translations(bool $menu = false): Repeater
     {
         $schema = [

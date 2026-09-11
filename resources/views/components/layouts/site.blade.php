@@ -69,6 +69,7 @@
         @endforeach
     </nav>
 </header>
+<x-school-level-filter/>
 <main id="main">{{ $slot }}</main>
 <footer class="mt-16 border-t border-line bg-[#f4f7f5]">
     <div class="shell grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
@@ -98,6 +99,7 @@
     </div>
     <div class="shell flex flex-wrap justify-between gap-3 border-t border-line py-5 text-xs text-muted"><p>&copy; {{ date('Y') }} Jakarta Taipei School. {{ __('site.rights') }}</p>@env('local')<p>{{ __('site.demo') }}</p>@endenv</div>
 </footer>
+@if($announcementPopup)<x-announcement-popup :popup="$announcementPopup"/>@endif
 @livewireScripts
 </body>
 </html>

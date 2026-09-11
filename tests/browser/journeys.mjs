@@ -45,7 +45,7 @@ try {
     await page.screenshot({ path: 'test-results/news-desktop.png', fullPage: true });
     await visit('/id/resources/calendar');
     await expect(page.locator('tbody tr')).toHaveCount(4);
-    await page.getByLabel('Jenjang', { exact: true }).selectOption({ label: 'SD' });
+    await page.getByRole('navigation', { name: 'Jenjang', exact: true }).getByRole('link', { name: 'SD', exact: true }).click();
     await expect(page.locator('tbody tr')).toHaveCount(1);
     await expect(page.getByRole('columnheader', { name: 'Tanggal unggah' })).toBeVisible();
     const downloadPromise = page.waitForEvent('download');

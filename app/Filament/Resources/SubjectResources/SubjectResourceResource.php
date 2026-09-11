@@ -32,13 +32,13 @@ class SubjectResourceResource extends CmsResource
     {
         return $schema->components([TextInput::make('topic')->required()->maxLength(191), CmsFields::department(),
             Select::make('type_id')->relationship('type', 'name')->required(),
-            Select::make('grade_level_id')->relationship('gradeLevel', 'name')->required(),
+            CmsFields::schoolLevels(),
             CmsFields::uploadDate(), CmsFields::document(true), CmsFields::publishing(), CmsFields::translations()])->columns(2);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([TextColumn::make('topic')->searchable(), TextColumn::make('type.name'), TextColumn::make('gradeLevel.name'), TextColumn::make('department.name'), TextColumn::make('status')->badge(), TextColumn::make('translation_status')->label('Translations')])
+        return $table->columns([TextColumn::make('topic')->searchable(), TextColumn::make('type.name'), TextColumn::make('school_level_label')->label('School levels'), TextColumn::make('department.name'), TextColumn::make('status')->badge(), TextColumn::make('translation_status')->label('Translations')])
             ->filters([SelectFilter::make('status')->options(['draft' => 'Draft', 'published' => 'Published', 'archived' => 'Archived'])])
             ->defaultSort('upload_date', 'desc')
             ->recordActions([EditAction::make(), DeleteAction::make()])

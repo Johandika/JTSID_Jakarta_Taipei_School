@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'browse_level' => '依學部瀏覽',
+    'level_hint' => '選擇學部以篩選資訊，全校公告仍會顯示。',
+    'all_levels' => '全部',
+    'school_wide' => '全校',
+    'announcement' => '公告',
+    'continue_site' => '繼續瀏覽網站',
     'home' => '首頁',
     'about' => '認識學校',
     'academics' => '課程設計',

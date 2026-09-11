@@ -44,7 +44,7 @@ class ContentController extends Controller
         $input = $request->validate(['department' => 'nullable|integer|exists:departments,id']);
 
         return view('public.staff', [
-            'staff' => StaffProfile::where('is_active', true)->with('department')
+            'staff' => StaffProfile::where('is_active', true)->forSchoolLevel()->with('department')
                 ->when($input['department'] ?? null, fn ($q, $id) => $q->where('department_id', $id))->orderBy('sort_order')->get(),
             'departments' => Department::where('is_active', true)->orderBy('sort_order')->get(),
         ]);

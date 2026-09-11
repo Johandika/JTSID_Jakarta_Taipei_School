@@ -32,7 +32,7 @@ class StaffProfileResource extends CmsResource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([TextInput::make('name')->required()->maxLength(150), TextInput::make('title')->required()->maxLength(150),
-            CmsFields::department(), TextInput::make('extension')->maxLength(50), Textarea::make('responsibilities'),
+            CmsFields::department(), CmsFields::schoolLevels(), TextInput::make('extension')->maxLength(50), Textarea::make('responsibilities'),
             CmsFields::image('photo'), TextInput::make('sort_order')->integer()->minValue(0)->default(0)->required(), Toggle::make('is_active')->default(true)])->columns(2);
     }
 
