@@ -1,15 +1,211 @@
-<x-layouts.site>
-    @php($site = \App\Support\Site::class)
-    <section class="relative flex min-h-[420px] items-end overflow-hidden bg-[#dce9e1] sm:min-h-[490px]">
-        <img src="{{ asset('images/campus.jpg') }}" alt="Jakarta Taipei School campus entrance" class="absolute inset-0 size-full object-cover object-[center_60%]" fetchpriority="high" width="1600" height="900">
-        <div class="absolute inset-0 bg-linear-to-t from-black/80 via-black/35 to-black/10"></div>
-        <div class="shell relative py-10 text-white sm:py-12">
-            <p class="mb-4 text-sm font-medium">{{ __('site.tagline') }}</p>
-            <h1 class="max-w-2xl text-4xl font-semibold leading-[1.1] sm:text-6xl">{{ __('site.school') }}</h1>
-            <p class="mb-6 mt-4 max-w-lg text-sm leading-6 text-white/90">{{ __('site.hero_copy') }}</p>
-            <div class="flex flex-wrap gap-3"><a class="btn btn-light" href="{{ $site::path('/about') }}">{{ __('site.explore') }}<x-site-icon name="arrow-up-right" class="size-4"/></a><a class="btn border border-white/60 text-white hover:bg-white/10" href="{{ $site::path('/admissions') }}">{{ __('site.apply') }}<x-site-icon name="arrow-right" class="size-4"/></a></div>
+<x-layouts.site :transparent-nav="true" :show-level-filter="false">
+    @php
+        $site = \App\Support\Site::class;
+        $heroSlides = [
+            [
+                'image' => asset('images/campus.jpg'),
+                'tagline' => __('site.tagline'),
+                'title' => __('site.hero_slide_1_title'),
+                'description' => __('site.hero_slide_1_desc'),
+                'cta_text' => __('site.apply'),
+                'cta_url' => $site::path('/admissions'),
+            ],
+            [
+                'image' => asset('images/seed-classroom.jpg'),
+                'tagline' => __('site.school'),
+                'title' => __('site.hero_slide_2_title'),
+                'description' => __('site.hero_slide_2_desc'),
+                'cta_text' => __('site.explore'),
+                'cta_url' => $site::path('/about'),
+            ],
+            [
+                'image' => asset('images/seed-library.jpg'),
+                'tagline' => __('site.academics'),
+                'title' => __('site.hero_slide_3_title'),
+                'description' => __('site.hero_slide_3_desc'),
+                'cta_text' => __('site.read_more'),
+                'cta_url' => $site::path('/academics'),
+            ],
+        ];
+
+        $curriculumPrograms = [
+            [
+                'col' => 'lg:col-span-5',
+                'image' => asset('images/programs/kindergarten.jpg'),
+                'title' => __('site.prog_kindergarten_title'),
+                'label' => __('site.prog_kindergarten_label'),
+                'description' => __('site.prog_kindergarten_desc'),
+                'url' => $site::path('/academics'),
+            ],
+            [
+                'col' => 'lg:col-span-7',
+                'image' => asset('images/programs/primary.jpg'),
+                'title' => __('site.prog_primary_title'),
+                'label' => __('site.prog_primary_label'),
+                'description' => __('site.prog_primary_desc'),
+                'url' => $site::path('/academics'),
+            ],
+            [
+                'col' => 'lg:col-span-7',
+                'image' => asset('images/programs/secondary.jpg'),
+                'title' => __('site.prog_secondary_title'),
+                'label' => __('site.prog_secondary_label'),
+                'description' => __('site.prog_secondary_desc'),
+                'url' => $site::path('/academics'),
+            ],
+            [
+                'col' => 'lg:col-span-5',
+                'image' => asset('images/programs/english.jpg'),
+                'title' => __('site.prog_english_title'),
+                'label' => __('site.prog_english_label'),
+                'description' => __('site.prog_english_desc'),
+                'url' => $site::path('/academics'),
+            ],
+        ];
+    @endphp
+
+    {{-- Hero Section: 70svh on Mobile (with next section peeking), Full Screen on Desktop --}}
+    <section class="relative h-[70svh] min-h-[500px] md:h-screen md:min-h-[640px] w-full overflow-hidden bg-black"
+             x-data="{
+                 current: 0,
+                 total: {{ count($heroSlides) }},
+                 paused: false,
+                 timer: null,
+                 slides: @js($heroSlides),
+                 init() {
+                     this.startTimer();
+                 },
+                 startTimer() {
+                     this.timer = setInterval(() => {
+                         if (!this.paused) {
+                             this.next();
+                         }
+                     }, 6500);
+                 },
+                 next() {
+                     this.current = (this.current + 1) % this.total;
+                 },
+                 prev() {
+                     this.current = (this.current - 1 + this.total) % this.total;
+                 },
+                 goTo(i) {
+                     this.current = i;
+                 }
+             }"
+             @mouseenter="paused = true"
+             @mouseleave="paused = false">
+
+        {{-- Background Image Slides --}}
+        @foreach($heroSlides as $idx => $slide)
+            <div x-show="current === {{ $idx }}"
+                 x-transition:enter="transition ease-out duration-1000"
+                 x-transition:enter-start="opacity-0 scale-100"
+                 x-transition:enter-end="opacity-100 scale-105"
+                 x-transition:leave="transition ease-in duration-800"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 class="absolute inset-0 size-full"
+                 @if($idx > 0) x-cloak @endif>
+                <img src="{{ $slide['image'] }}" alt="Jakarta Taipei School"
+                     class="size-full object-cover object-center transform transition-transform duration-10000 ease-out"
+                     @if($idx === 0) fetchpriority="high" @else loading="lazy" @endif
+                     width="1920" height="1080">
+            </div>
+        @endforeach
+
+        {{-- Multi-layered Dark Overlay for Text Legibility & Contrast --}}
+        <div class="absolute inset-0 bg-black/25 pointer-events-none"></div>
+        <div class="absolute top-0 inset-x-0 h-36 sm:h-44 bg-gradient-to-b from-black/85 via-black/35 to-transparent pointer-events-none"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none"></div>
+
+        {{-- Left-Bottom Diagonal Info Panel --}}
+        <div class="absolute bottom-0 left-0 z-20 w-[95%] sm:w-[88%] md:w-[78%] lg:w-[62%] xl:w-[52%]">
+            <div class="hero-diagonal-panel bg-jts/95 backdrop-blur-md text-white shadow-2xl pt-4 pb-4 pl-4 pr-12 sm:pt-7 sm:pb-7 sm:pl-7 sm:pr-18 lg:pt-9 lg:pb-9 lg:pl-10 lg:pr-24 transition-all duration-300">
+                {{-- Tagline / Eyebrow --}}
+                <div class="mb-1.5 sm:mb-2.5 flex items-center gap-2 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-accent">
+                    <span class="inline-block h-0.5 w-5 sm:w-6 bg-accent"></span>
+                    <span x-text="slides[current].tagline"></span>
+                </div>
+
+                {{-- Headline --}}
+                <h1 class="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-white min-h-[2.2em] flex items-center"
+                    x-text="slides[current].title">
+                </h1>
+
+                {{-- Description --}}
+                <p class="mb-3.5 sm:mb-5 mt-1 sm:mt-2 max-w-xl text-xs sm:text-sm md:text-base leading-relaxed text-white/90 font-normal line-clamp-2 sm:line-clamp-3 md:line-clamp-none min-h-[2.5em]"
+                   x-text="slides[current].description">
+                </p>
+
+                {{-- White CTA Button --}}
+                <div class="flex flex-wrap items-center gap-4">
+                    <a :href="slides[current].cta_url"
+                       class="inline-flex items-center gap-2.5 rounded bg-white px-4 py-2.5 sm:px-6 sm:py-3.5 text-xs sm:text-sm font-bold text-jts uppercase tracking-wider shadow-lg hover:bg-gray-100 hover:shadow-xl hover:translate-x-0.5 transition-all duration-200 group">
+                        <span x-text="slides[current].cta_text"></span>
+                        <x-site-icon name="chevron-right" class="size-3.5 sm:size-4 text-jts transition-transform group-hover:translate-x-1"/>
+                    </a>
+                </div>
+
+                {{-- Mobile Navigation Controls (Inside Green Panel, matching reference) --}}
+                <div class="mt-3.5 flex items-center gap-4 md:hidden">
+                    <button @click="prev(); paused = true"
+                            aria-label="{{ __('site.previous') }}"
+                            class="text-white hover:text-accent active:scale-90 transition-transform p-1">
+                        <x-site-icon name="arrow-left" class="size-4.5"/>
+                    </button>
+
+                    <div class="flex items-center gap-1.5">
+                        <template x-for="(slide, index) in slides" :key="index">
+                            <button @click="goTo(index); paused = true" :aria-label="'Slide ' + (index + 1)"
+                                    class="h-2 rounded-full transition-all duration-300"
+                                    :class="current === index ? 'w-4 bg-accent' : 'w-2 bg-white/50'">
+                            </button>
+                        </template>
+                    </div>
+
+                    <button @click="next(); paused = true"
+                            aria-label="{{ __('site.next') }}"
+                            class="text-white hover:text-accent active:scale-90 transition-transform p-1">
+                        <x-site-icon name="arrow-right" class="size-4.5"/>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        {{-- Desktop Bottom-Right Carousel Controls (Pill) --}}
+        <div class="absolute bottom-6 right-5 sm:bottom-8 sm:right-8 lg:right-12 z-30 hidden md:flex items-center gap-4 sm:gap-6 bg-black/40 backdrop-blur-md px-4 py-2.5 rounded-full border border-white/20 shadow-xl">
+            {{-- Slide Dots --}}
+            <div class="flex items-center gap-2">
+                <template x-for="(slide, index) in slides" :key="index">
+                    <button @click="goTo(index); paused = true" :aria-label="'Slide ' + (index + 1)"
+                            class="h-2 rounded-full transition-all duration-300"
+                            :class="current === index ? 'w-7 bg-accent' : 'w-2 bg-white/50 hover:bg-white/80'">
+                    </button>
+                </template>
+            </div>
+
+            <div class="h-4 w-px bg-white/30"></div>
+
+            {{-- Arrows --}}
+            <div class="flex items-center gap-1.5">
+                <button @click="prev(); paused = true"
+                        aria-label="{{ __('site.previous') }}"
+                        title="{{ __('site.previous') }}"
+                        class="flex size-9 items-center justify-center rounded-full text-white hover:bg-white/20 active:scale-95 transition-all">
+                    <x-site-icon name="chevron-left" class="size-5"/>
+                </button>
+                <button @click="next(); paused = true"
+                        aria-label="{{ __('site.next') }}"
+                        title="{{ __('site.next') }}"
+                        class="flex size-9 items-center justify-center rounded-full text-white hover:bg-white/20 active:scale-95 transition-all">
+                    <x-site-icon name="chevron-right" class="size-5"/>
+                </button>
+            </div>
         </div>
     </section>
+
+    {{-- School Level Filter Bar (Below Hero on Homepage) --}}
+    <x-school-level-filter/>
     <div class="border-b border-line">
         <div class="shell grid grid-cols-2 sm:grid-cols-4">
             @foreach(['academics' => ['book-open','/academics'], 'admissions' => ['graduation-cap','/admissions'], 'calendar' => ['calendar-days','/resources/calendar'], 'resources' => ['file-text','/resources']] as $key => [$icon,$path])
@@ -19,6 +215,68 @@
             @endforeach
         </div>
     </div>
+
+    {{-- Educational Programs Bento Grid Section --}}
+    <section class="shell py-16 sm:py-24 bg-white">
+        {{-- Section Heading --}}
+        <div class="mx-auto mb-10 sm:mb-14 max-w-3xl text-center">
+            <p class="eyebrow justify-center">{{ __('site.academics') }}</p>
+            <h2 class="section-title mx-auto">{{ __('site.curriculum_headline') }}</h2>
+            <p class="mt-4 text-base leading-7 text-muted mx-auto max-w-2xl">
+                {{ __('site.curriculum_desc') }}
+            </p>
+        </div>
+
+        {{-- Asymmetrical Bento Grid --}}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
+            @foreach($curriculumPrograms as $program)
+                <div class="{{ $program['col'] }} group relative h-[360px] sm:h-[400px] lg:h-[430px] rounded-lg sm:rounded-xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-shadow duration-300 select-none bg-gray-100"
+                     x-data="{ active: false }"
+                     @click="active = !active"
+                     @keydown.escape.window="active = false">
+
+                    {{-- Student Activity Background Photo --}}
+                    <img src="{{ $program['image'] }}"
+                         alt="{{ $program['title'] }}"
+                         width="800" height="600"
+                         class="size-full object-cover object-center transform transition-transform duration-400 ease-out group-hover:scale-105"
+                         loading="lazy">
+
+                    {{-- Solid JTS Green Overlay Panel --}}
+                    <div class="absolute bottom-0 left-0 bg-jts text-white p-5 sm:p-7 shadow-2xl transition-all duration-300 ease-out z-10"
+                         :class="active ? 'w-full max-w-full rounded-tr-none' : 'w-[92%] sm:w-auto sm:max-w-[80%] rounded-tr-lg sm:rounded-tr-xl group-hover:w-full group-hover:max-w-full group-hover:rounded-tr-none'">
+
+                        {{-- Label / Grade Level --}}
+                        <p class="text-xs sm:text-sm font-semibold uppercase tracking-wider text-accent mb-1">
+                            {{ $program['label'] }}
+                        </p>
+
+                        {{-- Program Title --}}
+                        <h3 class="text-xl sm:text-2xl font-bold text-white leading-tight">
+                            {{ $program['title'] }}
+                        </h3>
+
+                        {{-- Description & CTA (Reveals on Hover or Tap) --}}
+                        <div class="overflow-hidden transition-all duration-300 ease-out"
+                             :class="active ? 'max-h-60 opacity-100 mt-3 sm:mt-4' : 'max-h-0 opacity-0 group-hover:max-h-60 group-hover:opacity-100 group-hover:mt-3 group-hover:sm:mt-4'">
+                            <p class="text-xs sm:text-sm md:text-base leading-relaxed text-white/95 font-normal">
+                                {{ $program['description'] }}
+                            </p>
+
+                            <div class="mt-4 pt-1">
+                                <a href="{{ $program['url'] }}"
+                                   @click.stop
+                                   class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-white hover:text-accent transition-colors group/cta">
+                                    <span>{{ __('site.curriculum_learn_more') }}</span>
+                                    <x-site-icon name="arrow-right" class="size-4 text-white group-hover/cta:text-accent transition-transform group-hover/cta:translate-x-1" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </section>
     <section class="shell py-14 sm:py-18">
         <div class="mb-8 flex flex-wrap items-end justify-between gap-5">
             <div><p class="eyebrow">{{ __('site.news') }}</p><h2 class="section-title">{{ __('site.latest') }}</h2></div>
