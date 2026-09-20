@@ -15,6 +15,8 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -37,22 +39,52 @@ class AnnouncementPopupResource extends CmsResource
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(['default' => 1, 'lg' => 3])
             ->components([
-                TextInput::make('title')
-                    ->required()
-                    ->maxLength(191),
-                Toggle::make('is_active')->default(false)->helperText('Enable when ready to display to visitors.'),
-                Textarea::make('body')->label('Message')->rows(4)->maxLength(5000)->columnSpanFull(),
-                CmsFields::image()->helperText('Optional poster for congratulations, events, or announcements.'),
-                CmsFields::safeUrl('link_url')->label('Read more link'),
-                CmsFields::schoolLevels(),
-                DateTimePicker::make('starts_at')->seconds(false)->label('Start time ('.config('app.timezone').')'),
-                DateTimePicker::make('ends_at')->seconds(false)
-                    ->after(fn (Get $get): ?string => filled($get('starts_at')) ? 'starts_at' : null)
-                    ->label('End time ('.config('app.timezone').')'),
-                TextInput::make('sort_order')->label('Display priority')->integer()->minValue(0)->default(0)->required()
-                    ->helperText('Lower numbers appear first. If priorities match, the newest popup is used. Each popup appears once per browser tab session.'),
-            ])->columns(2);
+                Group::make()->schema([
+                    Section::make('Konten & Pesan Pengumuman')
+                        ->description('Judul, isi pesan popup, dan poster visual')
+                        ->schema([
+                            TextInput::make('title')
+                                ->label('Judul Pengumuman')
+                                ->required()
+                                ->maxLength(191),
+                            Textarea::make('body')
+                                ->label('Pesan Lengkap')
+                                ->rows(4)
+                                ->maxLength(5000)
+                                ->columnSpanFull(),
+                            CmsFields::image('image', 4096, 'Poster Visual Pengumuman (Opsional)')
+                                ->helperText('Gambar poster ucapan selamat, event, atau informasi mendesak.'),
+                            CmsFields::safeUrl('link_url', 'Tautan Baca Selengkapnya'),
+                        ]),
+                ])->columnSpan(['lg' => 2]),
+
+                Group::make()->schema([
+                    Section::make('Jadwal & Status Penayangan')
+                        ->description('Atur waktu aktif popup di website')
+                        ->schema([
+                            Toggle::make('is_active')
+                                ->label('Aktifkan Popup')
+                                ->default(false)
+                                ->helperText('Aktifkan saat popup sudah siap tampil kepada pengunjung.'),
+                            DateTimePicker::make('starts_at')
+                                ->seconds(false)
+                                ->label('Waktu Mulai ('.config('app.timezone').')'),
+                            DateTimePicker::make('ends_at')
+                                ->seconds(false)
+                                ->after(fn (Get $get): ?string => filled($get('starts_at')) ? 'starts_at' : null)
+                                ->label('Waktu Selesai ('.config('app.timezone').')'),
+                            TextInput::make('sort_order')
+                                ->label('Prioritas Tampilan')
+                                ->integer()
+                                ->minValue(0)
+                                ->default(0)
+                                ->required()
+                                ->helperText('Angka lebih kecil tampil lebih dulu.'),
+                        ]),
+                ])->columnSpan(['lg' => 1]),
+            ]);
     }
 
     public static function table(Table $table): Table
@@ -61,12 +93,21 @@ class AnnouncementPopupResource extends CmsResource
             ->recordTitleAttribute('title')
             ->columns([
                 TextColumn::make('title')
-                    ->searchable(),
-                TextColumn::make('school_level_label')->label('School levels'),
-                IconColumn::make('is_active')->boolean(),
-                TextColumn::make('starts_at')->dateTime(),
-                TextColumn::make('ends_at')->dateTime(),
-                TextColumn::make('sort_order')->label('Priority')->sortable(),
+                    ->label('Judul Pengumuman')
+                    ->searchable()
+                    ->weight('medium'),
+                IconColumn::make('is_active')
+                    ->label('Status Aktif')
+                    ->boolean(),
+                TextColumn::make('starts_at')
+                    ->label('Mulai')
+                    ->dateTime('d M Y, H:i'),
+                TextColumn::make('ends_at')
+                    ->label('Selesai')
+                    ->dateTime('d M Y, H:i'),
+                TextColumn::make('sort_order')
+                    ->label('Prioritas')
+                    ->sortable(),
             ])
             ->defaultSort('sort_order')
             ->recordActions([

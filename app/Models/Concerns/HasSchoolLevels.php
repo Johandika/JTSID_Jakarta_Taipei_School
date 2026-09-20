@@ -25,9 +25,8 @@ trait HasSchoolLevels
         });
     }
 
-    public function scopeForSchoolLevel(Builder $query, ?string $level = null): Builder
+    public function scopeForSchoolLevel(Builder $query, string $level): Builder
     {
-        $level ??= SchoolLevel::selected();
         if (! array_key_exists($level, SchoolLevel::OPTIONS)) {
             return $query;
         }

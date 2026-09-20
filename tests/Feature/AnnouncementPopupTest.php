@@ -26,14 +26,12 @@ class AnnouncementPopupTest extends TestCase
         Filament::setCurrentPanel(Filament::getPanel('admin'));
     }
 
-    public function test_only_general_popups_appear_before_a_visitor_selects_a_level(): void
+    public function test_school_level_query_does_not_control_popup_visibility(): void
     {
-        AnnouncementPopup::factory()->create(['title' => 'Whole school celebration', 'school_levels' => []]);
-        AnnouncementPopup::factory()->create(['title' => 'SD competition winners', 'school_levels' => ['sd', 'smp']]);
+        AnnouncementPopup::factory()->create(['title' => 'Whole school celebration']);
 
-        $this->get('/')->assertSee('Whole school celebration')->assertDontSee('SD competition winners');
-        $this->get('/?school_level=sd')->assertSee('SD competition winners')->assertDontSee('Whole school celebration');
-        $this->get('/?school_level=sma')->assertSee('Whole school celebration')->assertDontSee('SD competition winners');
+        $this->get('/?school_level=sd')->assertSee('Whole school celebration')->assertSessionMissing('school_level');
+        $this->get('/?school_level=sma')->assertSee('Whole school celebration')->assertSessionMissing('school_level');
     }
 
     public function test_popup_schedule_excludes_future_expired_and_disabled_content_and_respects_priority(): void
@@ -58,13 +56,12 @@ class AnnouncementPopupTest extends TestCase
 
         Livewire::test(CreateAnnouncementPopup::class)->fillForm([
             'title' => 'Congratulations JTS', 'body' => 'Our students did well.',
-            'image' => UploadedFile::fake()->image('congratulations.png'), 'school_levels' => ['sd', 'smp'],
+            'image' => UploadedFile::fake()->image('congratulations.png'),
             'link_url' => '/news', 'is_active' => true,
             'starts_at' => '2026-09-10 08:00:00', 'ends_at' => '2026-09-20 18:00:00', 'sort_order' => 2,
         ])->call('create')->assertHasNoFormErrors();
         $popup = AnnouncementPopup::where('title', 'Congratulations JTS')->firstOrFail();
         Storage::disk('public')->assertExists($popup->image);
-        $this->assertSame(['sd', 'smp'], $popup->school_levels);
         $this->assertSame('2026-09-20 18:00:00', $popup->ends_at->format('Y-m-d H:i:s'));
         $this->assertDatabaseHas('audit_logs', ['entity_type' => 'AnnouncementPopup', 'entity_id' => $popup->id, 'action' => 'created']);
 

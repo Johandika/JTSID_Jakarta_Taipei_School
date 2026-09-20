@@ -2,26 +2,63 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Post;
-use App\Models\SubjectResource;
+use App\Filament\Resources\Posts\PostResource;
+use App\Filament\Resources\SlideshowItems\SlideshowItemResource;
+use App\Filament\Resources\StaffProfiles\StaffProfileResource;
+use App\Filament\Resources\SubjectResources\SubjectResourceResource;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class ContentOverview extends StatsOverviewWidget
 {
+    protected static ?int $sort = 2;
+
+    protected int|string|array $columnSpan = 'full';
+
     protected function getStats(): array
     {
-        $posts = Post::query();
-        $resources = SubjectResource::query();
-        if (auth()->user()?->role?->code === 'department_admin') {
-            $posts->where('department_id', auth()->user()->department_id);
-            $resources->where('department_id', auth()->user()->department_id);
+        $posts = PostResource::getEloquentQuery();
+        $resources = SubjectResourceResource::getEloquentQuery();
+
+        $publishedPosts = (clone $posts)->published()->count();
+        $publishedResources = (clone $resources)->published()->count();
+        $draftPosts = (clone $posts)->where('status', 'draft')->count();
+
+        $stats = [
+            Stat::make('Berita Publikasi', number_format($publishedPosts))
+                ->description('Artikel tayang di website')
+                ->descriptionIcon('heroicon-m-arrow-trending-up')
+                ->color('success'),
+
+            Stat::make('Materi Pelajaran', number_format($publishedResources))
+                ->description('Silabus & materi aktif')
+                ->descriptionIcon('heroicon-m-document-text')
+                ->color('gray'),
+
+        ];
+
+        if (StaffProfileResource::canViewAny()) {
+            $stats[] = Stat::make('Staf & Guru', number_format(StaffProfileResource::getEloquentQuery()->where('is_active', true)->count()))
+                ->description('Profil pengajar terdaftar')
+                ->descriptionIcon('heroicon-m-user-group')
+                ->color('gray');
         }
 
-        return [
-            Stat::make('Published news', (clone $posts)->published()->count())->icon('heroicon-o-newspaper')->color('success'),
-            Stat::make('Published resources', $resources->published()->count())->icon('heroicon-o-folder-open'),
-            Stat::make('News awaiting publication', $posts->where('status', 'draft')->count())->icon('heroicon-o-pencil-square')->color('warning'),
-        ];
+        if (SlideshowItemResource::canViewAny()) {
+            $stats[] = Stat::make('Fasilitas & Sorotan', number_format(SlideshowItemResource::getEloquentQuery()->where('is_active', true)->count()))
+                ->description('Showcase fasilitas aktif')
+                ->descriptionIcon('heroicon-m-photo')
+                ->color('gray');
+        }
+
+        $stats[] = Stat::make('Draft Perlu Ditinjau', number_format($draftPosts))
+            ->description($draftPosts > 0 ? 'Menunggu persetujuan / rilis' : 'Seluruh berita telah tayang')
+            ->descriptionIcon($draftPosts > 0 ? 'heroicon-m-clock' : 'heroicon-m-check-circle')
+            ->color($draftPosts > 0 ? 'primary' : 'success')
+            ->extraAttributes([
+                'class' => 'stat-card-featured',
+            ]);
+
+        return $stats;
     }
 }

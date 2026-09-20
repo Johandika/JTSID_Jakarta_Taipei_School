@@ -20,7 +20,6 @@ class AnnouncementPopupFactory extends Factory
         return [
             'title' => fake()->sentence(),
             'body' => 'Congratulations to our school community.',
-            'school_levels' => [],
             'is_active' => true,
             'sort_order' => 0,
         ];

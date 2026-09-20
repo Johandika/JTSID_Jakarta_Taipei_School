@@ -9,6 +9,8 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -30,18 +32,88 @@ class SubjectResourceResource extends CmsResource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([TextInput::make('topic')->required()->maxLength(191), CmsFields::department(),
-            Select::make('type_id')->relationship('type', 'name')->required(),
-            CmsFields::schoolLevels(),
-            CmsFields::uploadDate(), CmsFields::document(true), CmsFields::publishing(), CmsFields::translations()])->columns(2);
+        return $schema
+            ->columns(['default' => 1, 'lg' => 3])
+            ->components([
+                Group::make()->schema([
+                    Section::make('Materi & Dokumen Utama')
+                        ->description('Judul materi pembelajaran dan file berkas unduhan')
+                        ->schema([
+                            TextInput::make('topic')
+                                ->label('Topik / Nama Materi')
+                                ->required()
+                                ->maxLength(191),
+                            CmsFields::document(true, 'File Dokumen Materi (PDF, DOCX, RAR)'),
+                        ]),
+
+                    Section::make('Deskripsi & Terjemahan')
+                        ->description('Instruksi dan deskripsi materi dalam berbagai bahasa')
+                        ->schema([
+                            CmsFields::translations('Judul Materi'),
+                        ]),
+                ])->columnSpan(['lg' => 2]),
+
+                Group::make()->schema([
+                    CmsFields::publishing(),
+
+                    Section::make('Klasifikasi Materi')
+                        ->description('Tipe berkas, departemen, dan jenjang sasaran')
+                        ->schema([
+                            Select::make('type_id')
+                                ->label('Tipe / Jenis Materi')
+                                ->relationship('type', 'name')
+                                ->required()
+                                ->searchable()
+                                ->preload(),
+                            CmsFields::department(),
+                            CmsFields::schoolLevels(),
+                            CmsFields::uploadDate(),
+                        ]),
+                ])->columnSpan(['lg' => 1]),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([TextColumn::make('topic')->searchable(), TextColumn::make('type.name'), TextColumn::make('school_level_label')->label('School levels'), TextColumn::make('department.name'), TextColumn::make('status')->badge(), TextColumn::make('translation_status')->label('Translations')])
-            ->filters([SelectFilter::make('status')->options(['draft' => 'Draft', 'published' => 'Published', 'archived' => 'Archived'])])
+        return $table
+            ->columns([
+                TextColumn::make('topic')
+                    ->label('Topik Materi')
+                    ->searchable()
+                    ->weight('medium')
+                    ->limit(40),
+                TextColumn::make('type.name')
+                    ->label('Tipe Materi')
+                    ->badge()
+                    ->color('gray'),
+                TextColumn::make('school_level_label')
+                    ->label('Jenjang'),
+                TextColumn::make('department.name')
+                    ->label('Departemen'),
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge(),
+                TextColumn::make('upload_date')
+                    ->label('Tanggal Unggah')
+                    ->date('d M Y')
+                    ->sortable(),
+                TextColumn::make('translation_status')
+                    ->label('Terjemahan')
+                    ->badge(),
+            ])
+            ->filters([
+                SelectFilter::make('status')
+                    ->options([
+                        'draft' => 'Draft',
+                        'published' => 'Published',
+                        'archived' => 'Archived',
+                    ]),
+            ])
             ->defaultSort('upload_date', 'desc')
-            ->recordActions([EditAction::make(), DeleteAction::make()])
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
             ->paginated([10, 25, 50]);
     }
 

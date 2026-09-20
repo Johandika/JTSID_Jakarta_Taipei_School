@@ -10,7 +10,10 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -30,18 +33,91 @@ class UniversityAcceptanceResource extends CmsResource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([TextInput::make('student_name')->required()->maxLength(150), TextInput::make('university_name')->required()->maxLength(191),
-            Select::make('academic_year_id')->relationship('academicYear', 'name')->required(), CmsFields::department(),
-            TextInput::make('program_name')->maxLength(191), TextInput::make('admission_path')->maxLength(150), TextInput::make('country')->maxLength(100),
-            TextInput::make('sort_order')->integer()->minValue(0)->default(0)->required(), Toggle::make('is_active')->default(true)])->columns(2);
+        return $schema
+            ->columns(['default' => 1, 'lg' => 3])
+            ->components([
+                Group::make()->schema([
+                    Section::make('Data Siswa & Universitas')
+                        ->description('Informasi siswa, universitas tujuan, dan program studi yang diterima')
+                        ->schema([
+                            TextInput::make('student_name')
+                                ->label('Nama Siswa')
+                                ->required()
+                                ->maxLength(150),
+                            TextInput::make('university_name')
+                                ->label('Nama Universitas')
+                                ->required()
+                                ->maxLength(191),
+                            TextInput::make('program_name')
+                                ->label('Program Studi / Jurusan')
+                                ->maxLength(191),
+                            TextInput::make('admission_path')
+                                ->label('Jalur Penerimaan')
+                                ->placeholder('Contoh: SNMPTN, International Admission, Beasiswa')
+                                ->maxLength(150),
+                            TextInput::make('country')
+                                ->label('Negara Universitas')
+                                ->maxLength(100),
+                        ])
+                        ->columns(2),
+                ])->columnSpan(['lg' => 2]),
+
+                Group::make()->schema([
+                    Section::make('Tahun Ajaran & Departemen')
+                        ->schema([
+                            Select::make('academic_year_id')
+                                ->label('Tahun Ajaran')
+                                ->relationship('academicYear', 'name')
+                                ->required()
+                                ->searchable()
+                                ->preload(),
+                            CmsFields::department(),
+                        ]),
+
+                    Section::make('Status & Urutan')
+                        ->schema([
+                            TextInput::make('sort_order')
+                                ->label('Urutan Tampilan')
+                                ->integer()
+                                ->minValue(0)
+                                ->default(0)
+                                ->required(),
+                            Toggle::make('is_active')
+                                ->label('Aktif / Tampilkan')
+                                ->default(true),
+                        ]),
+                ])->columnSpan(['lg' => 1]),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([TextColumn::make('student_name')->searchable(), TextColumn::make('university_name')->searchable(), TextColumn::make('academicYear.name'), TextColumn::make('program_name'), TextColumn::make('country')])
-
+        return $table
+            ->columns([
+                TextColumn::make('student_name')
+                    ->label('Nama Siswa')
+                    ->searchable()
+                    ->weight('medium'),
+                TextColumn::make('university_name')
+                    ->label('Universitas')
+                    ->searchable(),
+                TextColumn::make('academicYear.name')
+                    ->label('Tahun Ajaran'),
+                TextColumn::make('program_name')
+                    ->label('Program Studi'),
+                TextColumn::make('country')
+                    ->label('Negara')
+                    ->badge()
+                    ->color('gray'),
+                IconColumn::make('is_active')
+                    ->label('Aktif')
+                    ->boolean(),
+            ])
             ->defaultSort('id', 'desc')
-            ->recordActions([EditAction::make(), DeleteAction::make()])
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
             ->paginated([10, 25, 50]);
     }
 

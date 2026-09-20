@@ -10,6 +10,8 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -31,17 +33,83 @@ class StaffProfileResource extends CmsResource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([TextInput::make('name')->required()->maxLength(150), TextInput::make('title')->required()->maxLength(150),
-            CmsFields::department(), CmsFields::schoolLevels(), TextInput::make('extension')->maxLength(50), Textarea::make('responsibilities'),
-            CmsFields::image('photo'), TextInput::make('sort_order')->integer()->minValue(0)->default(0)->required(), Toggle::make('is_active')->default(true)])->columns(2);
+        return $schema
+            ->columns(['default' => 1, 'lg' => 3])
+            ->components([
+                Group::make()->schema([
+                    Section::make('Informasi Pribadi & Posisi')
+                        ->description('Identitas, jabatan, dan departemen staf pengajar')
+                        ->schema([
+                            TextInput::make('name')
+                                ->label('Nama Lengkap')
+                                ->required()
+                                ->maxLength(150),
+                            TextInput::make('title')
+                                ->label('Jabatan / Posisi')
+                                ->required()
+                                ->maxLength(150),
+                            CmsFields::department(),
+                            TextInput::make('extension')
+                                ->label('Nomor Ekstensi Telp')
+                                ->maxLength(50),
+                        ])
+                        ->columns(2),
+
+                    Section::make('Tanggung Jawab & Peran')
+                        ->description('Rincian tugas dan tanggung jawab di sekolah')
+                        ->schema([
+                            Textarea::make('responsibilities')
+                                ->label('Rincian Tugas')
+                                ->rows(4)
+                                ->columnSpanFull(),
+                        ]),
+                ])->columnSpan(['lg' => 2]),
+
+                Group::make()->schema([
+                    Section::make('Foto Profil')
+                        ->schema([
+                            CmsFields::image('photo', 2048, 'Foto Profil'),
+                        ]),
+
+                    Section::make('Status & Urutan')
+                        ->schema([
+                            TextInput::make('sort_order')
+                                ->label('Urutan Tampilan')
+                                ->integer()
+                                ->minValue(0)
+                                ->default(0)
+                                ->required(),
+                            Toggle::make('is_active')
+                                ->label('Aktif / Tampilkan')
+                                ->default(true),
+                        ]),
+                ])->columnSpan(['lg' => 1]),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([TextColumn::make('name')->searchable(), TextColumn::make('title'), TextColumn::make('department.name'), TextColumn::make('extension'), IconColumn::make('is_active')->boolean()])
-
-            ->defaultSort('id', 'desc')
-            ->recordActions([EditAction::make(), DeleteAction::make()])
+        return $table
+            ->columns([
+                TextColumn::make('name')
+                    ->label('Nama Staf')
+                    ->searchable()
+                    ->weight('medium'),
+                TextColumn::make('title')
+                    ->label('Jabatan'),
+                TextColumn::make('department.name')
+                    ->label('Departemen'),
+                TextColumn::make('extension')
+                    ->label('Ekstensi'),
+                IconColumn::make('is_active')
+                    ->label('Aktif')
+                    ->boolean(),
+            ])
+            ->defaultSort('sort_order', 'asc')
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
             ->paginated([10, 25, 50]);
     }
 

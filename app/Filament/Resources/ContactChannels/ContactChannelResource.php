@@ -10,6 +10,8 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Group;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -31,18 +33,94 @@ class ContactChannelResource extends CmsResource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([Select::make('channel')->options(array_combine(['admission_tel', 'phone', 'instagram', 'whatsapp', 'tiktok', 'address', 'email'], ['Admission telephone', 'Telephone', 'Instagram', 'WhatsApp', 'TikTok', 'Address', 'Email']))->required()->unique(ignoreRecord: true),
-            TextInput::make('label')->required()->maxLength(150), TextInput::make('value')->required()->maxLength(255),
-            CmsFields::image('qr_image', 1024), Toggle::make('is_visible_header'), Toggle::make('is_visible_footer')->default(true),
-            TextInput::make('sort_order')->integer()->minValue(0)->default(0)->required()])->columns(2);
+        return $schema
+            ->columns(['default' => 1, 'lg' => 3])
+            ->components([
+                Group::make()->schema([
+                    Section::make('Informasi Saluran Kontak')
+                        ->description('Pilih tipe saluran dan masukkan informasi kontak sekolah')
+                        ->schema([
+                            Select::make('channel')
+                                ->label('Tipe Saluran')
+                                ->options([
+                                    'admission_tel' => 'Admission Telephone',
+                                    'phone' => 'Telephone Sekolah',
+                                    'instagram' => 'Instagram',
+                                    'whatsapp' => 'WhatsApp',
+                                    'tiktok' => 'TikTok',
+                                    'address' => 'Alamat Sekolah',
+                                    'email' => 'Email',
+                                ])
+                                ->required()
+                                ->unique(ignoreRecord: true),
+                            TextInput::make('label')
+                                ->label('Label Teks')
+                                ->placeholder('Contoh: Telepon Admisi / @jakartataipeischool')
+                                ->required()
+                                ->maxLength(150),
+                            TextInput::make('value')
+                                ->label('Nilai / Tautan')
+                                ->placeholder('Nomor telp, link sosmed, atau alamat')
+                                ->required()
+                                ->maxLength(255)
+                                ->columnSpanFull(),
+                        ])
+                        ->columns(2),
+
+                    Section::make('Gambar QR Code')
+                        ->description('QR Code untuk pemindaian cepat (WhatsApp, Formulir Pendaftaran, dll.)')
+                        ->schema([
+                            CmsFields::image('qr_image', 1024, 'Gambar QR Code (Opsional)'),
+                        ]),
+                ])->columnSpan(['lg' => 2]),
+
+                Group::make()->schema([
+                    Section::make('Penempatan & Visibilitas')
+                        ->description('Atur lokasi tampilan kontak pada website publik')
+                        ->schema([
+                            Toggle::make('is_visible_header')
+                                ->label('Tampilkan di Header Navbar')
+                                ->default(false),
+                            Toggle::make('is_visible_footer')
+                                ->label('Tampilkan di Footer')
+                                ->default(true),
+                            TextInput::make('sort_order')
+                                ->label('Urutan Tampilan')
+                                ->integer()
+                                ->minValue(0)
+                                ->default(0)
+                                ->required(),
+                        ]),
+                ])->columnSpan(['lg' => 1]),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([TextColumn::make('channel')->badge(), TextColumn::make('label'), TextColumn::make('value')->limit(55)->searchable(), IconColumn::make('is_visible_footer')->boolean()])
-
+        return $table
+            ->columns([
+                TextColumn::make('channel')
+                    ->label('Saluran')
+                    ->badge(),
+                TextColumn::make('label')
+                    ->label('Label')
+                    ->weight('medium'),
+                TextColumn::make('value')
+                    ->label('Nilai Kontak')
+                    ->limit(55)
+                    ->searchable(),
+                IconColumn::make('is_visible_header')
+                    ->label('Header')
+                    ->boolean(),
+                IconColumn::make('is_visible_footer')
+                    ->label('Footer')
+                    ->boolean(),
+            ])
             ->defaultSort('id', 'desc')
-            ->recordActions([EditAction::make(), DeleteAction::make()])
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
             ->paginated([10, 25, 50]);
     }
 

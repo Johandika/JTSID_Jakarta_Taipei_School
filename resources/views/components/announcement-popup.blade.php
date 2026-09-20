@@ -1,5 +1,5 @@
 @props(['popup'])
-<dialog data-announcement-popup="{{ $popup->id }}" aria-labelledby="announcement-title" @if($popup->body) aria-describedby="announcement-message" @endif
+<dialog data-announcement-popup="{{ $popup->id }}" data-announcement-version="{{ $popup->updated_at?->timestamp }}" aria-labelledby="announcement-title" @if($popup->body) aria-describedby="announcement-message" @endif
         class="m-auto max-h-[90svh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-xl bg-white p-0 text-ink shadow-2xl backdrop:bg-black/65">
     <div class="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-line bg-white px-5 py-3">
         <p class="text-xs font-bold uppercase tracking-wide text-jts">{{ __('site.announcement') }}</p>

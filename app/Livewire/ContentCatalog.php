@@ -3,11 +3,11 @@
 namespace App\Livewire;
 
 use App\Models\Department;
-use App\Models\GradeLevel;
 use App\Models\Post;
 use App\Models\PostCategory;
 use App\Models\SubjectResource;
 use App\Support\SchoolLevel;
+use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -26,7 +26,7 @@ class ContentCatalog extends Component
     #[Locked]
     public string $locale = 'en';
 
-    #[Locked]
+    #[Url(as: 'school_level', except: 'all')]
     public string $schoolLevel = 'all';
 
     #[Url]
@@ -39,9 +39,6 @@ class ContentCatalog extends Component
     public string $category = '';
 
     #[Url]
-    public string $grade = '';
-
-    #[Url]
     public string $sort = 'newest';
 
     public function mount(string $kind, string $type = ''): void
@@ -49,7 +46,7 @@ class ContentCatalog extends Component
         $this->kind = $kind;
         $this->type = $type;
         $this->locale = app()->getLocale();
-        $this->schoolLevel = SchoolLevel::selected();
+        $this->schoolLevel = $this->normalizedSchoolLevel();
     }
 
     public function hydrate(): void
@@ -59,16 +56,20 @@ class ContentCatalog extends Component
 
     public function updated($name): void
     {
+        if ($name === 'schoolLevel') {
+            $this->schoolLevel = $this->normalizedSchoolLevel();
+        }
+
         $this->resetPage();
     }
 
     public function clearFilters(): void
     {
-        $this->reset('search', 'department', 'category', 'grade', 'sort');
+        $this->reset('search', 'department', 'category', 'schoolLevel', 'sort');
         $this->resetPage();
     }
 
-    public function render()
+    public function render(): View
     {
         app()->setLocale($this->locale);
         $query = ($this->kind === 'news' ? Post::query() : SubjectResource::query())->published()->forSchoolLevel($this->schoolLevel)->with(['translations', 'department']);
@@ -90,15 +91,18 @@ class ContentCatalog extends Component
             if ($this->type) {
                 $query->whereHas('type', fn ($q) => $q->where('code', $this->type));
             }
-            if (ctype_digit($this->grade)) {
-                $query->forSchoolLevel(GradeLevel::find($this->grade)?->code);
-            }
         }
 
         return view('livewire.content-catalog', [
             'items' => $query->orderBy('upload_date', $this->sort === 'oldest' ? 'asc' : 'desc')->orderByDesc('id')->paginate(10),
             'departments' => Department::where('is_active', true)->orderBy('sort_order')->get(),
-            'categories' => PostCategory::all(), 'grades' => GradeLevel::all(),
+            'categories' => PostCategory::all(),
+            'schoolLevels' => SchoolLevel::OPTIONS,
         ]);
+    }
+
+    private function normalizedSchoolLevel(): string
+    {
+        return array_key_exists($this->schoolLevel, SchoolLevel::OPTIONS) ? $this->schoolLevel : 'all';
     }
 }

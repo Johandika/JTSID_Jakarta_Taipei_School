@@ -19,13 +19,11 @@ const visit = async (tab, path) => {
 try {
     await fs.mkdir('test-results', { recursive: true });
     await visit(page, '/id/resources/calendar');
-    await page.getByRole('navigation', { name: 'Jenjang', exact: true }).getByRole('link', { name: 'SD', exact: true }).click();
+    await page.getByLabel('Jenjang sekolah', { exact: true }).selectOption('sd');
     await expect(page.locator('tbody tr')).toHaveCount(1);
     await visit(page, '/news');
-    await expect(page.getByRole('navigation', { name: 'Grade level', exact: true }).getByRole('link', { name: 'SD', exact: true })).toHaveAttribute('aria-current', 'true');
+    await expect(page.getByLabel('School level', { exact: true })).toHaveValue('all');
     await visit(page, '/id/resources/calendar');
-    await expect(page.locator('tbody tr')).toHaveCount(1);
-    await page.getByRole('navigation', { name: 'Jenjang', exact: true }).getByRole('link', { name: 'Semua', exact: true }).click();
     await expect(page.locator('tbody tr')).toHaveCount(4);
 
     await visit(page, '/admin/login');
@@ -46,10 +44,12 @@ try {
     await page.screenshot({ path: 'test-results/popup-admin.png', fullPage: true });
 
     const visitor = await context.newPage();
+    await visitor.clock.install();
     await visit(visitor, '/id');
     const dialog = visitor.getByRole('dialog');
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole('heading', { name: title })).toBeVisible();
+    await expect.poll(() => visitor.evaluate(() => Object.entries(sessionStorage).some(([key, value]) => key.startsWith('jts-announcement-') && value === 'initial-shown'))).toBe(true);
     await expect.poll(() => dialog.locator('img').evaluate(img => img.naturalWidth)).toBeGreaterThan(0);
     await visitor.screenshot({ path: 'test-results/popup-desktop.png' });
     await visitor.setViewportSize({ width: 390, height: 844 });
@@ -57,19 +57,34 @@ try {
     expect(await visitor.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await dialog.getByRole('button', { name: 'Tutup', exact: true }).click();
     await expect(dialog).not.toBeVisible();
+    await visitor.clock.fastForward(30_000);
+    await visitor.mouse.move(20, 20);
+    await visitor.clock.fastForward(89_000);
+    await expect(dialog).not.toBeVisible();
+    await visitor.clock.fastForward(1_000);
+    await expect(dialog).toBeVisible();
+    await expect.poll(() => visitor.evaluate(() => Object.entries(sessionStorage).some(([key, value]) => key.startsWith('jts-announcement-') && value === 'complete'))).toBe(true);
+    await dialog.getByRole('button', { name: 'Tutup', exact: true }).click();
     await visit(visitor, '/id/news');
+    await visitor.clock.fastForward(90_000);
     await expect(visitor.getByRole('dialog')).not.toBeVisible();
     await visitor.reload({ waitUntil: 'networkidle' });
+    await visitor.clock.fastForward(90_000);
     await expect(visitor.getByRole('dialog')).not.toBeVisible();
 
     const freshTab = await context.newPage();
+    await freshTab.clock.install();
     await visit(freshTab, '/id');
+    await expect(freshTab.getByRole('dialog')).toBeVisible();
+    await freshTab.keyboard.press('Escape');
+    await expect(freshTab.getByRole('dialog')).not.toBeVisible();
+    await freshTab.clock.fastForward(90_000);
     await expect(freshTab.getByRole('dialog')).toBeVisible();
     await freshTab.keyboard.press('Escape');
     await expect(freshTab.getByRole('dialog')).not.toBeVisible();
     expect(await freshTab.evaluate(() => document.body.style.overflow)).toBe('');
     expect(errors).toEqual([]);
-    console.log('PASS: global level persistence, all-level reset, admin poster upload, desktop/mobile popup, close, Escape, and once per tab session.');
+    console.log('PASS: immediate popup, one 90-second idle reminder, activity reset, desktop/mobile popup, close, Escape, and two-show session limit.');
 } catch (error) {
     await page.screenshot({ path: 'test-results/popup-browser-failure.png', fullPage: true });
     console.log('Form state:', (await page.locator('body').innerText()).slice(-3500));

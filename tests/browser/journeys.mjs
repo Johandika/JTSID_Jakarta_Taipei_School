@@ -15,6 +15,10 @@ const visit = async path => {
 try {
     if (!process.argv.includes('--admin-only')) {
     await visit('/');
+    const announcement = page.locator('[data-announcement-popup]');
+    if (await announcement.isVisible()) {
+        await announcement.getByRole('button', { name: 'Close', exact: true }).click();
+    }
     await page.locator('footer').scrollIntoViewIfNeeded();
     await expect.poll(() => page.locator('img[alt="WhatsApp QR"]').evaluate(image => image.naturalWidth)).toBeGreaterThan(0);
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -45,18 +49,18 @@ try {
     await page.screenshot({ path: 'test-results/news-desktop.png', fullPage: true });
     await visit('/id/resources/calendar');
     await expect(page.locator('tbody tr')).toHaveCount(4);
-    await page.getByRole('navigation', { name: 'Jenjang', exact: true }).getByRole('link', { name: 'SD', exact: true }).click();
+    await page.getByLabel('Jenjang sekolah', { exact: true }).selectOption('sd');
     await expect(page.locator('tbody tr')).toHaveCount(1);
+    await expect(page).toHaveURL(/school_level=sd/);
     await expect(page.getByRole('columnheader', { name: 'Tanggal unggah' })).toBeVisible();
-    const downloadPromise = page.waitForEvent('download');
-    await page.locator('tbody a[title="Unduh"]').click();
-    const download = await downloadPromise;
-    expect(download.suggestedFilename()).toMatch(/\.pdf$/);
-    expect(await download.failure()).toBeNull();
+    const downloadHref = await page.locator('tbody a[title="Unduh"]').getAttribute('href');
+    const downloadResponse = await page.request.get(new URL(downloadHref, page.url()).href);
+    expect(downloadResponse.status()).toBe(200);
+    expect(downloadResponse.headers()['content-disposition']).toMatch(/attachment;.*\.pdf/i);
     await page.setViewportSize({ width: 390, height: 844 });
     await page.screenshot({ path: 'test-results/resources-mobile.png', fullPage: true });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    console.log('PASS: Livewire search, department and grade filters, locale persistence, PDF download');
+    console.log('PASS: Livewire search, department and school-level dropdown filters, locale persistence, PDF download');
     }
 
     await page.setViewportSize({ width: 1440, height: 1000 });
@@ -66,42 +70,35 @@ try {
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
     await page.waitForURL('**/admin', { timeout: 60000 });
     await page.waitForLoadState('networkidle');
+    await expect(page.locator('.fi-topbar')).toHaveCount(0);
+    await expect(page.locator('.fi-sidebar-header-logo-ctn img')).toBeVisible();
+    await expect(page.locator('.fi-sidebar-footer .fi-user-menu')).toBeVisible();
+    const profileTrigger = page.locator('.fi-sidebar-footer .fi-user-menu-trigger');
+    await profileTrigger.click();
+    const profileMenu = page.locator('.fi-dropdown-panel:visible');
+    await expect(profileMenu).toBeVisible();
+    const profileTriggerBox = await profileTrigger.boundingBox();
+    const profileMenuBox = await profileMenu.boundingBox();
+    expect(profileMenuBox.x).toBeGreaterThanOrEqual(profileTriggerBox.x + profileTriggerBox.width);
+    await page.keyboard.press('Escape');
     await page.screenshot({ path: 'test-results/admin-desktop.png', fullPage: true });
     await page.setViewportSize({ width: 390, height: 844 });
+    await page.getByRole('button', { name: 'Expand sidebar' }).click();
+    await expect(page.locator('.fi-sidebar-header-logo-ctn img')).toBeVisible();
+    await expect(page.locator('.fi-sidebar-footer .fi-user-menu')).toBeVisible();
     await page.screenshot({ path: 'test-results/admin-mobile.png', fullPage: true, animations: 'disabled' });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await expect(page.getByRole('link', { name: 'Pages', exact: true })).toHaveCount(0);
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await visit('/admin/pages/create');
-    const slug = `browser-check-${Date.now()}`;
-    await page.getByRole('textbox', { name: /^Slug/ }).fill(slug);
-    await page.getByRole('textbox', { name: /^Title/ }).fill('Browser verification page');
-    await page.getByLabel('Status').selectOption('published');
-    await page.getByRole('button', { name: 'Create', exact: true }).click();
-    await page.waitForURL('**/admin/pages', { timeout: 45000 });
-    await visit(`/${slug}`);
-    await expect(page.getByRole('heading', { name: 'Browser verification page' })).toBeVisible();
-    await visit('/admin/pages');
-    await page.getByPlaceholder('Search', { exact: true }).fill(slug);
-    await expect(page.locator('tbody tr')).toHaveCount(1);
-    const row = page.locator('tr').filter({ hasText: slug });
-    await expect(row).toHaveCount(1);
-    await row.getByRole('link', { name: 'Edit', exact: true }).click();
-    await page.waitForURL('**/edit', { timeout: 60000 });
-    await page.waitForLoadState('networkidle');
-    await page.getByRole('textbox', { name: /^Title/ }).fill('Updated browser verification');
-    await expect(page.getByRole('textbox', { name: /^Title/ })).toHaveValue('Updated browser verification');
-    await page.getByRole('button', { name: 'Save changes', exact: true }).click();
-    await page.waitForURL('**/admin/pages', { timeout: 60000 });
-    await visit(`/${slug}`);
-    await expect(page.getByRole('heading', { name: 'Updated browser verification' })).toBeVisible();
-    await visit('/admin/pages');
-    await page.getByPlaceholder('Search', { exact: true }).fill(slug);
-    await expect(page.locator('tbody tr')).toHaveCount(1);
-    const updated = page.locator('tr').filter({ hasText: slug });
-    await updated.getByRole('button', { name: 'Delete', exact: true }).click();
-    await page.getByRole('alertdialog').getByRole('button', { name: 'Delete', exact: true }).click({ timeout: 60000 });
-    await expect(page.locator('tr').filter({ hasText: slug })).toHaveCount(0);
-    console.log('PASS: admin login, create/publish, public read, edit, delete');
+    await visit('/about');
+    await expect(page.getByRole('heading', { name: 'About Jakarta Taipei School' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Our school community' })).toBeVisible();
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await visit('/id/admissions');
+    await expect(page.getByRole('heading', { name: 'Pendaftaran' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'program Mandarin' })).toHaveAttribute('href', '/id/mandarin-program');
+    console.log('PASS: Pages removed from admin and static localized pages render');
     expect(errors).toEqual([]);
     console.log('PASS: no JavaScript errors');
 } finally {

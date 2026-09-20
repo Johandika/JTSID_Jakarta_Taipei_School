@@ -1,4 +1,4 @@
-<x-layouts.site :transparent-nav="true" :show-level-filter="false">
+<x-layouts.site :transparent-nav="true">
     @php
         $site = \App\Support\Site::class;
         $heroSlides = [
@@ -205,7 +205,6 @@
     </section>
 
     {{-- School Level Filter Bar (Below Hero on Homepage) --}}
-    <x-school-level-filter/>
     <div class="border-b border-line">
         <div class="shell grid grid-cols-2 sm:grid-cols-4">
             @foreach(['academics' => ['book-open','/academics'], 'admissions' => ['graduation-cap','/admissions'], 'calendar' => ['calendar-days','/resources/calendar'], 'resources' => ['file-text','/resources']] as $key => [$icon,$path])
@@ -277,38 +276,164 @@
             @endforeach
         </div>
     </section>
-    <section class="shell py-14 sm:py-18">
-        <div class="mb-8 flex flex-wrap items-end justify-between gap-5">
-            <div><p class="eyebrow">{{ __('site.news') }}</p><h2 class="section-title">{{ __('site.latest') }}</h2></div>
-            <a class="text-link" href="{{ $site::path('/news') }}">{{ __('site.all_news') }}<x-site-icon name="arrow-right" class="size-4"/></a>
-        </div>
-        <div class="grid gap-9 md:grid-cols-3">@forelse($posts as $post)<x-news-item :post="$post"/>@empty<p class="text-muted">{{ __('site.no_results') }}</p>@endforelse</div>
-    </section>
-    <section class="border-y border-line bg-[#f4f7f5] py-14 sm:py-18">
-        <div class="shell grid items-start gap-10 lg:grid-cols-[1fr_1.6fr]">
-            <div><p class="eyebrow">{{ __('site.resources') }}</p><h2 class="section-title">{{ __('site.learning') }}</h2><p class="mb-6 mt-5 max-w-sm text-sm leading-7 text-muted">{{ __('site.learning_copy') }}</p><a class="btn btn-primary" href="{{ $site::path('/resources') }}">{{ __('site.all_resources') }}<x-site-icon name="arrow-right" class="size-4"/></a></div>
-            <div>@foreach($resources as $resource)<a class="flex items-center gap-4 border-b border-line py-5 first:pt-0" href="{{ $site::path('/download/resources/'.$resource->id) }}"><span class="flex size-11 shrink-0 items-center justify-center rounded bg-white text-jts"><x-site-icon name="file-text"/></span><div class="min-w-0 flex-1"><span class="mb-1 block text-xs text-muted">{{ __('site.'.$resource->type->code) }} · {{ $resource->school_level_label }}</span><h3 class="text-sm font-semibold">{{ $resource->title }}</h3></div><x-site-icon name="download" class="size-4 text-jts"/></a>@endforeach</div>
-        </div>
-    </section>
-    <section class="shell grid items-center gap-10 py-14 sm:py-18 lg:grid-cols-[1.5fr_1fr]">
-        <div><p class="eyebrow">{{ __('site.about') }}</p><h2 class="section-title max-w-lg">{{ __('site.intro') }}</h2><p class="my-6 max-w-lg text-base leading-7 text-muted">{{ __('site.intro_copy') }}</p><a class="text-link" href="{{ $site::path('/academics') }}">{{ __('site.read_more') }}<x-site-icon name="arrow-right" class="size-4"/></a></div>
-        @if($slides->isNotEmpty())
-        <div x-data="slideshow({{ $slides->count() }})" role="region" aria-label="{{ __('site.highlights') }}" class="min-w-0">
-            <div class="relative aspect-[4/3] overflow-hidden rounded bg-gray-100">
-                @foreach($slides as $index => $slide)
-                <div x-show="current === {{ $index }}" @if($index > 0) x-cloak @endif class="absolute inset-0">
-                    @if($slide->link_url)<a href="{{ $site::path($slide->link_url) }}">@endif
-                    <img src="{{ $site::image($slide->image) }}" alt="{{ $slide->topic }}" class="size-full object-contain" loading="lazy">
-                    @if($slide->link_url)</a>@endif
+    {{-- Section: Materi Pelajaran (Digital Learning Resources Hub) --}}
+    <section class="border-y border-line bg-[#f4f7f5] py-16 sm:py-20">
+        <div class="shell grid items-start gap-10 lg:grid-cols-[1fr_1.4fr] lg:gap-14">
+            <div>
+                <p class="eyebrow">{{ __('site.resources') }}</p>
+                <h2 class="section-title mt-1">{{ __('site.learning') }}</h2>
+                <p class="mt-4 mb-8 text-sm sm:text-base leading-relaxed text-muted">{{ __('site.learning_copy') }}</p>
+
+                <div class="space-y-3 mb-8">
+                    <div class="flex items-center gap-3 text-sm text-ink/90 font-medium">
+                        <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-jts/15 text-jts">
+                            <x-site-icon name="check" class="size-3" />
+                        </span>
+                        <span>{{ __('site.calendar') }} · {{ __('site.syllabus') }} · {{ __('site.textbook') }}</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-sm text-ink/90 font-medium">
+                        <span class="flex size-5 shrink-0 items-center justify-center rounded-full bg-jts/15 text-jts">
+                            <x-site-icon name="check" class="size-3" />
+                        </span>
+                        <span>{{ __('site.resources_copy') }}</span>
+                    </div>
                 </div>
-                @endforeach
+
+                <a class="btn btn-primary shadow-xs hover:shadow-md transition-all inline-flex items-center gap-2" href="{{ $site::path('/resources') }}">
+                    <span>{{ __('site.view_all_resources') }}</span>
+                    <x-site-icon name="arrow-right" class="size-4"/>
+                </a>
             </div>
-            <div class="mt-4 flex items-center justify-between gap-3"><h3 class="text-sm font-semibold">{{ __('site.highlights') }}</h3><div class="flex gap-2">
-                <button class="icon-btn" @click="previous(); paused = true" title="{{ __('site.previous') }}" aria-label="{{ __('site.previous') }}"><x-site-icon name="chevron-left"/></button>
-                <button class="icon-btn" @click="paused = !paused" :aria-label="paused ? @js(__('site.play')) : @js(__('site.pause'))"><span x-show="!paused"><x-site-icon name="pause"/></span><span x-show="paused" x-cloak><x-site-icon name="play"/></span></button>
-                <button class="icon-btn" @click="next(); paused = true" title="{{ __('site.next') }}" aria-label="{{ __('site.next') }}"><x-site-icon name="chevron-right"/></button>
-            </div></div>
+
+            <div class="space-y-3.5">
+                @forelse($resources as $resource)
+                    <a class="group flex items-center justify-between gap-4 p-4 sm:p-5 rounded-xl bg-white border border-line/80 shadow-2xs hover:shadow-md hover:border-jts/40 transition-all duration-200" href="{{ $site::path('/download/resources/'.$resource->id) }}">
+                        <div class="flex items-center gap-4 min-w-0">
+                            <span class="flex size-11 sm:size-12 shrink-0 items-center justify-center rounded-lg bg-jts/10 text-jts group-hover:bg-jts group-hover:text-white transition-colors duration-200">
+                                <x-site-icon name="file-text" class="size-5 sm:size-6"/>
+                            </span>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-center gap-2 text-xs text-muted mb-1">
+                                    @if($resource->type)
+                                        <span class="font-semibold text-jts">{{ __('site.'.$resource->type->code) }}</span>
+                                        <span class="text-line-dark text-gray-300">·</span>
+                                    @endif
+                                    <span>{{ $resource->school_level_label }}</span>
+                                </div>
+                                <h3 class="text-sm sm:text-base font-bold text-ink group-hover:text-jts transition-colors truncate">
+                                    {{ $resource->title }}
+                                </h3>
+                            </div>
+                        </div>
+                        <span class="shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gray-50 border border-line text-xs font-semibold text-ink group-hover:bg-jts group-hover:text-white group-hover:border-jts transition-all shadow-2xs">
+                            <x-site-icon name="download" class="size-3.5"/>
+                            <span class="hidden sm:inline">{{ __('site.download') }}</span>
+                        </span>
+                    </a>
+                @empty
+                    <div class="text-center py-10 bg-white rounded-xl border border-dashed border-line">
+                        <x-site-icon name="file-text" class="size-8 mx-auto text-muted mb-2"/>
+                        <p class="text-sm font-medium text-muted">{{ __('site.no_results') }}</p>
+                    </div>
+                @endforelse
+            </div>
         </div>
+    </section>
+
+    {{-- Section: Fasilitas JTS (Campus Facilities Marquee Showcase) --}}
+    <section class="py-16 sm:py-24 overflow-hidden bg-white">
+        {{-- Centered Header --}}
+        <div class="shell text-center mb-10 sm:mb-14">
+            <div class="flex items-center justify-center gap-3 mb-3">
+                <span class="h-px w-7 bg-jts"></span>
+                <span class="text-xs font-bold uppercase tracking-widest text-jts">{{ __('site.facilities_eyebrow') }}</span>
+                <span class="h-px w-7 bg-jts"></span>
+            </div>
+            <h2 class="section-title text-center text-balance">
+                {{ __('site.facilities_headline') }}
+            </h2>
+            <p class="mt-4 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed text-muted text-center">
+                {{ __('site.facilities_desc') }}
+            </p>
+        </div>
+
+        @if($slides->isNotEmpty())
+            {{-- Marquee Full Width Wrapper --}}
+            <div class="relative w-full overflow-hidden py-4 sm:py-6">
+                {{-- Side Fade Masks --}}
+                <div class="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-36 lg:w-48 bg-gradient-to-r from-white via-white/80 to-transparent z-10"></div>
+                <div class="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-36 lg:w-48 bg-gradient-to-l from-white via-white/80 to-transparent z-10"></div>
+
+                {{-- Infinite Marquee Track --}}
+                <div class="flex animate-marquee gap-6 sm:gap-8 lg:gap-10 hover:[animation-play-state:paused]">
+                    {{-- Render two identical sets so the -50% translateX loop is seamless --}}
+                    @php
+                        $marqueeSlides = $slides->count() < 4 ? $slides->concat($slides)->concat($slides) : $slides->concat($slides);
+                    @endphp
+                    @foreach($marqueeSlides as $slide)
+                        <div class="group relative w-[320px] sm:w-[440px] lg:w-[520px] aspect-[16/10] shrink-0 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-line/70 bg-gray-900">
+                            {{-- Facility Image --}}
+                            <img src="{{ $site::image($slide->image) }}"
+                                 alt="{{ $slide->topic }}"
+                                 class="size-full object-cover transform transition-transform duration-500 ease-out group-hover:scale-105"
+                                 loading="lazy">
+
+                            {{-- Bottom Dark Gradient Overlay --}}
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none"></div>
+
+                            {{-- Bottom Text / Content --}}
+                            <div class="absolute inset-x-0 bottom-0 p-6 sm:p-7 lg:p-8 z-10 pointer-events-none">
+                                <span class="block text-xs sm:text-sm font-bold uppercase tracking-wider text-accent mb-1.5 drop-shadow-xs">
+                                    {{ $slide->tag ?: __('site.facilities_eyebrow') }}
+                                </span>
+                                <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-white leading-snug drop-shadow-sm line-clamp-1">
+                                    {{ $slide->topic }}
+                                </h3>
+                            </div>
+
+                            @if($slide->link_url)
+                                <a href="{{ $site::path($slide->link_url) }}" class="absolute inset-0 z-20" aria-label="{{ $slide->topic }}"></a>
+                            @endif
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+
         @endif
+
+        {{-- Centered Bottom CTA --}}
+        <div class="mt-10 sm:mt-12 text-center">
+            <a href="{{ $site::path('/profile') }}" class="btn btn-primary rounded-lg px-6 py-3 shadow-xs hover:shadow-md transition-all inline-flex items-center gap-2 group">
+                <span>{{ __('site.explore_facilities') }}</span>
+                <x-site-icon name="arrow-right" class="size-4 transition-transform duration-200 group-hover:translate-x-1"/>
+            </a>
+        </div>
+    </section>
+
+    {{-- Section: Berita & Media (News & Media) --}}
+    <section class="shell py-16 sm:py-20">
+        <div class="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-5">
+            <div>
+                <p class="eyebrow">{{ __('site.news') }}</p>
+                <h2 class="section-title mt-1">{{ __('site.latest') }}</h2>
+                <p class="mt-2 text-sm sm:text-base text-muted max-w-xl">{{ __('site.news_copy') }}</p>
+            </div>
+            <div class="shrink-0">
+                <a class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-line text-sm font-semibold text-ink hover:text-jts hover:border-jts/40 hover:bg-jts/5 transition-all shadow-2xs group" href="{{ $site::path('/news') }}">
+                    <span>{{ __('site.view_all_news') }}</span>
+                    <x-site-icon name="arrow-right" class="size-4 text-jts transition-transform duration-200 group-hover:translate-x-1"/>
+                </a>
+            </div>
+        </div>
+        <div class="grid gap-6 sm:gap-8 md:grid-cols-3">
+            @forelse($posts as $post)
+                <x-news-item :post="$post"/>
+            @empty
+                <div class="col-span-3 text-center py-12 bg-gray-50 rounded-xl border border-dashed border-line">
+                    <x-site-icon name="newspaper" class="size-8 mx-auto text-muted mb-2"/>
+                    <p class="text-sm font-medium text-muted">{{ __('site.no_results') }}</p>
+                </div>
+            @endforelse
+        </div>
     </section>
 </x-layouts.site>

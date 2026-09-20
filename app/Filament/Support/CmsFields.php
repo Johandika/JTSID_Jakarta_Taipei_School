@@ -18,81 +18,163 @@ class CmsFields
 {
     public static function schoolLevels(): Select
     {
-        return Select::make('school_levels')->label('School levels')->multiple()
-            ->options(SchoolLevel::OPTIONS)->default([])
-            ->helperText('Leave empty for the whole school, or select one or more levels (TK, SD, SMP, SMA).')
-            ->rules(['array'])->columnSpanFull();
+        return Select::make('school_levels')
+            ->label('Jenjang Sekolah')
+            ->multiple()
+            ->options(SchoolLevel::OPTIONS)
+            ->default([])
+            ->helperText('Kosongkan untuk seluruh sekolah, atau pilih: TK, SD, SMP, SMA.')
+            ->rules(['array'])
+            ->columnSpanFull();
     }
 
-    public static function translations(bool $menu = false): Repeater
+    public static function translations(string $titleLabel = 'Judul Konten'): Repeater
     {
         $schema = [
-            Select::make('locale')->options(['en' => 'English', 'zh-TW' => 'Traditional Chinese', 'id' => 'Indonesian'])->required()->distinct(),
-            TextInput::make('title')->required()->maxLength(191),
+            Select::make('locale')
+                ->label('Bahasa')
+                ->options([
+                    'en' => 'English (Primary)',
+                    'zh-TW' => 'Traditional Chinese (繁體中文)',
+                    'id' => 'Indonesian (Bahasa Indonesia)',
+                ])
+                ->required()
+                ->distinct(),
+            TextInput::make('title')
+                ->label($titleLabel)
+                ->required()
+                ->maxLength(191),
+            Textarea::make('summary')
+                ->label('Ringkasan Singkat')
+                ->rows(2)
+                ->maxLength(1000)
+                ->columnSpanFull(),
+            MarkdownEditor::make('body')
+                ->label('Isi Konten')
+                ->toolbarButtons(['bold', 'italic', 'heading', 'bulletList', 'orderedList', 'link', 'blockquote', 'undo', 'redo'])
+                ->columnSpanFull(),
+            Section::make('SEO & Metadata Search Engine')
+                ->description('Pengaturan meta title dan description untuk mesin pencari (Opsional)')
+                ->schema([
+                    TextInput::make('seo_title')
+                        ->label('SEO Meta Title')
+                        ->maxLength(191),
+                    Textarea::make('seo_description')
+                        ->label('SEO Meta Description')
+                        ->maxLength(255)
+                        ->rows(2),
+                ])
+                ->collapsed()
+                ->columnSpanFull(),
         ];
-        if (! $menu) {
-            $schema = array_merge($schema, [
-                Textarea::make('summary')->rows(2)->maxLength(1000),
-                MarkdownEditor::make('body')->toolbarButtons(['bold', 'italic', 'heading', 'bulletList', 'orderedList', 'link', 'blockquote', 'undo', 'redo'])->columnSpanFull(),
-                TextInput::make('seo_title')->maxLength(191),
-                Textarea::make('seo_description')->maxLength(255)->rows(2),
-            ]);
-        }
 
-        return Repeater::make('translations')->relationship()->schema($schema)->columns(2)
-            ->default([['locale' => 'en']])->minItems(1)->maxItems(3)->reorderable(false)
-            ->itemLabel(fn (array $state): string => ($state['locale'] ?? 'New').' - '.($state['title'] ?? 'Translation'))
+        return Repeater::make('translations')
+            ->label('Konten Multi-Bahasa')
+            ->relationship()
+            ->schema($schema)
+            ->columns(2)
+            ->default([['locale' => 'en']])
+            ->minItems(1)
+            ->maxItems(3)
+            ->reorderable(false)
+            ->collapsible()
+            ->itemLabel(fn (array $state): string => match ($state['locale'] ?? '') {
+                'en' => '🇬🇧 English (Required Primary)',
+                'zh-TW' => '🇹🇼 Traditional Chinese (繁體中文)',
+                'id' => '🇮🇩 Indonesian (Bahasa Indonesia)',
+                default => 'Terjemahan Baru',
+            }.(filled($state['title'] ?? null) ? ' — '.$state['title'] : ''))
             ->rules([fn () => function (string $attribute, $value, \Closure $fail) {
                 if (! collect($value)->contains(fn ($row) => ($row['locale'] ?? '') === 'en' && filled($row['title'] ?? null))) {
-                    $fail('An English translation is required.');
+                    $fail('Terjemahan bahasa Inggris (English) wajib diisi.');
                 }
-            }])->columnSpanFull();
+            }])
+            ->columnSpanFull();
     }
 
     public static function publishing(): Section
     {
-        return Section::make('Publishing')->schema([
-            Select::make('status')->options(['draft' => 'Draft', 'published' => 'Published', 'archived' => 'Archived'])->default('draft')->required(),
-            DateTimePicker::make('published_at')->label('Publish date')->seconds(false),
-        ])->columns(2);
+        return Section::make('Status & Publikasi')
+            ->description('Atur status tayang dan jadwal rilis')
+            ->schema([
+                Select::make('status')
+                    ->label('Status')
+                    ->options([
+                        'draft' => 'Draft',
+                        'published' => 'Published',
+                        'archived' => 'Archived',
+                    ])
+                    ->default('draft')
+                    ->required(),
+                DateTimePicker::make('published_at')
+                    ->label('Jadwal Publikasi')
+                    ->seconds(false)
+                    ->helperText('Kosongkan untuk langsung tayang saat Published.'),
+            ]);
     }
 
     public static function department(): Select
     {
-        return Select::make('department_id')->relationship('department', 'name',
-            fn (Builder $query) => auth()->user()?->role?->code === 'department_admin' ? $query->whereKey(auth()->user()->department_id) : $query)
-            ->default(fn () => auth()->user()?->department_id)->required()->searchable()->preload()
+        return Select::make('department_id')
+            ->label('Departemen')
+            ->relationship('department', 'name',
+                fn (Builder $query) => auth()->user()?->role?->code === 'department_admin' ? $query->whereKey(auth()->user()->department_id) : $query)
+            ->default(fn () => auth()->user()?->department_id)
+            ->required()
+            ->searchable()
+            ->preload()
             ->rules([fn () => function (string $attribute, $value, \Closure $fail) {
                 if (auth()->user()?->role?->code === 'department_admin' && (int) $value !== (int) auth()->user()->department_id) {
-                    $fail('Select your own department.');
+                    $fail('Pilih departemen Anda sendiri.');
                 }
             }]);
     }
 
-    public static function image(string $name = 'image', int $max = 4096): FileUpload
+    public static function image(string $name = 'image', int $max = 4096, ?string $label = 'Gambar / Foto Cover'): FileUpload
     {
-        return FileUpload::make($name)->disk('public')->directory('images')->visibility('public')
+        return FileUpload::make($name)
+            ->label($label)
+            ->disk('public')
+            ->directory('images')
+            ->visibility('public')
             ->preventFilePathTampering()
-            ->image()->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])->maxSize($max)->imageEditor()
+            ->image()
+            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+            ->maxSize($max)
+            ->imageEditor()
             ->rules(['extensions:jpg,jpeg,png,webp']);
     }
 
-    public static function document(bool $required = false): FileUpload
+    public static function document(bool $required = false, ?string $label = 'File Dokumen'): FileUpload
     {
-        return FileUpload::make('file_path')->label('Document')->disk('local')->directory('documents')
+        return FileUpload::make('file_path')
+            ->label($label)
+            ->disk('local')
+            ->directory('documents')
             ->preventFilePathTampering()
-            ->visibility('private')->acceptedFileTypes(['application/pdf', 'application/msword',
+            ->visibility('private')
+            ->acceptedFileTypes(['application/pdf', 'application/msword',
                 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.rar', 'application/x-rar', 'application/x-rar-compressed'])
-            ->maxSize(15360)->required($required)->rules(['extensions:pdf,doc,docx,rar']);
+            ->maxSize(15360)
+            ->required($required)
+            ->rules(['extensions:pdf,doc,docx,rar'])
+            ->helperText('Format didukung: PDF, DOCX, RAR (Maks. 15MB)');
     }
 
     public static function uploadDate(): DatePicker
     {
-        return DatePicker::make('upload_date')->required()->default(today());
+        return DatePicker::make('upload_date')
+            ->label('Tanggal Unggah')
+            ->required()
+            ->default(today());
     }
 
-    public static function safeUrl(string $name): TextInput
+    public static function safeUrl(string $name, ?string $label = 'Link URL Tujuan'): TextInput
     {
-        return TextInput::make($name)->maxLength(255)->rules(['regex:~^(?:/(?!/)[^\\s]*|https?://[^\\s]+)$~']);
+        return TextInput::make($name)
+            ->label($label)
+            ->placeholder('https:// atau /path-internal')
+            ->maxLength(255)
+            ->rules(['regex:~^(?:/(?!/)[^\\s]*|https?://[^\\s]+)$~']);
     }
 }

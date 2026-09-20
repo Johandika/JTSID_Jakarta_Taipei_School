@@ -1,8 +1,39 @@
-@props(['title' => null, 'description' => null, 'image' => null, 'transparentNav' => false, 'showLevelFilter' => true])
+@props(['title' => null, 'description' => null, 'image' => null, 'transparentNav' => false])
 @php
     $site = \App\Support\Site::class;
     $telephone = $contacts->firstWhere('channel', 'admission_tel');
     $address = $contacts->firstWhere('channel', 'address');
+    $headerNavigation = [
+        [
+            'title' => __('site.about'),
+            'url' => '/about',
+            'children' => [
+                ['title' => __('site.board_of_directors'), 'url' => '/board-of-directors'],
+                ['title' => __('site.school_profile'), 'url' => '/school-profile'],
+                ['title' => __('site.history'), 'url' => '/history'],
+                ['title' => __('site.parent_association'), 'url' => '/parent-association'],
+                ['title' => __('site.staff'), 'url' => '/staff'],
+                ['title' => __('site.contact'), 'url' => '/contact'],
+            ],
+        ],
+        ['title' => __('site.academics'), 'url' => '/academics', 'children' => []],
+        [
+            'title' => __('site.admissions'),
+            'url' => '/admissions',
+            'children' => [
+                ['title' => __('site.mandarin_program'), 'url' => '/mandarin-program'],
+            ],
+        ],
+        ['title' => __('site.news'), 'url' => '/news', 'children' => []],
+        ['title' => __('site.resources'), 'url' => '/resources', 'children' => []],
+        ['title' => __('site.universities'), 'url' => '/university-admission', 'children' => []],
+    ];
+    $footerNavigation = [
+        ['title' => __('site.about'), 'url' => '/about'],
+        ['title' => __('site.admissions'), 'url' => '/admissions'],
+        ['title' => __('site.staff'), 'url' => '/staff'],
+        ['title' => __('site.contact'), 'url' => '/contact'],
+    ];
 @endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
@@ -80,27 +111,27 @@
                 <img src="{{ asset('images/logo-white.png') }}" alt="Jakarta Taipei School" width="234" height="57"
                     x-show="!scrolled && isTransparent"
                     class="h-auto w-48 sm:w-56 transition-opacity duration-300 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)]">
-                <img src="{{ asset('images/logo.jpg') }}" alt="Jakarta Taipei School" width="234" height="57"
+                <img src="{{ file_exists(public_path('images/logo.png')) ? asset('images/logo.png') : asset('images/logo.jpg') }}" alt="Jakarta Taipei School" width="234" height="57"
                     x-show="scrolled || !isTransparent"
                     class="h-auto w-48 sm:w-56 transition-opacity duration-300">
             </a>
 
-            <nav class="hidden items-center gap-6 xl:flex" aria-label="Main navigation">
-                @foreach($navigation->where('menu_area', 'header') as $item)
+            <nav class="hidden items-center gap-6 xl:flex" aria-label="{{ __('site.main_navigation') }}">
+                @foreach($headerNavigation as $item)
                     <div class="relative" x-data="{ open: false }" @click.outside="open = false"
                         @keydown.escape.window="open = false">
                         <div class="flex items-center gap-1">
-                            <a href="{{ $site::path($item->url) }}" :class="{
+                            <a href="{{ $site::path($item['url']) }}" :class="{
                                    'text-white hover:text-white/80 font-medium': !scrolled && isTransparent,
                                    'text-ink hover:text-jts font-semibold': scrolled || !isTransparent,
-                                   'text-accent font-bold': (!scrolled && isTransparent) && (request()->getPathInfo() === $site::path($item->url)),
-                                   'text-jts': (scrolled || !isTransparent) && (request()->getPathInfo() === $site::path($item->url))
+                                   'text-accent font-bold': (!scrolled && isTransparent) && @js(request()->getPathInfo() === $site::path($item['url'])),
+                                   'text-jts': (scrolled || !isTransparent) && @js(request()->getPathInfo() === $site::path($item['url']))
                                }" class="py-6 text-[14px] transition-colors">
-                                {{ $item->title }}
+                                {{ $item['title'] }}
                             </a>
-                            @if($item->children->isNotEmpty())
+                            @if($item['children'])
                                 <button type="button" @click="open = !open" :aria-expanded="open"
-                                    aria-label="{{ $item->title }}" :class="{
+                                    aria-label="{{ $item['title'] }}" :class="{
                                                 'text-white hover:text-white/80': !scrolled && isTransparent,
                                                 'text-ink hover:text-jts': scrolled || !isTransparent
                                             }" class="p-1 transition-colors">
@@ -108,15 +139,15 @@
                                 </button>
                             @endif
                         </div>
-                        @if($item->children->isNotEmpty())
+                        @if($item['children'])
                             <div x-show="open" x-cloak x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 translate-y-1"
                                 x-transition:enter-end="opacity-100 translate-y-0"
                                 class="absolute left-0 top-full w-60 rounded-lg border border-line bg-white p-2 shadow-xl text-ink">
-                                @foreach($item->children as $child)
-                                    <a href="{{ $site::path($child->url) }}"
+                                @foreach($item['children'] as $child)
+                                    <a href="{{ $site::path($child['url']) }}"
                                         class="block rounded-md px-3 py-2.5 text-sm font-medium text-ink hover:bg-gray-50 hover:text-jts transition-colors">
-                                        {{ $child->title }}
+                                        {{ $child['title'] }}
                                     </a>
                                 @endforeach
                             </div>
@@ -138,16 +169,16 @@
         {{-- Mobile Menu Drawer --}}
         <nav id="mobile-menu" x-show="mobile" x-cloak @keydown.escape.window="mobile = false"
             class="max-h-[75svh] overflow-y-auto border-t border-line bg-white text-ink px-6 pb-6 pt-2 shadow-2xl backdrop-blur-lg xl:hidden"
-            aria-label="Mobile navigation">
-            @foreach($navigation->where('menu_area', 'header') as $item)
+            aria-label="{{ __('site.mobile_navigation') }}">
+            @foreach($headerNavigation as $item)
                 <div class="border-b border-line/60 py-2">
-                    <a href="{{ $site::path($item->url) }}"
-                        class="block py-2.5 font-semibold text-ink hover:text-jts text-base">{{ $item->title }}</a>
-                    @if($item->children->isNotEmpty())
+                    <a href="{{ $site::path($item['url']) }}"
+                        class="block py-2.5 font-semibold text-ink hover:text-jts text-base">{{ $item['title'] }}</a>
+                    @if($item['children'])
                         <div class="pl-4 space-y-1 pb-1">
-                            @foreach($item->children as $child)
-                                <a href="{{ $site::path($child->url) }}"
-                                    class="block py-2 text-sm text-muted hover:text-jts">{{ $child->title }}</a>
+                            @foreach($item['children'] as $child)
+                                <a href="{{ $site::path($child['url']) }}"
+                                    class="block py-2 text-sm text-muted hover:text-jts">{{ $child['title'] }}</a>
                             @endforeach
                         </div>
                     @endif
@@ -155,15 +186,12 @@
             @endforeach
         </nav>
     </header>
-    @if($showLevelFilter)
-        <x-school-level-filter />
-    @endif
     <main id="main">{{ $slot }}</main>
     <footer class="mt-16 border-t border-line bg-[#f4f7f5]">
         <div class="shell grid gap-10 py-14 md:grid-cols-[1.4fr_1fr_1fr]">
             <div>
-                <img src="{{ asset('images/logo.jpg') }}" alt="Jakarta Taipei School" width="234" height="57"
-                    class="mb-6 w-56 mix-blend-multiply">
+                <img src="{{ file_exists(public_path('images/logo.png')) ? asset('images/logo.png') : asset('images/logo.jpg') }}" alt="Jakarta Taipei School" width="234" height="57"
+                    class="mb-6 w-56">
                 @if($address)
                     <p class="mb-4 flex max-w-sm items-start gap-3 text-sm leading-6 text-muted"><x-site-icon name="map-pin"
                 class="mt-1 size-4" />{{ $address->value }}</p>@endif
@@ -177,8 +205,8 @@
             <div>
                 <h2 class="mb-5 text-sm font-bold">{{ __('site.quick_links') }}</h2>
                 <div class="grid gap-3 text-sm text-muted">
-                    @foreach($navigation->where('menu_area', 'footer') as $item)<a class="hover:text-jts"
-                    href="{{ $site::path($item->url) }}">{{ $item->title }}</a>@endforeach
+                    @foreach($footerNavigation as $item)<a class="hover:text-jts"
+                    href="{{ $site::path($item['url']) }}">{{ $item['title'] }}</a>@endforeach
                     <a href="/admin" class="hover:text-jts">{{ __('site.admin') }}</a>
                 </div>
             </div>

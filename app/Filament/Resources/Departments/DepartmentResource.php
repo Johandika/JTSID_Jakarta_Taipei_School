@@ -8,6 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -29,15 +30,56 @@ class DepartmentResource extends CmsResource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([TextInput::make('code')->required()->unique(ignoreRecord: true)->maxLength(50), TextInput::make('name')->required()->maxLength(150), TextInput::make('sort_order')->integer()->minValue(0)->required()->default(0), Toggle::make('is_active')->default(true)])->columns(2);
+        return $schema
+            ->columns(1)
+            ->components([
+                Section::make('Informasi Departemen')
+                    ->description('Kode dan nama departemen atau unit kerja')
+                    ->schema([
+                        TextInput::make('code')
+                            ->label('Kode Departemen')
+                            ->required()
+                            ->unique(ignoreRecord: true)
+                            ->maxLength(50),
+                        TextInput::make('name')
+                            ->label('Nama Departemen')
+                            ->required()
+                            ->maxLength(150),
+                        TextInput::make('sort_order')
+                            ->label('Urutan Tampilan')
+                            ->integer()
+                            ->minValue(0)
+                            ->required()
+                            ->default(0),
+                        Toggle::make('is_active')
+                            ->label('Status Aktif')
+                            ->default(true),
+                    ])
+                    ->columns(2),
+            ]);
     }
 
     public static function table(Table $table): Table
     {
-        return $table->columns([TextColumn::make('name')->searchable(), TextColumn::make('code'), IconColumn::make('is_active')->boolean()])
-
+        return $table
+            ->columns([
+                TextColumn::make('name')
+                    ->label('Nama Departemen')
+                    ->searchable()
+                    ->weight('medium'),
+                TextColumn::make('code')
+                    ->label('Kode')
+                    ->badge()
+                    ->color('gray'),
+                IconColumn::make('is_active')
+                    ->label('Status Aktif')
+                    ->boolean(),
+            ])
             ->defaultSort('id', 'desc')
-            ->recordActions([EditAction::make(), DeleteAction::make()])
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
             ->paginated([10, 25, 50]);
     }
 

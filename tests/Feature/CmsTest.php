@@ -2,15 +2,18 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Pages\Pages\CreatePage;
 use App\Filament\Resources\Posts\Pages\CreatePost;
 use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
+use App\Filament\Resources\Posts\PostResource;
 use App\Filament\Resources\SubjectResources\Pages\CreateSubjectResource;
+use App\Filament\Widgets\DashboardHeaderWidget;
+use App\Filament\Widgets\LatestContentWidget;
+use App\Filament\Widgets\NeedsAttentionWidget;
 use App\Livewire\ContentCatalog;
+use App\Models\AnnouncementPopup;
 use App\Models\Department;
 use App\Models\GradeLevel;
-use App\Models\Page;
 use App\Models\Post;
 use App\Models\PostCategory;
 use App\Models\SlideshowItem;
@@ -20,7 +23,9 @@ use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
@@ -49,6 +54,142 @@ class CmsTest extends TestCase
         $this->get('/zh')->assertSee('校園最新消息');
     }
 
+    public function test_static_pages_are_localized_and_removed_from_the_admin_and_database(): void
+    {
+        $this->assertFalse(Schema::hasTable('pages'));
+        $this->assertFalse(Schema::hasTable('page_translations'));
+
+        $localizedPages = [
+            '' => [
+                'summary' => 'Discover our community, learning, and life at Jakarta Taipei School.',
+                'titles' => ['about' => 'About Jakarta Taipei School', 'academics' => 'Academics', 'admissions' => 'Admissions', 'board-of-directors' => 'Board of Directors', 'school-profile' => 'School Profile', 'history' => 'Our History', 'parent-association' => 'Parent Association', 'contact' => 'Location & Contact', 'mandarin-program' => 'Short-term Mandarin Program'],
+            ],
+            '/id' => [
+                'summary' => 'Mengenal komunitas, kegiatan belajar, dan kehidupan di Jakarta Taipei School.',
+                'titles' => ['about' => 'Tentang Jakarta Taipei School', 'academics' => 'Akademik', 'admissions' => 'Pendaftaran', 'board-of-directors' => 'Dewan Pengurus', 'school-profile' => 'Profil Sekolah', 'history' => 'Sejarah Sekolah', 'parent-association' => 'Asosiasi Orang Tua', 'contact' => 'Lokasi & Kontak', 'mandarin-program' => 'Program Mandarin Jangka Pendek'],
+            ],
+            '/zh' => [
+                'summary' => '認識雅加達臺灣學校的社群、學習與校園生活。',
+                'titles' => ['about' => '認識雅加達臺灣學校', 'academics' => '課程設計', 'admissions' => '招生資訊', 'board-of-directors' => '理董事會', 'school-profile' => '學校概況', 'history' => '學校歷史', 'parent-association' => '家長委員會', 'contact' => '交通資訊與聯絡方式', 'mandarin-program' => '短期華語課程'],
+            ],
+        ];
+
+        foreach ($localizedPages as $prefix => $locale) {
+            foreach ($locale['titles'] as $slug => $title) {
+                $this->get($prefix.'/'.$slug)
+                    ->assertOk()
+                    ->assertSeeText($title)
+                    ->assertSeeText($locale['summary'])
+                    ->assertSee('class="prose"', false);
+            }
+        }
+
+        $this->get('/academics')->assertSeeText('Indonesian, Pancasila, and Religions');
+        $this->get('/id/admissions')
+            ->assertSee('<ol>', false)
+            ->assertSee('href="/id/mandarin-program"', false)
+            ->assertSee('href="https://www.jtsid.org/infomation03.php"', false)
+            ->assertSee('src="'.asset('images/seed-campus.jpg').'"', false);
+        $this->get('/zh/contact')
+            ->assertSee('href="https://wa.me/6281385435909"', false)
+            ->assertSeeText('透過 WhatsApp 聯絡');
+        $this->get('/page-that-does-not-exist')->assertNotFound();
+
+        $this->actingAs(User::where('email', 'admin@jts.local')->first());
+        $this->get('/admin/pages')->assertNotFound();
+        $this->get('/admin/pages/create')->assertNotFound();
+    }
+
+    public function test_pages_removal_migration_can_be_rolled_back(): void
+    {
+        $migration = require database_path('migrations/2026_09_20_154150_remove_pages_tables.php');
+        $migration->down();
+
+        $this->assertTrue(Schema::hasTable('pages'));
+        $this->assertTrue(Schema::hasTable('page_translations'));
+
+        DB::table('audit_logs')->insert([
+            'action' => 'deleted',
+            'entity_type' => 'Page',
+            'entity_id' => 1,
+        ]);
+
+        $migration->up();
+
+        $this->assertFalse(Schema::hasTable('pages'));
+        $this->assertFalse(Schema::hasTable('page_translations'));
+        $this->assertDatabaseMissing('audit_logs', ['entity_type' => 'Page']);
+    }
+
+    public function test_navigation_is_static_localized_and_removed_from_the_admin_and_database(): void
+    {
+        $this->assertFalse(Schema::hasTable('menu_items'));
+        $this->assertFalse(Schema::hasTable('menu_item_translations'));
+
+        $localizedNavigation = [
+            '/' => [
+                'labels' => ['About JTS', 'Academics', 'Admissions', 'News & Media', 'Subject Resources', 'University Admission', 'Board of Directors', 'School Profile', 'Our History', 'Parent Association', 'Our Team', 'Contact', 'Short-term Mandarin Program'],
+                'main_navigation' => 'Main navigation',
+                'mobile_navigation' => 'Mobile navigation',
+                'about_url' => '/about',
+                'child_url' => '/board-of-directors',
+            ],
+            '/id' => [
+                'labels' => ['Tentang JTS', 'Akademik', 'Pendaftaran', 'Berita & Media', 'Materi Pelajaran', 'Penerimaan Universitas', 'Dewan Pengurus', 'Profil Sekolah', 'Sejarah Sekolah', 'Asosiasi Orang Tua', 'Tim Kami', 'Kontak', 'Program Mandarin Jangka Pendek'],
+                'main_navigation' => 'Navigasi utama',
+                'mobile_navigation' => 'Navigasi seluler',
+                'about_url' => '/id/about',
+                'child_url' => '/id/board-of-directors',
+            ],
+            '/zh' => [
+                'labels' => ['認識學校', '課程設計', '招生資訊', '新聞與媒體', '學習資源', '大學錄取榜', '理董事會', '學校概況', '學校歷史', '家長委員會', '校園團隊', '聯絡我們', '短期華語課程'],
+                'main_navigation' => '主要導覽',
+                'mobile_navigation' => '行動版導覽',
+                'about_url' => '/zh/about',
+                'child_url' => '/zh/board-of-directors',
+            ],
+        ];
+
+        foreach ($localizedNavigation as $url => $expected) {
+            $response = $this->get($url)->assertOk();
+
+            foreach ($expected['labels'] as $label) {
+                $response->assertSee($label);
+            }
+
+            $response
+                ->assertSee('aria-label="'.$expected['main_navigation'].'"', false)
+                ->assertSee('aria-label="'.$expected['mobile_navigation'].'"', false)
+                ->assertSee('href="'.$expected['about_url'].'"', false)
+                ->assertSee('href="'.$expected['child_url'].'"', false);
+        }
+
+        $this->actingAs(User::where('email', 'admin@jts.local')->first())
+            ->get('/admin/menu-items')
+            ->assertNotFound();
+    }
+
+    public function test_navigation_removal_migration_can_be_rolled_back(): void
+    {
+        $migration = require database_path('migrations/2026_09_20_151535_remove_menu_items_tables.php');
+        $migration->down();
+
+        $this->assertTrue(Schema::hasTable('menu_items'));
+        $this->assertTrue(Schema::hasTable('menu_item_translations'));
+
+        DB::table('audit_logs')->insert([
+            'action' => 'deleted',
+            'entity_type' => 'MenuItem',
+            'entity_id' => 1,
+        ]);
+
+        $migration->up();
+
+        $this->assertFalse(Schema::hasTable('menu_items'));
+        $this->assertFalse(Schema::hasTable('menu_item_translations'));
+        $this->assertDatabaseMissing('audit_logs', ['entity_type' => 'MenuItem']);
+    }
+
     public function test_drafts_future_posts_and_untranslated_content_are_not_public(): void
     {
         $this->get('/news/campus-story-14')->assertNotFound();
@@ -63,13 +204,13 @@ class CmsTest extends TestCase
 
     public function test_translation_falls_back_as_a_complete_record_and_html_is_sanitized(): void
     {
-        $page = Page::where('slug', 'about')->first();
-        $page->translations()->where('locale', 'id')->delete();
-        $page->translations()->where('locale', 'en')->update(['body' => '<script>alert(1)</script> [bad](javascript:alert%281%29)']);
+        $post = Post::where('slug', 'campus-story-1')->first();
+        $post->translations()->where('locale', 'id')->delete();
+        $post->translations()->where('locale', 'en')->update(['body' => '<script>alert(1)</script> [bad](javascript:alert%281%29)']);
         app()->setLocale('id');
-        $this->assertSame('en', $page->translation()->locale);
-        $this->assertStringNotContainsString('<script>', $page->html_body);
-        $this->assertStringNotContainsString('href="javascript:', $page->html_body);
+        $this->assertSame('en', $post->translation()->locale);
+        $this->assertStringNotContainsString('<script>', $post->html_body);
+        $this->assertStringNotContainsString('href="javascript:', $post->html_body);
     }
 
     public function test_search_filter_pagination_and_locale_survive_livewire_updates(): void
@@ -82,7 +223,7 @@ class CmsTest extends TestCase
         $catalog->set('department', (string) Department::where('code', 'academic')->value('id'))->assertSet('paginators.page', 1)->assertSee('7 results');
         app()->setLocale('id');
         Livewire::test(ContentCatalog::class, ['kind' => 'resources', 'type' => 'calendar'])
-            ->assertSee('4 hasil')->set('grade', (string) GradeLevel::first()->id)->assertSee('1 hasil')->assertSee('Tanggal unggah');
+            ->assertSee('4 hasil')->set('schoolLevel', GradeLevel::first()->code)->assertSee('1 hasil')->assertSee('Tanggal unggah');
     }
 
     public function test_download_is_attachment_and_draft_resource_is_hidden(): void
@@ -104,6 +245,66 @@ class CmsTest extends TestCase
         $this->assertFalse(Gate::forUser($viewer)->allows('update', Post::first()));
     }
 
+    public function test_admin_navigation_uses_sidebar_branding_and_user_menu_without_a_topbar(): void
+    {
+        $this->actingAs(User::where('email', 'admin@jts.local')->firstOrFail())
+            ->get('/admin')
+            ->assertOk()
+            ->assertDontSee('class="fi-topbar"', false)
+            ->assertSee('class="fi-sidebar-header-logo-ctn"', false)
+            ->assertSee('class="fi-sidebar-footer ', false)
+            ->assertSee('class="fi-user-menu', false)
+            ->assertSee('x-float.placement.right-end', false)
+            ->assertDontSee('Filament\\Livewire\\GlobalSearch', false);
+    }
+
+    public function test_dashboard_actions_links_and_counts_follow_user_permissions(): void
+    {
+        Post::query()->update(['status' => 'published']);
+        SubjectResource::query()->update(['status' => 'published']);
+
+        $departmentAdmin = User::where('email', 'academic@jts.local')->firstOrFail();
+        $ownPost = Post::where('department_id', $departmentAdmin->department_id)->firstOrFail();
+        $otherPost = Post::where('department_id', '!=', $departmentAdmin->department_id)->firstOrFail();
+        $ownPost->update(['status' => 'draft']);
+        $otherPost->update(['status' => 'draft']);
+
+        $ownResource = SubjectResource::where('department_id', $departmentAdmin->department_id)->firstOrFail();
+        $otherResource = SubjectResource::whereKeyNot($ownResource->id)->firstOrFail();
+        $otherResource->update([
+            'department_id' => Department::whereKeyNot($departmentAdmin->department_id)->value('id'),
+        ]);
+        $ownResource->update(['status' => 'draft']);
+        $otherResource->update(['status' => 'draft']);
+
+        $viewer = User::where('email', 'viewer@jts.local')->firstOrFail();
+        $this->actingAs($viewer);
+        Livewire::test(DashboardHeaderWidget::class)
+            ->assertDontSeeText('Buat Berita')
+            ->assertDontSeeText('Upload Materi');
+        Livewire::test(LatestContentWidget::class)
+            ->assertDontSee(PostResource::getUrl('edit', ['record' => $ownPost]), false);
+
+        $this->flushSession();
+        $this->actingAs($departmentAdmin);
+        Livewire::test(DashboardHeaderWidget::class)
+            ->assertSeeText('Buat Berita')
+            ->assertSeeText('Upload Materi');
+        Livewire::test(NeedsAttentionWidget::class)
+            ->assertSeeText('1 draft berita menunggu rilis')
+            ->assertSeeText('1 materi berstatus draft')
+            ->assertDontSeeText('popup pengumuman sedang tampil');
+
+        AnnouncementPopup::query()->delete();
+        AnnouncementPopup::factory()->create(['starts_at' => now()->addDay()]);
+        AnnouncementPopup::factory()->create(['starts_at' => now()->subDay(), 'ends_at' => now()->addDay()]);
+
+        $this->flushSession();
+        $this->actingAs(User::where('email', 'admin@jts.local')->firstOrFail());
+        Livewire::test(NeedsAttentionWidget::class)
+            ->assertSeeText('1 popup pengumuman sedang tampil');
+    }
+
     public function test_department_admin_cannot_read_edit_or_transfer_other_departments_content(): void
     {
         $user = User::where('email', 'academic@jts.local')->first();
@@ -114,7 +315,7 @@ class CmsTest extends TestCase
         $this->assertFalse(Gate::allows('update', $other));
         Livewire::test(ListPosts::class)->assertCanSeeTableRecords([$own])->assertCanNotSeeTableRecords([$other]);
         $this->get('/admin/posts/'.$other->id.'/edit')->assertNotFound();
-        $this->get('/admin/pages')->assertForbidden();
+        $this->get('/admin/pages')->assertNotFound();
         $this->get('/admin/users')->assertForbidden();
         $this->expectException(ValidationException::class);
         $own->update(['department_id' => $other->department_id]);
@@ -139,9 +340,12 @@ class CmsTest extends TestCase
     public function test_english_translation_is_required(): void
     {
         $this->actingAs(User::where('email', 'admin@jts.local')->first());
-        Livewire::test(CreatePage::class)->fillForm(['slug' => 'no-english', 'template' => 'default', 'status' => 'published',
-            'translations' => [['locale' => 'id', 'title' => 'Tanpa English']]])->call('create')->assertHasFormErrors(['translations']);
-        $this->assertDatabaseMissing('pages', ['slug' => 'no-english']);
+        Livewire::test(CreatePost::class)->fillForm([
+            'topic' => 'No English', 'slug' => 'no-english', 'department_id' => Department::first()->id,
+            'category_id' => PostCategory::first()->id, 'upload_date' => today()->toDateString(), 'status' => 'published',
+            'translations' => [['locale' => 'id', 'title' => 'Tanpa English']],
+        ])->call('create')->assertHasFormErrors(['translations']);
+        $this->assertDatabaseMissing('posts', ['slug' => 'no-english']);
     }
 
     public function test_resource_upload_accepts_pdf_and_rejects_executable_and_oversized_files(): void
@@ -175,7 +379,7 @@ class CmsTest extends TestCase
     public function test_all_admin_lists_and_create_forms_render(): void
     {
         $this->actingAs(User::where('email', 'admin@jts.local')->first());
-        foreach (['pages', 'posts', 'subject-resources', 'slideshow-items', 'contact-channels', 'staff-profiles', 'university-acceptances', 'menu-items', 'departments', 'academic-years', 'users'] as $path) {
+        foreach (['posts', 'subject-resources', 'slideshow-items', 'contact-channels', 'staff-profiles', 'university-acceptances', 'departments', 'academic-years', 'users'] as $path) {
             $this->get('/admin/'.$path)->assertOk();
             $this->get('/admin/'.$path.'/create')->assertOk();
         }
