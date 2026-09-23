@@ -1,7 +1,6 @@
-<x-static-page slug="admissions" :title="__('pages.admissions.title')" :summary="__('pages.admissions.summary')"
+<x-static-page :title="__('pages.admissions.title')" :summary="__('pages.admissions.summary')"
     :seo-title="__('pages.admissions.seo_title')" hero-image="images/seed-campus.jpg"
     gallery-url="https://www.jtsid.org/infomation03.php">
-    <blockquote><p>{{ __('pages.admissions.notice') }}</p></blockquote>
     <h2>{{ __('pages.admissions.journey_heading') }}</h2>
     <ol>
         @foreach(__('pages.admissions.steps') as $step)

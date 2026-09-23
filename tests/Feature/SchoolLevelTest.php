@@ -10,7 +10,6 @@ use App\Models\Department;
 use App\Models\GradeLevel;
 use App\Models\Post;
 use App\Models\PostCategory;
-use App\Models\SlideshowItem;
 use App\Models\StaffProfile;
 use App\Models\SubjectResource;
 use App\Models\SubjectResourceType;
@@ -96,14 +95,12 @@ class SchoolLevelTest extends TestCase
     {
         foreach (['Elementary teacher', 'Senior high teacher', 'School office'] as $name) {
             StaffProfile::create(['name' => $name, 'title' => $name, 'department_id' => Department::first()->id, 'is_active' => true]);
-            SlideshowItem::create(['topic' => $name.' highlight', 'image' => 'images/seed-campus.jpg', 'is_active' => true]);
         }
         AnnouncementPopup::factory()->create(['title' => 'Whole school celebration']);
 
         $this->get('/staff?school_level=sd')->assertSee('Elementary teacher')->assertSee('Senior high teacher')->assertSee('School office');
-        $this->get('/?school_level=sma')->assertSee('Elementary teacher highlight')->assertSee('Senior high teacher highlight')
-            ->assertSee('School office highlight')->assertSee('Whole school celebration')->assertSessionMissing('school_level');
-        foreach (['/', '/about', '/staff', '/university-admission'] as $url) {
+        $this->get('/?school_level=sma')->assertSee('Whole school celebration')->assertSessionMissing('school_level');
+        foreach (['/', '/school-profile', '/staff', '/university-admission'] as $url) {
             $this->get($url)->assertDontSee('aria-label="School level"', false);
         }
         foreach (['/news' => 'School level', '/id/resources' => 'Jenjang sekolah', '/zh/news' => '學部'] as $url => $label) {
@@ -145,7 +142,7 @@ class SchoolLevelTest extends TestCase
 
         $this->get('/admin/posts/create')->assertOk()->assertSeeText('Jenjang Sekolah');
         $this->get('/admin/subject-resources/create')->assertOk()->assertSeeText('Jenjang Sekolah');
-        foreach (['staff-profiles', 'slideshow-items', 'announcement-popups'] as $resource) {
+        foreach (['staff-profiles', 'announcement-popups'] as $resource) {
             $this->get('/admin/'.$resource.'/create')->assertOk()->assertDontSeeText('School levels');
         }
     }
@@ -193,7 +190,7 @@ class SchoolLevelTest extends TestCase
 
     public function test_global_content_school_level_columns_are_removed_and_migration_can_be_rolled_back(): void
     {
-        foreach (['staff_profiles', 'slideshow_items', 'announcement_popups'] as $tableName) {
+        foreach (['staff_profiles', 'announcement_popups'] as $tableName) {
             $this->assertFalse(Schema::hasColumn($tableName, 'school_levels'));
         }
 
@@ -204,14 +201,14 @@ class SchoolLevelTest extends TestCase
         $migration = require database_path('migrations/2026_09_20_173012_remove_school_levels_from_global_content_tables.php');
         $migration->down();
 
-        foreach (['staff_profiles', 'slideshow_items', 'announcement_popups'] as $tableName) {
+        foreach (['staff_profiles', 'announcement_popups'] as $tableName) {
             $this->assertTrue(Schema::hasColumn($tableName, 'school_levels'));
         }
         DB::table('staff_profiles')->where('id', $staff->id)->update(['school_levels' => json_encode(['sd'])]);
 
         $migration->up();
 
-        foreach (['staff_profiles', 'slideshow_items', 'announcement_popups'] as $tableName) {
+        foreach (['staff_profiles', 'announcement_popups'] as $tableName) {
             $this->assertFalse(Schema::hasColumn($tableName, 'school_levels'));
         }
         $this->assertDatabaseHas('staff_profiles', ['id' => $staff->id, 'name' => 'Migration teacher']);

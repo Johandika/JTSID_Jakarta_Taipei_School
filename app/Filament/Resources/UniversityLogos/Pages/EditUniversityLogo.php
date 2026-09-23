@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\SlideshowItems\Pages;
+namespace App\Filament\Resources\UniversityLogos\Pages;
 
-use App\Filament\Resources\SlideshowItems\SlideshowItemResource;
+use App\Filament\Resources\UniversityLogos\UniversityLogoResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditSlideshowItem extends EditRecord
+class EditUniversityLogo extends EditRecord
 {
-    protected static string $resource = SlideshowItemResource::class;
+    protected static string $resource = UniversityLogoResource::class;
 
     protected function getHeaderActions(): array
     {

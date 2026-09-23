@@ -14,9 +14,9 @@ use App\Livewire\ContentCatalog;
 use App\Models\AnnouncementPopup;
 use App\Models\Department;
 use App\Models\GradeLevel;
+use App\Models\HeroSlide;
 use App\Models\Post;
 use App\Models\PostCategory;
-use App\Models\SlideshowItem;
 use App\Models\SubjectResource;
 use App\Models\SubjectResourceType;
 use App\Models\User;
@@ -45,7 +45,7 @@ class CmsTest extends TestCase
     public function test_public_pages_and_all_locales_render(): void
     {
         foreach (['', '/id', '/zh'] as $locale) {
-            foreach (['/', '/about', '/academics', '/admissions', '/news', '/news/campus-story-1', '/resources', '/resources/calendar', '/staff', '/university-admission', '/contact'] as $path) {
+            foreach (['/', '/school-profile', '/academics', '/admissions', '/news', '/news/campus-story-1', '/resources', '/resources/calendar', '/staff', '/university-admission', '/contact'] as $path) {
                 $response = $this->get($locale.$path);
                 $this->assertSame(200, $response->status(), 'Failed public URL: '.$locale.$path);
             }
@@ -62,15 +62,15 @@ class CmsTest extends TestCase
         $localizedPages = [
             '' => [
                 'summary' => 'Discover our community, learning, and life at Jakarta Taipei School.',
-                'titles' => ['about' => 'About Jakarta Taipei School', 'academics' => 'Academics', 'admissions' => 'Admissions', 'board-of-directors' => 'Board of Directors', 'school-profile' => 'School Profile', 'history' => 'Our History', 'parent-association' => 'Parent Association', 'contact' => 'Location & Contact', 'mandarin-program' => 'Short-term Mandarin Program'],
+                'titles' => ['academics' => 'Academics', 'admissions' => 'Admissions', 'board-of-directors' => 'Board of Directors', 'school-profile' => 'School Profile', 'history' => 'Our History', 'parent-association' => 'Parent Association', 'contact' => 'Location & Contact', 'mandarin-program' => 'Short-term Mandarin Program'],
             ],
             '/id' => [
                 'summary' => 'Mengenal komunitas, kegiatan belajar, dan kehidupan di Jakarta Taipei School.',
-                'titles' => ['about' => 'Tentang Jakarta Taipei School', 'academics' => 'Akademik', 'admissions' => 'Pendaftaran', 'board-of-directors' => 'Dewan Pengurus', 'school-profile' => 'Profil Sekolah', 'history' => 'Sejarah Sekolah', 'parent-association' => 'Asosiasi Orang Tua', 'contact' => 'Lokasi & Kontak', 'mandarin-program' => 'Program Mandarin Jangka Pendek'],
+                'titles' => ['academics' => 'Akademik', 'admissions' => 'Pendaftaran', 'board-of-directors' => 'Dewan Pengurus', 'school-profile' => 'Profil Sekolah', 'history' => 'Sejarah Sekolah', 'parent-association' => 'Asosiasi Orang Tua', 'contact' => 'Lokasi & Kontak', 'mandarin-program' => 'Program Mandarin Jangka Pendek'],
             ],
             '/zh' => [
                 'summary' => '認識雅加達臺灣學校的社群、學習與校園生活。',
-                'titles' => ['about' => '認識雅加達臺灣學校', 'academics' => '課程設計', 'admissions' => '招生資訊', 'board-of-directors' => '理董事會', 'school-profile' => '學校概況', 'history' => '學校歷史', 'parent-association' => '家長委員會', 'contact' => '交通資訊與聯絡方式', 'mandarin-program' => '短期華語課程'],
+                'titles' => ['academics' => '課程設計', 'admissions' => '招生資訊', 'board-of-directors' => '理董事會', 'school-profile' => '學校概況', 'history' => '學校歷史', 'parent-association' => '家長委員會', 'contact' => '交通資訊與聯絡方式', 'mandarin-program' => '短期華語課程'],
             ],
         ];
 
@@ -80,8 +80,13 @@ class CmsTest extends TestCase
                     ->assertOk()
                     ->assertSeeText($title)
                     ->assertSeeText($locale['summary'])
-                    ->assertSee('class="prose"', false);
+                    ->assertSee('class="prose"', false)
+                    ->assertDontSee('<aside', false)
+                    ->assertDontSeeText('Sample content for local testing')
+                    ->assertDontSeeText('Konten contoh untuk pengujian lokal')
+                    ->assertDontSeeText('此為本機測試用範例內容');
             }
+            $this->get($prefix.'/about')->assertNotFound();
         }
 
         $this->get('/academics')->assertSeeText('Indonesian, Pancasila, and Religions');
@@ -121,6 +126,64 @@ class CmsTest extends TestCase
         $this->assertDatabaseMissing('audit_logs', ['entity_type' => 'Page']);
     }
 
+    public function test_demo_cleanup_migration_only_changes_exact_legacy_content(): void
+    {
+        $notices = [
+            'en' => '> Sample content for local testing. This is not an official school announcement.',
+            'id' => '> Konten contoh untuk pengujian lokal. Informasi ini belum menjadi pengumuman resmi sekolah.',
+            'zh-TW' => '> 此為本機測試用範例內容，並非學校正式公告。',
+        ];
+
+        foreach ($notices as $locale => $notice) {
+            $posts = DB::table('post_translations')->where('locale', $locale)->orderBy('id')->limit(2)->pluck('id');
+            DB::table('post_translations')->where('id', $posts[0])->update(['body' => $notice."\n\n".'Approved article body.']);
+            DB::table('post_translations')->where('id', $posts[1])->update(['body' => 'Custom body. '.$notice]);
+
+            $resources = DB::table('subject_resource_translations')->where('locale', $locale)->orderBy('id')->limit(2)->pluck('id');
+            DB::table('subject_resource_translations')->where('id', $resources[0])->update(['body' => $notice]);
+            DB::table('subject_resource_translations')->where('id', $resources[1])->update(['body' => 'Custom resource body. '.$notice]);
+        }
+
+        $staff = DB::table('staff_profiles')->orderBy('id')->limit(2)->pluck('id');
+        DB::table('staff_profiles')->where('id', $staff[0])->update(['responsibilities' => 'Sample profile for local testing. Replace with approved staff information.']);
+        DB::table('staff_profiles')->where('id', $staff[1])->update(['responsibilities' => 'Approved staff responsibilities.']);
+
+        $slides = DB::table('hero_slides')->orderBy('id')->limit(2)->pluck('id');
+        DB::table('hero_slides')->where('id', $slides[0])->update(['cta_url' => '/about']);
+        DB::table('hero_slides')->where('id', $slides[1])->update(['cta_url' => '/admissions']);
+
+        $migration = require database_path('migrations/2026_09_24_001353_clean_public_demo_content_and_about_hero_links.php');
+        $migration->up();
+
+        foreach ($notices as $locale => $notice) {
+            $this->assertSame('Approved article body.', DB::table('post_translations')->where('locale', $locale)->orderBy('id')->value('body'));
+            $this->assertSame('Custom body. '.$notice, DB::table('post_translations')->where('locale', $locale)->orderBy('id')->skip(1)->value('body'));
+            $this->assertNull(DB::table('subject_resource_translations')->where('locale', $locale)->orderBy('id')->value('body'));
+            $this->assertSame('Custom resource body. '.$notice, DB::table('subject_resource_translations')->where('locale', $locale)->orderBy('id')->skip(1)->value('body'));
+        }
+
+        $this->assertNull(DB::table('staff_profiles')->where('id', $staff[0])->value('responsibilities'));
+        $this->assertSame('Approved staff responsibilities.', DB::table('staff_profiles')->where('id', $staff[1])->value('responsibilities'));
+        $this->assertSame('/school-profile', DB::table('hero_slides')->where('id', $slides[0])->value('cta_url'));
+        $this->assertSame('/admissions', DB::table('hero_slides')->where('id', $slides[1])->value('cta_url'));
+    }
+
+    public function test_seeded_public_content_has_no_demo_notices(): void
+    {
+        foreach (['', '/id', '/zh'] as $prefix) {
+            foreach (['/news/campus-story-1', '/resources/calendar', '/staff'] as $path) {
+                $this->get($prefix.$path)
+                    ->assertOk()
+                    ->assertDontSeeText('Sample content for local testing')
+                    ->assertDontSeeText('Konten contoh untuk pengujian lokal')
+                    ->assertDontSeeText('此為本機測試用範例內容')
+                    ->assertDontSeeText('Sample profile for local testing');
+            }
+        }
+
+        $this->assertFalse(HeroSlide::where('cta_url', '/about')->exists());
+    }
+
     public function test_navigation_is_static_localized_and_removed_from_the_admin_and_database(): void
     {
         $this->assertFalse(Schema::hasTable('menu_items'));
@@ -131,21 +194,18 @@ class CmsTest extends TestCase
                 'labels' => ['About JTS', 'Academics', 'Admissions', 'News & Media', 'Subject Resources', 'University Admission', 'Board of Directors', 'School Profile', 'Our History', 'Parent Association', 'Our Team', 'Contact', 'Short-term Mandarin Program'],
                 'main_navigation' => 'Main navigation',
                 'mobile_navigation' => 'Mobile navigation',
-                'about_url' => '/about',
                 'child_url' => '/board-of-directors',
             ],
             '/id' => [
                 'labels' => ['Tentang JTS', 'Akademik', 'Pendaftaran', 'Berita & Media', 'Materi Pelajaran', 'Penerimaan Universitas', 'Dewan Pengurus', 'Profil Sekolah', 'Sejarah Sekolah', 'Asosiasi Orang Tua', 'Tim Kami', 'Kontak', 'Program Mandarin Jangka Pendek'],
                 'main_navigation' => 'Navigasi utama',
                 'mobile_navigation' => 'Navigasi seluler',
-                'about_url' => '/id/about',
                 'child_url' => '/id/board-of-directors',
             ],
             '/zh' => [
                 'labels' => ['認識學校', '課程設計', '招生資訊', '新聞與媒體', '學習資源', '大學錄取榜', '理董事會', '學校概況', '學校歷史', '家長委員會', '校園團隊', '聯絡我們', '短期華語課程'],
                 'main_navigation' => '主要導覽',
                 'mobile_navigation' => '行動版導覽',
-                'about_url' => '/zh/about',
                 'child_url' => '/zh/board-of-directors',
             ],
         ];
@@ -160,7 +220,9 @@ class CmsTest extends TestCase
             $response
                 ->assertSee('aria-label="'.$expected['main_navigation'].'"', false)
                 ->assertSee('aria-label="'.$expected['mobile_navigation'].'"', false)
-                ->assertSee('href="'.$expected['about_url'].'"', false)
+                ->assertSee('aria-controls="about-desktop-submenu"', false)
+                ->assertSee('aria-controls="about-mobile-submenu"', false)
+                ->assertDontSee('href="'.rtrim($url, '/').'/about"', false)
                 ->assertSee('href="'.$expected['child_url'].'"', false);
         }
 
@@ -188,6 +250,55 @@ class CmsTest extends TestCase
         $this->assertFalse(Schema::hasTable('menu_items'));
         $this->assertFalse(Schema::hasTable('menu_item_translations'));
         $this->assertDatabaseMissing('audit_logs', ['entity_type' => 'MenuItem']);
+    }
+
+    public function test_contacts_are_static_and_removed_from_the_admin_and_database(): void
+    {
+        $this->assertFalse(Schema::hasTable('contact_channels'));
+
+        foreach (['', '/id', '/zh'] as $prefix) {
+            $this->get($prefix.'/')
+                ->assertOk()
+                ->assertSee('href="tel:+62214523273"', false)
+                ->assertSee('href="tel:+62214530535"', false)
+                ->assertSee('href="mailto:jts@jtsid.org"', false)
+                ->assertSee('href="https://wa.me/6281385435909"', false)
+                ->assertSee('href="https://www.facebook.com/profile.php?id=100057615161035"', false)
+                ->assertSee('href="https://www.instagram.com/jakartataipeischoolofficial/"', false)
+                ->assertSee('href="https://youtube.com/@jakartataipeischool?si=5LP55sxC05ZOteLH"', false)
+                ->assertSee('src="'.asset('images/qr-whatsapp.png').'"', false);
+
+            $this->get($prefix.'/contact')
+                ->assertOk()
+                ->assertSeeText('Jl. Raya Kelapa Hybrida Blok QA3, Kelapa Gading, Jakarta Utara 14250, Indonesia')
+                ->assertSeeText('+62 (21) 452 3273')
+                ->assertSeeText('+62 (21) 453 0535')
+                ->assertSeeText('jts@jtsid.org');
+        }
+
+        $this->actingAs(User::where('email', 'admin@jts.local')->firstOrFail());
+        $this->get('/admin/contact-channels')->assertNotFound();
+        $this->get('/admin/contact-channels/create')->assertNotFound();
+        $this->get('/admin/contact-channels/1/edit')->assertNotFound();
+    }
+
+    public function test_contacts_removal_migration_can_be_rolled_back(): void
+    {
+        $migration = require database_path('migrations/2026_09_22_002145_remove_contact_channels_table.php');
+        $migration->down();
+
+        $this->assertTrue(Schema::hasTable('contact_channels'));
+
+        DB::table('audit_logs')->insert([
+            'action' => 'deleted',
+            'entity_type' => 'ContactChannel',
+            'entity_id' => 1,
+        ]);
+
+        $migration->up();
+
+        $this->assertFalse(Schema::hasTable('contact_channels'));
+        $this->assertDatabaseMissing('audit_logs', ['entity_type' => 'ContactChannel']);
     }
 
     public function test_drafts_future_posts_and_untranslated_content_are_not_public(): void
@@ -364,25 +475,40 @@ class CmsTest extends TestCase
             ->call('create')->assertHasFormErrors();
     }
 
-    public function test_slideshow_limit_and_replacement(): void
-    {
-        for ($i = 3; $i <= 10; $i++) {
-            SlideshowItem::create(['topic' => 'Slide '.$i, 'image' => 'images/seed-campus.jpg', 'is_active' => true]);
-        }
-        $slide = SlideshowItem::first();
-        $slide->update(['image' => 'images/seed-library.jpg']);
-        $this->assertSame(10, SlideshowItem::where('is_active', true)->count());
-        $this->expectException(ValidationException::class);
-        SlideshowItem::create(['topic' => 'Slide 11', 'image' => 'images/seed-campus.jpg', 'is_active' => true]);
-    }
-
     public function test_all_admin_lists_and_create_forms_render(): void
     {
         $this->actingAs(User::where('email', 'admin@jts.local')->first());
-        foreach (['posts', 'subject-resources', 'slideshow-items', 'contact-channels', 'staff-profiles', 'university-acceptances', 'departments', 'academic-years', 'users'] as $path) {
+        foreach (['posts', 'subject-resources', 'staff-profiles', 'university-acceptances', 'university-logos', 'hero-slides', 'departments', 'academic-years', 'users'] as $path) {
             $this->get('/admin/'.$path)->assertOk();
             $this->get('/admin/'.$path.'/create')->assertOk();
         }
         $this->get('/admin/audit-logs')->assertOk();
+    }
+
+    public function test_hero_slides_render_on_homepage_with_translations(): void
+    {
+        $this->get('/')
+            ->assertOk()
+            ->assertSee('Excellence in Trilingual Education')
+            ->assertSee('seed-classroom.jpg');
+
+        $this->get('/id')
+            ->assertOk()
+            ->assertSee('Keunggulan Pendidikan Tiga Bahasa')
+            ->assertSee('seed-classroom.jpg');
+
+        $this->get('/zh')
+            ->assertOk()
+            ->assertSee('深耕三語，開創卓越教育')
+            ->assertSee('seed-classroom.jpg');
+    }
+
+    public function test_empty_hero_slides_hides_hero_section_without_error(): void
+    {
+        HeroSlide::query()->delete();
+
+        $this->get('/')
+            ->assertOk()
+            ->assertDontSee('hero-diagonal-panel');
     }
 }

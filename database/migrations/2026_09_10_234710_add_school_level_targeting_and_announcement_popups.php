@@ -13,6 +13,9 @@ return new class extends Migration
     public function up(): void
     {
         foreach (['posts', 'subject_resources', 'slideshow_items', 'staff_profiles'] as $table) {
+            if (! Schema::hasTable($table)) {
+                continue;
+            }
             Schema::table($table, fn (Blueprint $table) => $table->json('school_levels')->nullable());
         }
         Schema::table('subject_resources', fn (Blueprint $table) => $table->unsignedBigInteger('grade_level_id')->nullable()->change());
@@ -45,6 +48,9 @@ return new class extends Migration
     {
         Schema::dropIfExists('announcement_popups');
         foreach (['posts', 'subject_resources', 'slideshow_items', 'staff_profiles'] as $table) {
+            if (! Schema::hasTable($table)) {
+                continue;
+            }
             Schema::table($table, fn (Blueprint $table) => $table->dropColumn('school_levels'));
         }
     }

@@ -1,32 +1,27 @@
 <x-layouts.site :transparent-nav="true">
     @php
         $site = \App\Support\Site::class;
-        $heroSlides = [
-            [
-                'image' => asset('images/campus.jpg'),
-                'tagline' => __('site.tagline'),
-                'title' => __('site.hero_slide_1_title'),
-                'description' => __('site.hero_slide_1_desc'),
-                'cta_text' => __('site.apply'),
-                'cta_url' => $site::path('/admissions'),
-            ],
-            [
-                'image' => asset('images/seed-classroom.jpg'),
-                'tagline' => __('site.school'),
-                'title' => __('site.hero_slide_2_title'),
-                'description' => __('site.hero_slide_2_desc'),
-                'cta_text' => __('site.explore'),
-                'cta_url' => $site::path('/about'),
-            ],
-            [
-                'image' => asset('images/seed-library.jpg'),
-                'tagline' => __('site.academics'),
-                'title' => __('site.hero_slide_3_title'),
-                'description' => __('site.hero_slide_3_desc'),
-                'cta_text' => __('site.read_more'),
-                'cta_url' => $site::path('/academics'),
-            ],
-        ];
+        $slides = collect($heroSlides ?? [])->map(function ($s) use ($site) {
+            $image = $s->image;
+            $imageUrl = str_starts_with($image, 'http')
+                ? $image
+                : (file_exists(public_path(ltrim($image, '/'))) ? asset(ltrim($image, '/')) : asset('storage/' . ltrim($image, '/')));
+
+            $ctaUrl = $s->cta_url;
+            if ($ctaUrl && ! str_starts_with($ctaUrl, 'http') && ! str_starts_with($ctaUrl, '#')) {
+                $ctaUrl = $site::path($ctaUrl);
+            }
+
+            return [
+                'image' => $imageUrl,
+                'tagline' => method_exists($s, 'trans') ? $s->trans('tagline') : ($s->tagline ?? ''),
+                'title' => method_exists($s, 'trans') ? $s->trans('title') : ($s->title ?? ''),
+                'description' => method_exists($s, 'trans') ? $s->trans('description') : ($s->description ?? ''),
+                'cta_text' => method_exists($s, 'trans') ? $s->trans('cta_text') : ($s->cta_text ?? ''),
+                'cta_url' => $ctaUrl ?: '#',
+            ];
+        })->values()->all();
+
 
         $curriculumPrograms = [
             [
@@ -65,13 +60,14 @@
     @endphp
 
     {{-- Hero Section: 70svh on Mobile (with next section peeking), Full Screen on Desktop --}}
+    @if(count($slides) > 0)
     <section class="relative h-[70svh] min-h-[500px] md:h-screen md:min-h-[640px] w-full overflow-hidden bg-black"
              x-data="{
                  current: 0,
-                 total: {{ count($heroSlides) }},
+                 total: {{ count($slides) }},
                  paused: false,
                  timer: null,
-                 slides: @js($heroSlides),
+                 slides: @js($slides),
                  init() {
                      this.startTimer();
                  },
@@ -96,7 +92,7 @@
              @mouseleave="paused = false">
 
         {{-- Background Image Slides --}}
-        @foreach($heroSlides as $idx => $slide)
+        @foreach($slides as $idx => $slide)
             <div x-show="current === {{ $idx }}"
                  x-transition:enter="transition ease-out duration-1000"
                  x-transition:enter-start="opacity-0 scale-100"
@@ -203,6 +199,7 @@
             </div>
         </div>
     </section>
+    @endif
 
     {{-- School Level Filter Bar (Below Hero on Homepage) --}}
     <div class="border-b border-line">
@@ -340,100 +337,369 @@
         </div>
     </section>
 
-    {{-- Section: Fasilitas JTS (Campus Facilities Marquee Showcase) --}}
-    <section class="py-16 sm:py-24 overflow-hidden bg-white">
-        {{-- Centered Header --}}
-        <div class="shell text-center mb-10 sm:mb-14">
-            <div class="flex items-center justify-center gap-3 mb-3">
-                <span class="h-px w-7 bg-jts"></span>
-                <span class="text-xs font-bold uppercase tracking-widest text-jts">{{ __('site.facilities_eyebrow') }}</span>
-                <span class="h-px w-7 bg-jts"></span>
-            </div>
-            <h2 class="section-title text-center text-balance">
-                {{ __('site.facilities_headline') }}
-            </h2>
-            <p class="mt-4 max-w-2xl mx-auto text-sm sm:text-base leading-relaxed text-muted text-center">
-                {{ __('site.facilities_desc') }}
-            </p>
-        </div>
+    {{-- Section: Fasilitas JTS (Campus Facilities Bento Grid & Pillars) --}}
+    <section class="py-16 sm:py-24 bg-white">
+        <div class="shell">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 xl:gap-14 items-center">
+                {{-- Left Column (Desktop): Bento Grid of 4 Cards --}}
+                <div class="lg:col-span-7 order-2 lg:order-1">
+                    <div class="grid grid-cols-1 sm:grid-cols-12 gap-3.5 sm:gap-4 lg:gap-5">
+                        {{-- Left Half of Bento: 1 Tall Card (Ruang Kelas Modern) --}}
+                        <div class="sm:col-span-6 flex">
+                            <div class="group relative w-full h-[320px] sm:h-[460px] lg:h-[490px] rounded-2xl overflow-hidden border border-line/70 bg-gray-900 shadow-sm hover:shadow-xl transition-all duration-300">
+                                <img src="{{ asset('images/programs/primary.jpg') }}"
+                                     alt="{{ __('site.facility_classroom') }}"
+                                     class="size-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-105"
+                                     loading="lazy">
 
-        @if($slides->isNotEmpty())
-            {{-- Marquee Full Width Wrapper --}}
-            <div class="relative w-full overflow-hidden py-4 sm:py-6">
-                {{-- Side Fade Masks --}}
-                <div class="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-36 lg:w-48 bg-gradient-to-r from-white via-white/80 to-transparent z-10"></div>
-                <div class="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-36 lg:w-48 bg-gradient-to-l from-white via-white/80 to-transparent z-10"></div>
+                                {{-- Dark gradient overlay --}}
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300 pointer-events-none group-hover:from-black/90"></div>
 
-                {{-- Infinite Marquee Track --}}
-                <div class="flex animate-marquee gap-6 sm:gap-8 lg:gap-10 hover:[animation-play-state:paused]">
-                    {{-- Render two identical sets so the -50% translateX loop is seamless --}}
-                    @php
-                        $marqueeSlides = $slides->count() < 4 ? $slides->concat($slides)->concat($slides) : $slides->concat($slides);
-                    @endphp
-                    @foreach($marqueeSlides as $slide)
-                        <div class="group relative w-[320px] sm:w-[440px] lg:w-[520px] aspect-[16/10] shrink-0 rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border border-line/70 bg-gray-900">
-                            {{-- Facility Image --}}
-                            <img src="{{ $site::image($slide->image) }}"
-                                 alt="{{ $slide->topic }}"
-                                 class="size-full object-cover transform transition-transform duration-500 ease-out group-hover:scale-105"
-                                 loading="lazy">
+                                {{-- Action badge --}}
+                                <div class="absolute top-4 right-4 size-8.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white/90 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0 shadow-sm z-10 pointer-events-none">
+                                    <x-site-icon name="arrow-up-right" class="size-4" />
+                                </div>
 
-                            {{-- Bottom Dark Gradient Overlay --}}
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none"></div>
+                                {{-- Bottom text --}}
+                                <div class="absolute inset-x-0 bottom-0 p-5 sm:p-6 z-10 pointer-events-none">
+                                    <span class="inline-block text-[11px] sm:text-xs font-bold uppercase tracking-wider text-accent mb-1 drop-shadow-xs">
+                                        {{ __('site.facility_tag_learning') }}
+                                    </span>
+                                    <h3 class="text-base sm:text-lg lg:text-xl font-bold text-white leading-snug drop-shadow-sm group-hover:text-amber-200 transition-colors">
+                                        {{ __('site.facility_classroom') }}
+                                    </h3>
+                                </div>
 
-                            {{-- Bottom Text / Content --}}
-                            <div class="absolute inset-x-0 bottom-0 p-6 sm:p-7 lg:p-8 z-10 pointer-events-none">
-                                <span class="block text-xs sm:text-sm font-bold uppercase tracking-wider text-accent mb-1.5 drop-shadow-xs">
-                                    {{ $slide->tag ?: __('site.facilities_eyebrow') }}
-                                </span>
-                                <h3 class="text-lg sm:text-xl lg:text-2xl font-bold text-white leading-snug drop-shadow-sm line-clamp-1">
-                                    {{ $slide->topic }}
-                                </h3>
+                                <a href="{{ $site::path('/profile') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_classroom') }}"></a>
+                            </div>
+                        </div>
+
+                        {{-- Right Half of Bento: 1 Top Horizontal Card + 2 Bottom Cards --}}
+                        <div class="sm:col-span-6 flex flex-col gap-3.5 sm:gap-4 lg:gap-5 h-full">
+                            {{-- Top Horizontal Card (Laboratorium Sains) --}}
+                            <div class="group relative w-full h-[180px] sm:h-[220px] lg:h-[235px] rounded-2xl overflow-hidden border border-line/70 bg-gray-900 shadow-sm hover:shadow-xl transition-all duration-300">
+                                <img src="{{ asset('images/programs/secondary.jpg') }}"
+                                     alt="{{ __('site.facility_lab') }}"
+                                     class="size-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-105"
+                                     loading="lazy">
+
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300 pointer-events-none group-hover:from-black/90"></div>
+
+                                <div class="absolute top-4 right-4 size-8.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white/90 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0 shadow-sm z-10 pointer-events-none">
+                                    <x-site-icon name="arrow-up-right" class="size-4" />
+                                </div>
+
+                                <div class="absolute inset-x-0 bottom-0 p-5 z-10 pointer-events-none">
+                                    <span class="inline-block text-[11px] sm:text-xs font-bold uppercase tracking-wider text-accent mb-1 drop-shadow-xs">
+                                        {{ __('site.facility_tag_exploration') }}
+                                    </span>
+                                    <h3 class="text-base sm:text-lg lg:text-xl font-bold text-white leading-snug drop-shadow-sm group-hover:text-amber-200 transition-colors">
+                                        {{ __('site.facility_lab') }}
+                                    </h3>
+                                </div>
+
+                                <a href="{{ $site::path('/profile') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_lab') }}"></a>
                             </div>
 
-                            @if($slide->link_url)
-                                <a href="{{ $site::path($slide->link_url) }}" class="absolute inset-0 z-20" aria-label="{{ $slide->topic }}"></a>
+                            {{-- Bottom Row: 2 Cards Side-by-Side --}}
+                            <div class="grid grid-cols-2 gap-3.5 sm:gap-4 lg:gap-5 flex-1">
+                                {{-- Card 3: Perpustakaan --}}
+                                <div class="group relative w-full h-[160px] sm:h-[220px] lg:h-[235px] rounded-2xl overflow-hidden border border-line/70 bg-gray-900 shadow-sm hover:shadow-xl transition-all duration-300">
+                                    <img src="{{ asset('images/seed-library.jpg') }}"
+                                         alt="{{ __('site.facility_library') }}"
+                                         class="size-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-105"
+                                         loading="lazy">
+
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300 pointer-events-none group-hover:from-black/90"></div>
+
+                                    <div class="absolute top-3.5 right-3.5 size-7.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white/90 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0 shadow-sm z-10 pointer-events-none">
+                                        <x-site-icon name="arrow-up-right" class="size-3.5" />
+                                    </div>
+
+                                    <div class="absolute inset-x-0 bottom-0 p-4 sm:p-4.5 z-10 pointer-events-none">
+                                        <span class="inline-block text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-accent mb-0.5 drop-shadow-xs">
+                                            {{ __('site.facility_tag_literacy') }}
+                                        </span>
+                                        <h3 class="text-xs sm:text-sm lg:text-base font-bold text-white leading-snug drop-shadow-sm group-hover:text-amber-200 transition-colors">
+                                            {{ __('site.facility_library') }}
+                                        </h3>
+                                    </div>
+
+                                    <a href="{{ $site::path('/profile') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_library') }}"></a>
+                                </div>
+
+                                {{-- Card 4: Fasilitas Olahraga --}}
+                                <div class="group relative w-full h-[160px] sm:h-[220px] lg:h-[235px] rounded-2xl overflow-hidden border border-line/70 bg-gray-900 shadow-sm hover:shadow-xl transition-all duration-300">
+                                    <img src="{{ asset('images/seed-classroom.jpg') }}"
+                                         alt="{{ __('site.facility_sports') }}"
+                                         class="size-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-105"
+                                         loading="lazy">
+
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent transition-opacity duration-300 pointer-events-none group-hover:from-black/90"></div>
+
+                                    <div class="absolute top-3.5 right-3.5 size-7.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center text-white/90 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-1 group-hover:translate-y-0 shadow-sm z-10 pointer-events-none">
+                                        <x-site-icon name="arrow-up-right" class="size-3.5" />
+                                    </div>
+
+                                    <div class="absolute inset-x-0 bottom-0 p-4 sm:p-4.5 z-10 pointer-events-none">
+                                        <span class="inline-block text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-accent mb-0.5 drop-shadow-xs">
+                                            {{ __('site.facility_tag_activity') }}
+                                        </span>
+                                        <h3 class="text-xs sm:text-sm lg:text-base font-bold text-white leading-snug drop-shadow-sm group-hover:text-amber-200 transition-colors">
+                                            {{ __('site.facility_sports') }}
+                                        </h3>
+                                    </div>
+
+                                    <a href="{{ $site::path('/profile') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_sports') }}"></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Right Column (Desktop): Header, Pillars & Link --}}
+                <div class="lg:col-span-5 flex flex-col justify-center order-1 lg:order-2">
+                    {{-- Eyebrow --}}
+                    <div class="flex items-center gap-2.5 mb-3.5">
+                        <span class="h-0.5 w-6 bg-jts"></span>
+                        <span class="text-xs font-bold uppercase tracking-widest text-jts">{{ __('site.facilities_eyebrow') }}</span>
+                    </div>
+
+                    {{-- Section Title --}}
+                    <h2 class="text-2xl sm:text-3xl lg:text-4xl xl:text-[40px] font-bold tracking-tight text-ink leading-[1.2] mb-4">
+                        {{ __('site.facilities_headline') }}
+                    </h2>
+
+                    {{-- Description --}}
+                    <p class="text-sm sm:text-base leading-relaxed text-muted mb-7 lg:mb-8 max-w-lg">
+                        {{ __('site.facilities_desc') }}
+                    </p>
+
+                    {{-- 3 Feature Cards --}}
+                    <div class="space-y-3 sm:space-y-3.5 mb-7 lg:mb-8">
+                        {{-- Pillar 1: Trilingual --}}
+                        <div class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-line shadow-2xs hover:shadow-sm hover:border-jts/40 transition-all duration-200">
+                            <span class="flex size-11 sm:size-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-jts border border-emerald-100">
+                                <x-site-icon name="languages" class="size-5 sm:size-6 text-jts" />
+                            </span>
+                            <span class="text-sm sm:text-base font-bold text-ink">
+                                {{ __('site.pillar_trilingual_title') }}
+                            </span>
+                        </div>
+
+                        {{-- Pillar 2: Curriculum --}}
+                        <div class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-line shadow-2xs hover:shadow-sm hover:border-jts/40 transition-all duration-200">
+                            <span class="flex size-11 sm:size-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-jts border border-emerald-100">
+                                <x-site-icon name="book-open" class="size-5 sm:size-6 text-jts" />
+                            </span>
+                            <span class="text-sm sm:text-base font-bold text-ink">
+                                {{ __('site.pillar_curriculum_title') }}
+                            </span>
+                        </div>
+
+                        {{-- Pillar 3: Character --}}
+                        <div class="flex items-center gap-4 p-4 rounded-2xl bg-white border border-line shadow-2xs hover:shadow-sm hover:border-jts/40 transition-all duration-200">
+                            <span class="flex size-11 sm:size-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-jts border border-emerald-100">
+                                <x-site-icon name="award" class="size-5 sm:size-6 text-jts" />
+                            </span>
+                            <span class="text-sm sm:text-base font-bold text-ink">
+                                {{ __('site.pillar_character_title') }}
+                            </span>
+                        </div>
+                    </div>
+
+                    {{-- Text Link with Arrow --}}
+                    <div>
+                        <a href="{{ $site::path('/profile') }}" class="inline-flex items-center gap-2 text-sm sm:text-base font-bold text-jts hover:text-[#104a31] transition-colors group">
+                            <span>{{ __('site.explore_facilities') }}</span>
+                            <x-site-icon name="arrow-right" class="size-4.5 transition-transform duration-200 group-hover:translate-x-1.5" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- Section: Berita & Media (News & Media - 1x3 Layout with Highlight Card & 3 Compact Cards) --}}
+    <section class="border-t border-line bg-[#f4f7f5] py-16 sm:py-24">
+        <div class="shell">
+            {{-- Section Header --}}
+            <div class="mb-10 sm:mb-12 max-w-3xl">
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-ink">{{ __('site.latest') }}</h2>
+                <p class="mt-2 text-sm sm:text-base text-muted max-w-2xl">
+                    {{ __('site.news_copy') }}
+                </p>
+            </div>
+
+            @php
+                $featuredPost = $posts->first();
+                $secondaryPosts = $posts->slice(1, 3);
+            @endphp
+
+            @if($featuredPost)
+                {{-- 1. Main Highlight Card (Top Horizontal Card) --}}
+                <article class="group relative flex flex-col lg:flex-row bg-white rounded-2xl border border-line/80 shadow-2xs hover:shadow-xl hover:border-jts/40 transition-all duration-300 overflow-hidden mb-8 sm:mb-10">
+                    {{-- Left: Cover Image (~50% width on Desktop) --}}
+                    <a href="{{ $site::path('/news/'.$featuredPost->slug) }}" class="relative w-full lg:w-1/2 aspect-[16/10] lg:aspect-auto overflow-hidden bg-gray-100 block shrink-0">
+                        <img src="{{ $site::image($featuredPost->image) }}"
+                             alt="{{ $featuredPost->title }}"
+                             class="size-full object-cover object-center transform transition-transform duration-500 ease-out group-hover:scale-105"
+                             loading="lazy" width="800" height="500">
+
+                        {{-- Floating Pill Badges on Photo --}}
+                        <div class="absolute top-4 left-4 z-10 flex flex-wrap gap-2">
+                            @if($featuredPost->category)
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-jts text-white shadow-md">
+                                    {{ __('site.'.$featuredPost->category->code) }}
+                                </span>
                             @endif
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-jts/90 text-white shadow-md backdrop-blur-xs">
+                                {{ $featuredPost->school_level_label }}
+                            </span>
+                        </div>
+                    </a>
+
+                    {{-- Right: Content Body (~50% width on Desktop) --}}
+                    <div class="p-6 sm:p-8 lg:p-10 flex flex-col justify-between flex-1">
+                        <div>
+                            {{-- Publication Date --}}
+                            <div class="text-xs sm:text-sm text-muted font-medium mb-3">
+                                {{ $featuredPost->upload_date->translatedFormat('d F Y') }}
+                            </div>
+
+                            {{-- Headline --}}
+                            <h3 class="text-xl sm:text-2xl font-bold leading-tight text-ink group-hover:text-jts transition-colors duration-200 mb-3.5 line-clamp-2 sm:line-clamp-3">
+                                <a href="{{ $site::path('/news/'.$featuredPost->slug) }}">
+                                    {{ $featuredPost->title }}
+                                </a>
+                            </h3>
+
+                            {{-- Excerpt Summary Paragraph --}}
+                            <p class="text-sm sm:text-base leading-relaxed text-muted line-clamp-3 mb-6">
+                                {{ $featuredPost->translation()?->summary }}
+                            </p>
+                        </div>
+
+                        {{-- Learn More Button (Exclusively on Highlight Card) --}}
+                        <div class="pt-4 border-t border-line/60 mt-auto">
+                            <a href="{{ $site::path('/news/'.$featuredPost->slug) }}" class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold uppercase tracking-wider text-jts hover:text-jts/80 group/link transition-all">
+                                <span>{{ __('site.learn_more') }}</span>
+                                <x-site-icon name="arrow-right" class="size-4 transition-transform duration-200 group-hover/link:translate-x-1" />
+                            </a>
+                        </div>
+                    </div>
+                </article>
+
+                {{-- 2. Three Cards Underneath (3-Column Grid) --}}
+                @if($secondaryPosts->isNotEmpty())
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mb-10 sm:mb-12">
+                        @foreach($secondaryPosts as $post)
+                            <article class="group relative flex flex-col bg-white rounded-2xl border border-line/80 shadow-2xs hover:shadow-xl hover:border-jts/40 transition-all duration-300 overflow-hidden">
+                                {{-- Thumbnail Image with Badge --}}
+                                <a href="{{ $site::path('/news/'.$post->slug) }}" class="relative aspect-[16/10] w-full overflow-hidden bg-gray-100 block">
+                                    <img src="{{ $site::image($post->image) }}"
+                                         alt="{{ $post->title }}"
+                                         class="size-full object-cover object-center transform transition-transform duration-500 ease-out group-hover:scale-105"
+                                         loading="lazy" width="400" height="250">
+
+                                    {{-- Floating Category Pill Badge (Green) --}}
+                                    <div class="absolute top-3.5 left-3.5 z-10 flex flex-wrap gap-1.5">
+                                        @if($post->category)
+                                            <span class="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-jts text-white shadow-md">
+                                                {{ __('site.'.$post->category->code) }}
+                                            </span>
+                                        @endif
+                                    </div>
+                                </a>
+
+                                {{-- Card Body --}}
+                                <div class="p-5 sm:p-6 flex flex-col flex-1 justify-between">
+                                    <div>
+                                        {{-- Publication Date --}}
+                                        <div class="text-xs text-muted font-medium mb-3">
+                                            {{ $post->upload_date->translatedFormat('d F Y') }}
+                                        </div>
+
+                                        {{-- Title & Circular Arrow Button Row --}}
+                                        <div class="flex items-start justify-between gap-3">
+                                            <h4 class="text-sm sm:text-base font-bold leading-snug text-ink group-hover:text-jts transition-colors duration-200 line-clamp-3 flex-1">
+                                                <a href="{{ $site::path('/news/'.$post->slug) }}">
+                                                    {{ $post->title }}
+                                                </a>
+                                            </h4>
+
+                                            {{-- Circular Arrow Button --}}
+                                            <a href="{{ $site::path('/news/'.$post->slug) }}"
+                                               aria-label="{{ $post->title }}"
+                                               class="size-9 sm:size-10 rounded-full bg-[#eef5f0] text-jts flex items-center justify-center shrink-0 group-hover:bg-jts group-hover:text-white transition-all duration-200 shadow-2xs hover:scale-105">
+                                                <x-site-icon name="arrow-right" class="size-4" />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        @endforeach
+                    </div>
+                @endif
+
+                {{-- 3. Centered Bottom CTA Button (Lihat Berita Lainnya) --}}
+                <div class="text-center">
+                    <a href="{{ $site::path('/news') }}"
+                       class="inline-flex items-center gap-2 rounded-lg border border-jts px-6 py-3 text-xs sm:text-sm font-bold uppercase tracking-wider text-jts hover:bg-jts hover:text-white transition-all shadow-2xs hover:shadow-md group">
+                        <span>{{ __('site.see_more_news') }}</span>
+                        <x-site-icon name="arrow-right" class="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+                    </a>
+                </div>
+            @else
+                {{-- Empty State Fallback --}}
+                <div class="text-center py-16 bg-white rounded-2xl border border-dashed border-line">
+                    <x-site-icon name="newspaper" class="size-10 mx-auto text-muted mb-3"/>
+                    <p class="text-base font-semibold text-ink">{{ __('site.no_results') }}</p>
+                    <p class="text-sm text-muted mt-1">{{ __('site.news_copy') }}</p>
+                </div>
+            @endif
+        </div>
+    </section>
+
+    {{-- Section: Logo Kampus Lulusan JTS (University Logos Marquee) --}}
+    @if(isset($universityLogos) && $universityLogos->isNotEmpty())
+        @php
+            $marqueeLogos = $universityLogos->count() < 8
+                ? $universityLogos->concat($universityLogos)->concat($universityLogos)
+                : $universityLogos->concat($universityLogos);
+        @endphp
+        <section class="border-t border-line bg-white py-14 sm:py-18 overflow-hidden">
+            <div class="shell mb-8 sm:mb-10 text-center">
+                <div class="flex items-center justify-center gap-3 mb-2.5">
+                    <span class="h-px w-6 bg-jts"></span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-jts">{{ __('site.alumni_eyebrow') }}</span>
+                    <span class="h-px w-6 bg-jts"></span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-bold tracking-tight text-ink text-center text-balance">
+                    {{ __('site.alumni_headline') }}
+                </h2>
+            </div>
+
+            {{-- Infinite Marquee Track with Side Fade Masks --}}
+            <div class="relative w-full overflow-hidden py-6 sm:py-8">
+                {{-- Left Fade Mask --}}
+                <div class="pointer-events-none absolute inset-y-0 left-0 w-20 sm:w-44 lg:w-56 bg-gradient-to-r from-white via-white/80 to-transparent z-10"></div>
+                {{-- Right Fade Mask --}}
+                <div class="pointer-events-none absolute inset-y-0 right-0 w-20 sm:w-44 lg:w-56 bg-gradient-to-l from-white via-white/80 to-transparent z-10"></div>
+
+                {{-- Scrolling Track --}}
+                <div class="flex animate-marquee items-center gap-14 sm:gap-20 lg:gap-24 hover:[animation-play-state:paused]">
+                    @foreach($marqueeLogos as $uni)
+                        <div class="shrink-0 flex items-center justify-center h-16 sm:h-20 lg:h-22 w-auto min-w-[140px] sm:min-w-[180px] max-w-[240px] sm:max-w-[280px] px-4 grayscale opacity-90 hover:grayscale-0 hover:opacity-100 hover:scale-105 transition-all duration-300"
+                             title="{{ $uni->title ?? 'University Logo' }}">
+                            <img src="{{ $site::image($uni->logo) }}"
+                                 alt="{{ $uni->title ?? 'University Logo' }}"
+                                 class="h-12 sm:h-16 lg:h-18 w-auto max-w-full object-contain pointer-events-none select-none"
+                                 loading="lazy">
                         </div>
                     @endforeach
                 </div>
             </div>
-
-        @endif
-
-        {{-- Centered Bottom CTA --}}
-        <div class="mt-10 sm:mt-12 text-center">
-            <a href="{{ $site::path('/profile') }}" class="btn btn-primary rounded-lg px-6 py-3 shadow-xs hover:shadow-md transition-all inline-flex items-center gap-2 group">
-                <span>{{ __('site.explore_facilities') }}</span>
-                <x-site-icon name="arrow-right" class="size-4 transition-transform duration-200 group-hover:translate-x-1"/>
-            </a>
-        </div>
-    </section>
-
-    {{-- Section: Berita & Media (News & Media) --}}
-    <section class="shell py-16 sm:py-20">
-        <div class="mb-10 flex flex-col sm:flex-row sm:items-end justify-between gap-5">
-            <div>
-                <p class="eyebrow">{{ __('site.news') }}</p>
-                <h2 class="section-title mt-1">{{ __('site.latest') }}</h2>
-                <p class="mt-2 text-sm sm:text-base text-muted max-w-xl">{{ __('site.news_copy') }}</p>
-            </div>
-            <div class="shrink-0">
-                <a class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-line text-sm font-semibold text-ink hover:text-jts hover:border-jts/40 hover:bg-jts/5 transition-all shadow-2xs group" href="{{ $site::path('/news') }}">
-                    <span>{{ __('site.view_all_news') }}</span>
-                    <x-site-icon name="arrow-right" class="size-4 text-jts transition-transform duration-200 group-hover:translate-x-1"/>
-                </a>
-            </div>
-        </div>
-        <div class="grid gap-6 sm:gap-8 md:grid-cols-3">
-            @forelse($posts as $post)
-                <x-news-item :post="$post"/>
-            @empty
-                <div class="col-span-3 text-center py-12 bg-gray-50 rounded-xl border border-dashed border-line">
-                    <x-site-icon name="newspaper" class="size-8 mx-auto text-muted mb-2"/>
-                    <p class="text-sm font-medium text-muted">{{ __('site.no_results') }}</p>
-                </div>
-            @endforelse
-        </div>
-    </section>
+        </section>
+    @endif
 </x-layouts.site>

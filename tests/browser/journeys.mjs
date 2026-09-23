@@ -12,6 +12,11 @@ const visit = async path => {
     const response = await page.goto(`http://localhost:8000${path}`, { waitUntil: 'networkidle', timeout: 60000 });
     expect(response.status(), path).toBe(200);
 };
+const assertStaticContentAligned = async () => {
+    const heading = await page.locator('.page-heading h1').boundingBox();
+    const article = await page.locator('main article').boundingBox();
+    expect(Math.abs(heading.x - article.x)).toBeLessThanOrEqual(1);
+};
 try {
     if (!process.argv.includes('--admin-only')) {
     await visit('/');
@@ -20,8 +25,23 @@ try {
         await announcement.getByRole('button', { name: 'Close', exact: true }).click();
     }
     await page.locator('footer').scrollIntoViewIfNeeded();
-    await expect.poll(() => page.locator('img[alt="WhatsApp QR"]').evaluate(image => image.naturalWidth)).toBeGreaterThan(0);
+    await page.getByRole('button', { name: 'Scan JTS contact QR code' }).click();
+    await expect(page.locator('#jts-qr-modal')).toBeVisible();
+    await expect.poll(() => page.locator('img[alt="JTS admissions WhatsApp QR code"]').evaluate(image => image.naturalWidth)).toBeGreaterThan(0);
+    await page.locator('#jts-qr-modal').getByRole('button', { name: 'Close' }).click();
     await page.evaluate(() => window.scrollTo(0, 0));
+    const desktopAbout = page.getByRole('navigation', { name: 'Main navigation' }).getByRole('button', { name: 'About JTS' });
+    await expect(desktopAbout).toHaveAttribute('aria-expanded', 'false');
+    await desktopAbout.click();
+    await expect(desktopAbout).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('#about-desktop-submenu').getByRole('link', { name: 'School Profile' })).toHaveAttribute('href', '/school-profile');
+    await page.keyboard.press('Escape');
+    await expect(desktopAbout).toHaveAttribute('aria-expanded', 'false');
+    await desktopAbout.focus();
+    await page.keyboard.press('Enter');
+    await expect(desktopAbout).toHaveAttribute('aria-expanded', 'true');
+    await page.mouse.click(1200, 500);
+    await expect(desktopAbout).toHaveAttribute('aria-expanded', 'false');
     await page.screenshot({ path: 'test-results/home-desktop.png', fullPage: true });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.evaluate(() => window.scrollTo(0, 0));
@@ -29,12 +49,32 @@ try {
     await page.screenshot({ path: 'test-results/home-mobile.png', fullPage: true });
     await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
     await expect(page.locator('#mobile-menu')).toBeVisible();
+    const mobileAbout = page.locator('#mobile-menu').getByRole('button', { name: 'About JTS' });
+    await expect(mobileAbout).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator('#about-mobile-submenu')).toBeHidden();
+    await mobileAbout.click();
+    await expect(mobileAbout).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('#about-mobile-submenu').getByRole('link', { name: 'School Profile' })).toHaveAttribute('href', '/school-profile');
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#mobile-menu')).toBeHidden();
+    await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
+    await mobileAbout.focus();
+    await page.keyboard.press('Space');
+    await expect(mobileAbout).toHaveAttribute('aria-expanded', 'true');
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Open navigation', exact: true }).click();
     await page.locator('#mobile-menu').getByRole('link', { name: 'Academics', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'Academics', exact: true })).toBeVisible();
     await visit('/id');
     await expect(page.getByRole('heading', { name: 'Kabar terbaru JTS' })).toBeVisible();
+    await page.getByRole('button', { name: 'Buka navigasi', exact: true }).click();
+    await page.locator('#mobile-menu').getByRole('button', { name: 'Tentang JTS' }).click();
+    await expect(page.locator('#about-mobile-submenu').getByRole('link', { name: 'Profil Sekolah' })).toHaveAttribute('href', '/id/school-profile');
     await visit('/zh');
     await expect(page.getByRole('heading', { name: '校園最新消息' })).toBeVisible();
+    await page.getByRole('button', { name: '開啟導覽', exact: true }).click();
+    await page.locator('#mobile-menu').getByRole('button', { name: '認識學校' }).click();
+    await expect(page.locator('#about-mobile-submenu').getByRole('link', { name: '學校概況' })).toHaveAttribute('href', '/zh/school-profile');
     console.log('PASS: homepage, QR image, mobile navigation, Indonesian, Traditional Chinese');
 
     await page.setViewportSize({ width: 1440, height: 1000 });
@@ -89,14 +129,21 @@ try {
     await page.screenshot({ path: 'test-results/admin-mobile.png', fullPage: true, animations: 'disabled' });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await expect(page.getByRole('link', { name: 'Pages', exact: true })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Contacts & QR', exact: true })).toHaveCount(0);
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await visit('/about');
-    await expect(page.getByRole('heading', { name: 'About Jakarta Taipei School' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Our school community' })).toBeVisible();
+    for (const path of ['/about', '/id/about', '/zh/about']) {
+        expect((await page.request.get(`http://localhost:8000${path}`)).status()).toBe(404);
+    }
+    await visit('/school-profile');
+    await expect(page.getByRole('heading', { name: 'School Profile' })).toBeVisible();
+    await assertStaticContentAligned();
+    await expect(page.locator('main aside')).toHaveCount(0);
+    await expect(page.locator('main')).not.toContainText('Sample content for local testing');
     await page.setViewportSize({ width: 390, height: 844 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await visit('/id/admissions');
     await expect(page.getByRole('heading', { name: 'Pendaftaran' })).toBeVisible();
+    await assertStaticContentAligned();
     await expect(page.getByRole('link', { name: 'program Mandarin' })).toHaveAttribute('href', '/id/mandarin-program');
     console.log('PASS: Pages removed from admin and static localized pages render');
     expect(errors).toEqual([]);

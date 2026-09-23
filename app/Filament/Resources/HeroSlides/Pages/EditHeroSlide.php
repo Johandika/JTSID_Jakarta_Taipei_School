@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\ContactChannels\Pages;
+namespace App\Filament\Resources\HeroSlides\Pages;
 
-use App\Filament\Resources\ContactChannels\ContactChannelResource;
+use App\Filament\Resources\HeroSlides\HeroSlideResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditContactChannel extends EditRecord
+class EditHeroSlide extends EditRecord
 {
-    protected static string $resource = ContactChannelResource::class;
+    protected static string $resource = HeroSlideResource::class;
 
     protected function getHeaderActions(): array
     {

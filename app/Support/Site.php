@@ -30,13 +30,4 @@ class Site
     {
         return $path ? asset('storage/'.$path) : asset('images/campus.jpg');
     }
-
-    public static function contactUrl($contact): string
-    {
-        return match ($contact->channel) {
-            'phone', 'admission_tel' => 'tel:'.preg_replace('/[^+0-9]/', '', $contact->value),
-            'email' => 'mailto:'.filter_var($contact->value, FILTER_SANITIZE_EMAIL),
-            default => preg_match('~^https?://~i', $contact->value) ? $contact->value : '#',
-        };
-    }
 }

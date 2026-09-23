@@ -1,5 +1,4 @@
 @props([
-    'slug',
     'title',
     'summary',
     'seoTitle' => null,
@@ -10,13 +9,7 @@
 
 <x-layouts.site :title="$seoTitle ?: $title" :description="$summary">
     <x-page-heading :title="$title" :description="$summary" />
-    <div class="shell grid gap-10 py-12 lg:grid-cols-[220px_1fr]">
-        <aside class="space-y-1 self-start border-l-2 border-line pl-5">
-            @foreach(['about', 'academics', 'admissions', 'staff', 'contact'] as $path)
-                <a class="block py-3 text-sm {{ $slug === $path ? 'font-bold text-jts' : 'text-muted hover:text-jts' }}"
-                    href="{{ \App\Support\Site::path('/'.$path) }}">{{ __('site.'.$path) }}</a>
-            @endforeach
-        </aside>
+    <div class="shell py-12">
         <article class="min-w-0 max-w-3xl">
             @if($heroImage)
                 <img src="{{ asset($heroImage) }}" alt="{{ $title }}"

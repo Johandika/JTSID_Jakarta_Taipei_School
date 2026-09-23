@@ -7,7 +7,6 @@ use App\Http\Middleware\SetLocale;
 use Illuminate\Support\Facades\Route;
 
 $staticPages = [
-    'about',
     'academics',
     'admissions',
     'board-of-directors',

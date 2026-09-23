@@ -5,13 +5,13 @@ namespace App\Providers;
 use App\Models\AcademicYear;
 use App\Models\AnnouncementPopup;
 use App\Models\AuditLog;
-use App\Models\ContactChannel;
 use App\Models\Department;
+use App\Models\HeroSlide;
 use App\Models\Post;
-use App\Models\SlideshowItem;
 use App\Models\StaffProfile;
 use App\Models\SubjectResource;
 use App\Models\UniversityAcceptance;
+use App\Models\UniversityLogo;
 use App\Models\User;
 use App\Policies\ContentPolicy;
 use App\Policies\GlobalContentPolicy;
@@ -45,12 +45,11 @@ class AppServiceProvider extends ServiceProvider
         foreach ([Post::class, SubjectResource::class, StaffProfile::class, UniversityAcceptance::class] as $model) {
             Gate::policy($model, ContentPolicy::class);
         }
-        foreach ([AnnouncementPopup::class, SlideshowItem::class, ContactChannel::class, Department::class, AcademicYear::class] as $model) {
+        foreach ([AnnouncementPopup::class, UniversityLogo::class, HeroSlide::class, Department::class, AcademicYear::class] as $model) {
             Gate::policy($model, GlobalContentPolicy::class);
         }
         Gate::policy(User::class, UserPolicy::class);
         View::composer('components.layouts.site', function ($view) {
-            $view->with('contacts', ContactChannel::orderBy('sort_order')->get());
             $view->with('announcementPopup', AnnouncementPopup::visible()->orderBy('sort_order')->orderByDesc('id')->first());
         });
         Event::listen(Login::class, function ($event) {

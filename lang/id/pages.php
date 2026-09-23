@@ -1,28 +1,19 @@
 <?php
 
 $standardPage = [
-    'notice' => 'Konten contoh untuk pengujian lokal. Informasi ini belum menjadi pengumuman resmi sekolah.',
     'community_heading' => 'Komunitas sekolah kami',
     'community_body' => 'Jakarta Taipei School menghubungkan bahasa, budaya, dan pengalaman belajar dalam lingkungan sekolah yang beragam.',
     'learning_heading' => 'Belajar bersama',
     'learning_body' => 'Kehidupan sekolah mencakup pembelajaran akademik, bahasa, kegiatan siswa, dan hubungan dengan orang tua.',
-    'closing' => 'Konten rinci untuk halaman ini dapat dilengkapi dengan informasi yang telah disetujui sekolah.',
 ];
 
 $summary = 'Mengenal komunitas, kegiatan belajar, dan kehidupan di Jakarta Taipei School.';
 
 return [
-    'about' => [
-        'title' => 'Tentang Jakarta Taipei School',
-        'summary' => $summary,
-        'seo_title' => 'Tentang Jakarta Taipei School',
-        'body' => $standardPage,
-    ],
     'academics' => [
         'title' => 'Akademik',
         'summary' => $summary,
         'seo_title' => 'Akademik',
-        'notice' => $standardPage['notice'],
         'mandarin_heading' => 'Mandarin',
         'mandarin_body' => 'Bahasa, literasi, matematika, sains, dan pembelajaran budaya dari TK hingga SMA.',
         'indonesian_heading' => 'Bahasa Indonesia, Pancasila, dan Agama',
@@ -34,7 +25,6 @@ return [
         'title' => 'Pendaftaran',
         'summary' => $summary,
         'seo_title' => 'Pendaftaran',
-        'notice' => $standardPage['notice'],
         'journey_heading' => 'Mulai perjalanan Anda di JTS',
         'steps' => [
             'Hubungi bagian pendaftaran untuk mengetahui jenjang dan ketersediaan tempat.',
@@ -60,6 +50,50 @@ return [
         'title' => 'Profil Sekolah',
         'summary' => $summary,
         'seo_title' => 'Profil Sekolah',
+        'eyebrow' => 'SEKOLAH SPK INTERNASIONAL • DIDIRIKAN 1991',
+        'headline' => 'Membentuk Generasi Unggul Tiga Bahasa Berdaya Saing Global',
+        'subheadline' => 'Jakarta Taipei School (JTS) adalah institusi pendidikan terkemuka di Kelapa Gading, Jakarta Utara, yang memadukan keunggulan kurikulum Taiwan, standar internasional Cambridge, serta nilai kebangsaan Indonesia.',
+        'stats' => [
+            'year' => ['num' => '1991', 'label' => 'Tahun Didirikan'],
+            'spk' => ['num' => 'SPK', 'label' => 'Status Kemendikbudristek'],
+            'curriculum' => ['num' => '2019', 'label' => 'Silabus Kemdikbud Taiwan'],
+            'languages' => ['num' => '3', 'label' => 'Bahasa Pengantar Utama'],
+        ],
+        'overview_title' => 'Tentang Jakarta Taipei School',
+        'overview_p1' => 'Didirikan pada tahun 1991 di Kelapa Gading, Jakarta Utara, Indonesia, Jakarta Taipei School (JTS) telah berdedikasi selama lebih dari tiga dekade dalam menyediakan pendidikan bermutu tinggi bagi para peserta didik.',
+        'overview_p2' => 'Sekolah kami terdaftar secara resmi sebagai sekolah SPK (Satuan Pendidikan Kerjasama) oleh Kemendikbudristek Indonesia dan menggunakan silabus kurikulum yang dikeluarkan oleh Kementerian Pendidikan Taiwan pada tahun 2019, membina kemampuan nalar kritis, wawasan global, serta integritas karakter siswa.',
+        'trilingual_heading' => 'Pilar Pendidikan Tiga Bahasa (Trilingual Education)',
+        'trilingual_subheading' => 'Di JTS, pembelajaran bahasa dirancang terpadu sebagai sarana berpikir, berkreasi, dan meraih prestasi di kancah internasional.',
+        'levels_note_title' => 'Penerapan Jenjang Bahasa',
+        'levels_note_desc' => 'Jenjang SD, SMP, dan SMA menerapkan kurikulum Tiga Bahasa penuh (Mandarin, Inggris, dan Indonesia). Khusus untuk jenjang TK, proses belajar menggunakan Dua Bahasa (Mandarin dan Inggris) guna menanamkan fondasi komunikasi alami sejak dini.',
+        'pillars' => [
+            'mandarin' => [
+                'title' => 'Bahasa Mandarin (Immersion)',
+                'badge' => 'Sertifikat Pendidik Taiwan',
+                'desc' => 'Semua guru mempunyai kualifikasi terbaik dan sertifikat pengajar resmi dari Taiwan. Bersama dengan itu, kami menyediakan lingkungan belajar Bahasa Mandarin terbaik dan imersif untuk setiap mata pelajaran.',
+            ],
+            'english' => [
+                'title' => 'Bahasa Inggris (Cambridge)',
+                'badge' => 'Cambridge Curriculum',
+                'desc' => 'Untuk mata pelajaran Bahasa Inggris, kami menggunakan buku teks pelajaran resmi dari Cambridge yang teruji internasional untuk membangun kefasihan literasi dan komunikasi akademik berstandar global.',
+            ],
+            'indonesian' => [
+                'title' => 'Bahasa Indonesia (Nasional)',
+                'badge' => 'Kemendikbudristek',
+                'desc' => 'Pembelajaran mata pelajaran Bahasa Indonesia disusun berdasarkan kurikulum baru dari Kemendikbudristek Indonesia, memupuk wawasan kebangsaan, apresiasi budaya lokal, serta etika kebhinekaan.',
+            ],
+        ],
+        'excellence_heading' => 'Pendidik Tersertifikasi & Jalur Prestasi Universitas Internasional',
+        'excellence_p1' => 'Anak-anak dapat tumbuh dalam lingkungan tiga bahasa yang berkualitas tinggi, mengembangkan potensi unik mereka secara maksimal. Siswa dibimbing secara intensif untuk berpartisipasi mengikuti berbagai kompetisi di luar sekolah serta meraih sertifikat atau prestasi dalam bahasa asing.',
+        'excellence_p2' => 'Berbekal kompetensi trilingual dan persiapan akademik yang komprehensif, para lulusan JTS berhasil melanjutkan studi ke berbagai universitas internasional terbaik di Taiwan, kawasan Asia, hingga perguruan tinggi terkemuka di mancanegara.',
+        'excellence_card1_title' => 'Kompetisi & Sertifikasi Asing',
+        'excellence_card1_desc' => 'Bimbingan intensif untuk kompetisi antar-sekolah dan pencapaian sertifikasi bahasa asing resmi (TOCFL & Cambridge).',
+        'excellence_card2_title' => 'Universitas Internasional Terbaik',
+        'excellence_card2_desc' => 'Jalur akademik terbukti mengantarkan lulusan diterima di berbagai universitas terkemuka di Taiwan dan mancanegara.',
+        'cta_title' => 'Wujudkan Masa Depan Gemilang Bersama JTS',
+        'cta_desc' => 'Kunjungi kampus kami di Kelapa Gading atau hubungi staf penerimaan siswa untuk informasi pendaftaran dan jadwal tur sekolah.',
+        'cta_admissions' => 'Informasi Pendaftaran',
+        'cta_contact' => 'Hubungi Kami',
         'body' => $standardPage,
     ],
     'history' => [
@@ -78,10 +112,10 @@ return [
         'title' => 'Lokasi & Kontak',
         'summary' => $summary,
         'seo_title' => 'Lokasi & Kontak',
-        'notice' => $standardPage['notice'],
         'heading' => 'Kunjungi Jakarta Taipei School',
-        'address' => 'Kelapa Gading, Jakarta Utara, Indonesia.',
-        'telephone' => 'Telepon: +62 21 452 3273',
+        'address_label' => 'Alamat',
+        'telephone_label' => 'Telepon',
+        'email_label' => 'Email',
         'contact_prefix' => 'Silakan hubungi sekolah sebelum berkunjung. ',
         'contact_link' => 'Hubungi melalui WhatsApp',
         'contact_suffix' => '.',

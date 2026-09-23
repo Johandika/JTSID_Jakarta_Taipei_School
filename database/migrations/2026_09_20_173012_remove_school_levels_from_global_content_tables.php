@@ -12,6 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         foreach (['staff_profiles', 'slideshow_items', 'announcement_popups'] as $tableName) {
+            if (! Schema::hasTable($tableName)) {
+                continue;
+            }
+
             Schema::table($tableName, function (Blueprint $table): void {
                 $table->dropColumn('school_levels');
             });
@@ -24,6 +28,10 @@ return new class extends Migration
     public function down(): void
     {
         foreach (['staff_profiles', 'slideshow_items', 'announcement_popups'] as $tableName) {
+            if (! Schema::hasTable($tableName)) {
+                continue;
+            }
+
             Schema::table($tableName, function (Blueprint $table): void {
                 $table->json('school_levels')->nullable();
             });

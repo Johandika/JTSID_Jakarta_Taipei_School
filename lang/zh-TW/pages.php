@@ -1,28 +1,19 @@
 <?php
 
 $standardPage = [
-    'notice' => '此為本機測試用範例內容，並非學校正式公告。',
     'community_heading' => '我們的學校社群',
     'community_body' => '雅加達臺灣學校在多元環境中連結語言、文化與學習經驗。',
     'learning_heading' => '共同學習',
     'learning_body' => '校園生活涵蓋學科、語言、學生活動，以及與家長的合作。',
-    'closing' => '本頁詳細內容待學校核准後補充。',
 ];
 
 $summary = '認識雅加達臺灣學校的社群、學習與校園生活。';
 
 return [
-    'about' => [
-        'title' => '認識雅加達臺灣學校',
-        'summary' => $summary,
-        'seo_title' => '認識雅加達臺灣學校',
-        'body' => $standardPage,
-    ],
     'academics' => [
         'title' => '課程設計',
         'summary' => $summary,
         'seo_title' => '課程設計',
-        'notice' => $standardPage['notice'],
         'mandarin_heading' => '華語課程',
         'mandarin_body' => '從幼兒園到高中，涵蓋語文、數學、科學及文化學習。',
         'indonesian_heading' => '印尼語、建國五原則與宗教',
@@ -34,7 +25,6 @@ return [
         'title' => '招生資訊',
         'summary' => $summary,
         'seo_title' => '招生資訊',
-        'notice' => $standardPage['notice'],
         'journey_heading' => '開啟您在本校的旅程',
         'steps' => [
             '聯絡招生處，了解學制及名額。',
@@ -60,6 +50,50 @@ return [
         'title' => '學校概況',
         'summary' => $summary,
         'seo_title' => '學校概況',
+        'eyebrow' => '印尼政府認證 SPK 國際學校 • 創立於 1991 年',
+        'headline' => '深耕三語卓越教育，培育具備全球視野的未來領袖',
+        'subheadline' => '雅加達臺灣學校（JTS）座落於印尼北雅加達 Kelapa Gading，結合臺灣優質教育部課綱、劍橋國際英語標準與印尼在地文化，提供全方位全人教育。',
+        'stats' => [
+            'year' => ['num' => '1991', 'label' => '創校年份'],
+            'spk' => ['num' => 'SPK', 'label' => '印尼教育部認證'],
+            'curriculum' => ['num' => '2019', 'label' => '臺灣教育部課綱'],
+            'languages' => ['num' => '3', 'label' => '教學語言環境'],
+        ],
+        'overview_title' => '關於雅加達臺灣學校',
+        'overview_p1' => '雅加達臺灣學校（JTS）於 1991 年創立於印尼北雅加達 Kelapa Gading，三十餘年來始終堅持卓越辦學理念，致力為在印尼學子提供優質完備且溫暖關懷的教育環境。',
+        'overview_p2' => '本校正式立案並經印尼教育文化研究技術部（Kemendikbudristek）核准為 SPK（合作教育機構）學校，全面採用臺灣教育部 2019 年頒布之課綱進行教學，注重素養導向、多元思維、品德涵養與全球競合力。',
+        'trilingual_heading' => '三語教育核心架構（Trilingual Education）',
+        'trilingual_subheading' => '在 JTS，語言不只是學科知識，更是探索世界、連結跨文化與開啟國際視野的關鍵鑰匙。',
+        'levels_note_title' => '各學段語言教學規劃',
+        'levels_note_desc' => '國小、國中與高中學段全面推行中、英、印尼三語教學。幼兒園學段則專注於中文與英語雙語浸潤，從小建立扎實自信的雙語溝通基礎與生活常規。',
+        'pillars' => [
+            'mandarin' => [
+                'title' => '華語浸潤教學',
+                'badge' => '臺灣合格教師團隊',
+                'desc' => '全體教師均具備臺灣教育部認可之最高資質與合格教師證，營造沉浸式優質華語學習環境，兼具深厚文化底蘊與學術深度。',
+            ],
+            'english' => [
+                'title' => '劍橋英語課程',
+                'badge' => 'Cambridge 官方教材',
+                'desc' => '英語學科全面採用劍橋（Cambridge）原版權威教材，依循國際標準嚴謹規劃，全方位強化聽說讀寫與跨學科英語學術能力。',
+            ],
+            'indonesian' => [
+                'title' => '印尼語與在地文化',
+                'badge' => '印尼最新課綱標準',
+                'desc' => '依據印尼教育部最新課綱實施印尼語、公民素養與社會文化教學，引導學生深植在地關懷並具備多元包容力。',
+            ],
+        ],
+        'excellence_heading' => '專業師資群與邁向國際頂尖學府之升學軌道',
+        'excellence_p1' => '學生在高品質三語環境中茁壯成長，充分開展天賦潛能。學校積極輔導並帶領學生參與校外競賽，榮獲多項外語認證與傑出獎項。',
+        'excellence_p2' => '在扎實學術培育與全方位升學輔導下，歷屆畢業生卓越斐然，順利錄取臺灣頂尖大學及歐美、亞洲各大國際知名學府。',
+        'excellence_card1_title' => '校際競賽與國際語文認證',
+        'excellence_card1_desc' => '專業輔導學生積極參與校際各類競賽，並考取官方權威之外語能力檢定證書（TOCFL 華語文能力測驗與劍橋英語）。',
+        'excellence_card2_title' => '世界頂尖與臺灣一流名校',
+        'excellence_card2_desc' => '全方位的升學輔導與學術奠基，歷年畢業生皆順利錄取臺灣頂尖大學及世界各國知名高等學府。',
+        'cta_title' => '開啟在 JTS 的卓越學習之旅',
+        'cta_desc' => '歡迎親臨位於 Kelapa Gading 的校園參觀，或隨時聯絡招生團隊了解最新入學資訊。',
+        'cta_admissions' => '招生入學資訊',
+        'cta_contact' => '聯絡我們',
         'body' => $standardPage,
     ],
     'history' => [
@@ -78,10 +112,10 @@ return [
         'title' => '交通資訊與聯絡方式',
         'summary' => $summary,
         'seo_title' => '交通資訊與聯絡方式',
-        'notice' => $standardPage['notice'],
         'heading' => '造訪雅加達臺灣學校',
-        'address' => '印尼雅加達北區 Kelapa Gading。',
-        'telephone' => '電話：+62 21 452 3273',
+        'address_label' => '地址',
+        'telephone_label' => '電話',
+        'email_label' => '電子郵件',
         'contact_prefix' => '參觀前請先聯絡學校。',
         'contact_link' => '透過 WhatsApp 聯絡',
         'contact_suffix' => '。',

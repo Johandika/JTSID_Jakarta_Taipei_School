@@ -2,8 +2,8 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Resources\HeroSlides\HeroSlideResource;
 use App\Filament\Resources\Posts\PostResource;
-use App\Filament\Resources\SlideshowItems\SlideshowItemResource;
 use App\Filament\Resources\StaffProfiles\StaffProfileResource;
 use App\Filament\Resources\SubjectResources\SubjectResourceResource;
 use Filament\Widgets\StatsOverviewWidget;
@@ -44,9 +44,9 @@ class ContentOverview extends StatsOverviewWidget
                 ->color('gray');
         }
 
-        if (SlideshowItemResource::canViewAny()) {
-            $stats[] = Stat::make('Fasilitas & Sorotan', number_format(SlideshowItemResource::getEloquentQuery()->where('is_active', true)->count()))
-                ->description('Showcase fasilitas aktif')
+        if (HeroSlideResource::canViewAny()) {
+            $stats[] = Stat::make('Hero Slides', number_format(HeroSlideResource::getEloquentQuery()->where('is_active', true)->count()))
+                ->description('Slide carousel aktif')
                 ->descriptionIcon('heroicon-m-photo')
                 ->color('gray');
         }

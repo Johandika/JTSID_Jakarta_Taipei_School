@@ -1,28 +1,19 @@
 <?php
 
 $standardPage = [
-    'notice' => 'Sample content for local testing. This is not an official school announcement.',
     'community_heading' => 'Our school community',
     'community_body' => 'Jakarta Taipei School brings together languages, cultures, and learning experiences in a diverse school environment.',
     'learning_heading' => 'Learning together',
     'learning_body' => 'School life includes academic learning, languages, student activities, and partnerships with parents.',
-    'closing' => 'Detailed information for this page can be completed with school-approved content.',
 ];
 
 $summary = 'Discover our community, learning, and life at Jakarta Taipei School.';
 
 return [
-    'about' => [
-        'title' => 'About Jakarta Taipei School',
-        'summary' => $summary,
-        'seo_title' => 'About Jakarta Taipei School',
-        'body' => $standardPage,
-    ],
     'academics' => [
         'title' => 'Academics',
         'summary' => $summary,
         'seo_title' => 'Academics',
-        'notice' => $standardPage['notice'],
         'mandarin_heading' => 'Mandarin',
         'mandarin_body' => 'Language, literacy, mathematics, science, and cultural learning from kindergarten through senior high school.',
         'indonesian_heading' => 'Indonesian, Pancasila, and Religions',
@@ -34,7 +25,6 @@ return [
         'title' => 'Admissions',
         'summary' => $summary,
         'seo_title' => 'Admissions',
-        'notice' => $standardPage['notice'],
         'journey_heading' => 'Start your journey at JTS',
         'steps' => [
             'Contact admissions to discuss grade placement and availability.',
@@ -60,6 +50,50 @@ return [
         'title' => 'School Profile',
         'summary' => $summary,
         'seo_title' => 'School Profile',
+        'eyebrow' => 'SPK INTERNATIONAL SCHOOL • ESTABLISHED 1991',
+        'headline' => 'Empowering Future Trilingual Leaders with Global Perspectives',
+        'subheadline' => 'Located in Kelapa Gading, North Jakarta, Jakarta Taipei School (JTS) seamlessly integrates Taiwan\'s curriculum excellence, Cambridge international standards, and Indonesian national educational values.',
+        'stats' => [
+            'year' => ['num' => '1991', 'label' => 'Year Established'],
+            'spk' => ['num' => 'SPK', 'label' => 'Kemendikbudristek Status'],
+            'curriculum' => ['num' => '2019', 'label' => 'Taiwan MoE Syllabus'],
+            'languages' => ['num' => '3', 'label' => 'Languages of Instruction'],
+        ],
+        'overview_title' => 'About Jakarta Taipei School',
+        'overview_p1' => 'Established in 1991 in Kelapa Gading, North Jakarta, Indonesia, Jakarta Taipei School (JTS) has dedicated more than three decades to delivering high-caliber holistic education for young generations.',
+        'overview_p2' => 'Our school is officially registered as an SPK (Satuan Pendidikan Kerjasama) institution by the Ministry of Education, Culture, Research, and Technology of Indonesia and operates under the syllabus issued by the Ministry of Education of Taiwan in 2019, fostering critical thinking, international competencies, and upright character.',
+        'trilingual_heading' => 'Trilingual Education Framework',
+        'trilingual_subheading' => 'At JTS, language learning is carefully orchestrated as a dynamic medium for deep inquiry, innovation, and global leadership.',
+        'levels_note_title' => 'Language Level Application',
+        'levels_note_desc' => 'Primary (SD), Junior High (SMP), and Senior High (SMA) operate as full Trilingual programs (Mandarin, English, and Indonesian). Kindergarten (TK) is delivered bilingually in Mandarin and English to build early confidence and natural fluency.',
+        'pillars' => [
+            'mandarin' => [
+                'title' => 'Mandarin Immersion',
+                'badge' => 'Taiwan MoE Certified',
+                'desc' => 'All teachers possess premier qualifications and official teaching certificates from Taiwan. We offer a vibrant, immersive Mandarin learning environment across subject areas to foster authentic literacy and eloquence.',
+            ],
+            'english' => [
+                'title' => 'Cambridge English',
+                'badge' => 'Cambridge Curriculum',
+                'desc' => 'English language instruction utilizes official Cambridge textbooks and rigorous curriculum frameworks, preparing students for international benchmark assessments and articulate communication.',
+            ],
+            'indonesian' => [
+                'title' => 'Bahasa Indonesia',
+                'badge' => 'Kemendikbudristek',
+                'desc' => 'Indonesian language and national studies follow the latest curriculum from Indonesia\'s Ministry of Education, nurturing deep civic awareness, cultural appreciation, and moral grounding.',
+            ],
+        ],
+        'excellence_heading' => 'Certified Faculty & Pathways to World-Class Universities',
+        'excellence_p1' => 'Students flourish in a high-quality trilingual environment that unlocks their full individual potential. Our dedicated educators guide students to actively compete in inter-school competitions, earn recognized foreign language credentials, and celebrate academic achievements.',
+        'excellence_p2' => 'With robust academic preparation and holistic guidance, JTS graduates consistently secure admissions to prestigious universities across Taiwan, Asia, Europe, and North America.',
+        'excellence_card1_title' => 'Competitions & Global Certifications',
+        'excellence_card1_desc' => 'Intensive coaching for inter-school competitions and official foreign language proficiencies (TOCFL & Cambridge).',
+        'excellence_card2_title' => 'Leading International Universities',
+        'excellence_card2_desc' => 'A proven academic pathway guiding graduates to admissions at premier universities in Taiwan and worldwide.',
+        'cta_title' => 'Begin Your Educational Journey with JTS',
+        'cta_desc' => 'Visit our campus in Kelapa Gading or connect with our admissions team to explore enrollment and private school tours.',
+        'cta_admissions' => 'Admissions Information',
+        'cta_contact' => 'Contact Us',
         'body' => $standardPage,
     ],
     'history' => [
@@ -78,10 +112,10 @@ return [
         'title' => 'Location & Contact',
         'summary' => $summary,
         'seo_title' => 'Location & Contact',
-        'notice' => $standardPage['notice'],
         'heading' => 'Visit Jakarta Taipei School',
-        'address' => 'Kelapa Gading, North Jakarta, Indonesia.',
-        'telephone' => 'Telephone: +62 21 452 3273',
+        'address_label' => 'Address',
+        'telephone_label' => 'Telephone',
+        'email_label' => 'Email',
         'contact_prefix' => 'Please contact the school before visiting. ',
         'contact_link' => 'Contact us on WhatsApp',
         'contact_suffix' => '.',

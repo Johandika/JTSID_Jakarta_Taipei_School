@@ -3,18 +3,16 @@
 namespace Database\Seeders;
 
 use App\Models\AcademicYear;
-use App\Models\ContactChannel;
 use App\Models\Department;
 use App\Models\GradeLevel;
+use App\Models\HeroSlide;
 use App\Models\Post;
 use App\Models\PostCategory;
-use App\Models\SlideshowItem;
 use App\Models\StaffProfile;
 use App\Models\SubjectResource;
 use App\Models\SubjectResourceType;
 use App\Models\UniversityAcceptance;
-use chillerlan\QRCode\QRCode;
-use chillerlan\QRCode\QROptions;
+use App\Models\UniversityLogo;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Storage;
 
@@ -25,9 +23,91 @@ class DemoContentSeeder extends Seeder
         if (! app()->environment(['local', 'testing'])) {
             return;
         }
-        foreach (['seed-campus.jpg', 'seed-library.jpg', 'seed-classroom.jpg', 'seed-highlight.jpg'] as $image) {
-            if (! Storage::disk('public')->exists('images/'.$image)) {
+        foreach (['campus.jpg', 'seed-campus.jpg', 'seed-library.jpg', 'seed-classroom.jpg', 'seed-highlight.jpg'] as $image) {
+            if (file_exists(public_path('images/'.$image)) && ! Storage::disk('public')->exists('images/'.$image)) {
                 Storage::disk('public')->put('images/'.$image, file_get_contents(public_path('images/'.$image)));
+            }
+        }
+        if (HeroSlide::count() === 0) {
+            $heroSlides = [
+                [
+                    'image' => 'images/campus.jpg',
+                    'title' => [
+                        'en' => 'Excellence in Trilingual Education',
+                        'id' => 'Keunggulan Pendidikan Tiga Bahasa',
+                        'zh-TW' => '深耕三語，開創卓越教育',
+                    ],
+                    'description' => [
+                        'en' => 'Combining Taiwan curriculum, English language mastery, and Indonesian culture to empower future-ready global leaders.',
+                        'id' => 'Memadukan kurikulum Taiwan, penguasaan Bahasa Inggris, dan budaya Indonesia untuk mencetak generasi pemimpin masa depan.',
+                        'zh-TW' => '結合臺灣優質課程、英語精熟學習與印尼多元文化，培育具備國際視野與未來競爭力的領袖人才。',
+                    ],
+                    'tagline' => [
+                        'en' => 'Jakarta Taipei School',
+                        'id' => 'Jakarta Taipei School',
+                        'zh-TW' => '雅加達臺北學校',
+                    ],
+                    'cta_text' => [
+                        'en' => 'Apply Now',
+                        'id' => 'Daftar Sekarang',
+                        'zh-TW' => '立即報名',
+                    ],
+                    'cta_url' => '/admissions',
+                ],
+                [
+                    'image' => 'images/seed-classroom.jpg',
+                    'title' => [
+                        'en' => 'A Nurturing & Character-Driven Community',
+                        'id' => 'Komunitas Belajar Berkarakter & Mengayomi',
+                        'zh-TW' => '溫暖關懷、重視品格的學習園地',
+                    ],
+                    'description' => [
+                        'en' => 'From kindergarten to senior high school, students discover their unique potential through collaborative learning and care.',
+                        'id' => 'Dari jenjang TK hingga SMA, setiap siswa diajak menggali potensi terbaiknya dalam lingkungan yang suportif dan penuh perhatian.',
+                        'zh-TW' => '從幼兒園至高中，引導每位學子在充滿支持與啟發的環境中探索熱情、發揮天賦潛能。',
+                    ],
+                    'tagline' => [
+                        'en' => 'Our School',
+                        'id' => 'Sekolah Kami',
+                        'zh-TW' => '本校簡介',
+                    ],
+                    'cta_text' => [
+                        'en' => 'Explore',
+                        'id' => 'Jelajahi',
+                        'zh-TW' => '了解更多',
+                    ],
+                    'cta_url' => '/school-profile',
+                ],
+                [
+                    'image' => 'images/seed-library.jpg',
+                    'title' => [
+                        'en' => 'World-Class Pathways & Opportunities',
+                        'id' => 'Peluang & Prestasi Berstandar Global',
+                        'zh-TW' => '放眼世界，接軌國際頂尖學府',
+                    ],
+                    'description' => [
+                        'en' => 'Guiding students toward prestigious universities in Taiwan and across the globe with holistic academic preparation.',
+                        'id' => 'Mempersiapkan siswa meraih pintu masuk ke berbagai universitas terkemuka di Taiwan dan mancanegara dengan bekal akademik komprehensif.',
+                        'zh-TW' => '全方位升學輔導與多元學習歷程，協助畢業生順利進入臺灣及全球知名頂尖大學。',
+                    ],
+                    'tagline' => [
+                        'en' => 'Academics',
+                        'id' => 'Akademik',
+                        'zh-TW' => '學術課程',
+                    ],
+                    'cta_text' => [
+                        'en' => 'Read More',
+                        'id' => 'Selengkapnya',
+                        'zh-TW' => '閱讀更多',
+                    ],
+                    'cta_url' => '/academics',
+                ],
+            ];
+            foreach ($heroSlides as $i => $item) {
+                HeroSlide::create(array_merge($item, [
+                    'sort_order' => $i + 1,
+                    'is_active' => true,
+                ]));
             }
         }
         if (Post::exists()) {
@@ -55,7 +135,7 @@ class DemoContentSeeder extends Seeder
                     'id' => 'Ruang untuk rasa ingin tahu, pengalaman baru, dan kebersamaan dalam komunitas sekolah kami.',
                     'zh-TW' => '在學校社群中，培養好奇心、開拓新體驗，一起成長。',
                     default => 'Making room for curiosity, new experiences, and shared moments in our school community.',
-                }, 'body' => $this->sampleNotice($locale)."\n\n".match ($locale) {
+                }, 'body' => match ($locale) {
                     'id' => "## Belajar dan bertumbuh bersama\n\nSetiap hari menghadirkan kesempatan untuk bertanya, berkreasi, dan berbagi. Komunitas sekolah mendukung siswa untuk menjelajahi ide melalui kegiatan belajar dan interaksi lintas budaya.\n\nHubungi sekolah untuk informasi kegiatan dan jadwal yang telah dikonfirmasi.",
                     'zh-TW' => "## 共同學習與成長\n\n每一天都是提問、創作與分享的機會。學校社群支持學生透過學習活動與跨文化互動探索新觀點。\n\n如需已確認的活動資訊及時間，請聯絡學校。",
                     default => "## Learning and growing together\n\nEvery day brings opportunities to ask questions, create, and share. Our school community supports students as they explore ideas through classroom experiences and cross-cultural connections.\n\nContact the school for confirmed activity details and schedules.",
@@ -68,43 +148,39 @@ class DemoContentSeeder extends Seeder
                     'grade_level_id' => $grade->id, 'school_levels' => [$grade->code], 'department_id' => $department->id, 'file_path' => $file,
                     'upload_date' => today()->subDays($type->id), 'published_at' => now()->subDay(), 'status' => 'published']);
                 foreach (['en', 'id', 'zh-TW'] as $locale) {
-                    $resource->translations()->create(['locale' => $locale, 'title' => $grade->name.' '.__('site.'.$type->code, [], $locale).' 2026 / 2027', 'body' => $this->sampleNotice($locale)]);
+                    $resource->translations()->create(['locale' => $locale, 'title' => $grade->name.' '.__('site.'.$type->code, [], $locale).' 2026 / 2027']);
                 }
             }
         }
-        SlideshowItem::create(['topic' => 'Campus life', 'image' => 'images/seed-campus.jpg', 'link_url' => '/about', 'sort_order' => 1]);
-        SlideshowItem::create(['topic' => 'School highlight', 'image' => 'images/seed-highlight.jpg', 'link_url' => '/news', 'sort_order' => 2]);
         foreach (Department::all() as $d) {
-            StaffProfile::create(['department_id' => $d->id, 'name' => 'Sample Staff '.$d->id, 'title' => 'Department Coordinator', 'extension' => '10'.$d->id,
-                'responsibilities' => 'Sample profile for local testing. Replace with approved staff information.']);
+            StaffProfile::create(['department_id' => $d->id, 'name' => 'Sample Staff '.$d->id, 'title' => 'Department Coordinator', 'extension' => '10'.$d->id]);
         }
         foreach (['National Taiwan University', 'National Cheng Kung University', 'Universitas Indonesia', 'National Tsing Hua University'] as $i => $name) {
             UniversityAcceptance::create(['department_id' => $department->id, 'academic_year_id' => AcademicYear::latest('id')->value('id'),
                 'student_name' => 'Sample Student '.($i + 1), 'university_name' => $name, 'program_name' => 'Sample program', 'country' => $i === 2 ? 'Indonesia' : 'Taiwan']);
         }
-        foreach ([
-            ['admission_tel', 'Admissions', '+62 21 452 3273', true], ['phone', 'Telephone', '+62 21 452 3273', false],
-            ['address', 'Campus', 'Kelapa Gading, Jakarta Utara, Indonesia', false],
-            ['whatsapp', 'WhatsApp', 'https://wa.me/6281385435909', true],
-            ['instagram', 'Instagram', 'https://www.instagram.com/jakartataipeischoolofficial/', true],
-        ] as $order => [$channel, $label, $value, $header]) {
-            $qr = null;
-            if (in_array($channel, ['whatsapp', 'instagram'])) {
-                $qr = 'images/qr-'.$channel.'.png';
-                $options = new QROptions(['outputType' => QRCode::OUTPUT_IMAGE_PNG, 'outputBase64' => false, 'scale' => 5]);
-                Storage::disk('public')->put($qr, (new QRCode($options))->render($value));
-            }
-            ContactChannel::create(['channel' => $channel, 'label' => $label, 'value' => $value, 'qr_image' => $qr, 'is_visible_header' => $header, 'sort_order' => $order]);
-        }
-    }
 
-    private function sampleNotice(string $locale): string
-    {
-        return match ($locale) {
-            'id' => '> Konten contoh untuk pengujian lokal. Informasi ini belum menjadi pengumuman resmi sekolah.',
-            'zh-TW' => '> 此為本機測試用範例內容，並非學校正式公告。',
-            default => '> Sample content for local testing. This is not an official school announcement.',
-        };
+        $uniLogos = [
+            ['logo' => 'university-logos/ucl.svg', 'title' => 'UCL (University College London)'],
+            ['logo' => 'university-logos/oxford.svg', 'title' => 'University of Oxford'],
+            ['logo' => 'university-logos/lse.svg', 'title' => 'London School of Economics (LSE)'],
+            ['logo' => 'university-logos/berkeley.svg', 'title' => 'University of California, Berkeley'],
+            ['logo' => 'university-logos/washington.svg', 'title' => 'University of Washington'],
+            ['logo' => 'university-logos/yale.svg', 'title' => 'Yale University'],
+            ['logo' => 'university-logos/harvard.svg', 'title' => 'Harvard University'],
+            ['logo' => 'university-logos/stanford.svg', 'title' => 'Stanford University'],
+            ['logo' => 'university-logos/korea.svg', 'title' => 'Korea University'],
+            ['logo' => 'university-logos/sydney.svg', 'title' => 'The University of Sydney'],
+            ['logo' => 'university-logos/ntu.svg', 'title' => 'National Taiwan University (NTU)'],
+        ];
+        foreach ($uniLogos as $i => $item) {
+            UniversityLogo::create([
+                'logo' => $item['logo'],
+                'title' => $item['title'],
+                'sort_order' => $i + 1,
+                'is_active' => true,
+            ]);
+        }
     }
 
     private function sampleDocument(): string

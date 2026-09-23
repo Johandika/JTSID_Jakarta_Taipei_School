@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HeroSlide;
 use App\Models\Post;
-use App\Models\SlideshowItem;
 use App\Models\SubjectResource;
+use App\Models\UniversityLogo;
 use Illuminate\View\View;
 
 class HomeController extends Controller
@@ -12,9 +13,10 @@ class HomeController extends Controller
     public function __invoke(): View
     {
         return view('public.home', [
-            'posts' => Post::published()->with(['translations', 'category', 'department'])->orderByDesc('upload_date')->limit(3)->get(),
+            'heroSlides' => HeroSlide::where('is_active', true)->orderBy('sort_order')->get(),
+            'posts' => Post::published()->with(['translations', 'category', 'department'])->orderByDesc('upload_date')->limit(4)->get(),
             'resources' => SubjectResource::published()->with(['translations', 'type'])->orderByDesc('upload_date')->limit(4)->get(),
-            'slides' => SlideshowItem::where('is_active', true)->orderBy('sort_order')->limit(10)->get(),
+            'universityLogos' => UniversityLogo::where('is_active', true)->orderBy('sort_order')->get(),
         ]);
     }
 }
