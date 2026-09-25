@@ -9,17 +9,16 @@
             'children' => [
                 ['title' => __('site.board_of_directors'), 'url' => '/board-of-directors'],
                 ['title' => __('site.school_profile'), 'url' => '/school-profile'],
-                ['title' => __('site.history'), 'url' => '/history'],
-                ['title' => __('site.parent_association'), 'url' => '/parent-association'],
                 ['title' => __('site.staff'), 'url' => '/staff'],
                 ['title' => __('site.contact'), 'url' => '/contact'],
             ],
         ],
         ['title' => __('site.academics'), 'url' => '/academics', 'children' => []],
         [
-            'title' => __('site.admissions'),
-            'url' => '/admissions',
+            'title' => __('site.enrollment'),
+            'url' => null,
             'children' => [
+                ['title' => __('site.school_admissions'), 'url' => '/admissions'],
                 ['title' => __('site.mandarin_program'), 'url' => '/mandarin-program'],
             ],
         ],
@@ -126,7 +125,7 @@
                             @endif
                             @if($item['children'])
                                 <button type="button" @click="open = !open" :aria-expanded="open"
-                                    @if(! $item['url']) aria-controls="about-desktop-submenu" @endif
+                                    @if(! $item['url']) aria-controls="{{ $loop->first ? 'about-desktop-submenu' : 'enrollment-desktop-submenu' }}" @endif
                                     aria-label="{{ $item['title'] }}" :class="{
                                                 'text-white hover:text-white/80': !scrolled && isTransparent,
                                                 'text-ink hover:text-jts': scrolled || !isTransparent,
@@ -139,7 +138,7 @@
                             @endif
                         </div>
                         @if($item['children'])
-                            <div @if(! $item['url']) id="about-desktop-submenu" @endif x-show="open" x-cloak x-transition:enter="transition ease-out duration-150"
+                            <div @if(! $item['url']) id="{{ $loop->first ? 'about-desktop-submenu' : 'enrollment-desktop-submenu' }}" @endif x-show="open" x-cloak x-transition:enter="transition ease-out duration-150"
                                 x-transition:enter-start="opacity-0 translate-y-1"
                                 x-transition:enter-end="opacity-100 translate-y-0"
                                 class="absolute left-0 top-full w-60 rounded-lg border border-line bg-white p-2 shadow-xl text-ink">
@@ -175,13 +174,13 @@
                         <a href="{{ $site::path($item['url']) }}"
                             class="block py-2.5 font-semibold text-ink hover:text-jts text-base">{{ $item['title'] }}</a>
                     @else
-                        <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="about-mobile-submenu"
+                        <button type="button" @click="open = !open" :aria-expanded="open" aria-controls="{{ $loop->first ? 'about-mobile-submenu' : 'enrollment-mobile-submenu' }}"
                             class="flex w-full items-center justify-between py-2.5 text-left text-base font-semibold text-ink hover:text-jts">
                             <span>{{ $item['title'] }}</span><x-site-icon name="chevron-down" class="size-4" />
                         </button>
                     @endif
                     @if($item['children'])
-                        <div @if(! $item['url']) id="about-mobile-submenu" x-show="open" x-cloak @endif class="space-y-1 pb-1 pl-4">
+                        <div @if(! $item['url']) id="{{ $loop->first ? 'about-mobile-submenu' : 'enrollment-mobile-submenu' }}" x-show="open" x-cloak @endif class="space-y-1 pb-1 pl-4">
                             @foreach($item['children'] as $child)
                                 <a href="{{ $site::path($child['url']) }}"
                                     class="block py-2 text-sm text-muted hover:text-jts">{{ $child['title'] }}</a>

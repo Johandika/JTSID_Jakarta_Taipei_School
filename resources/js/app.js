@@ -1,6 +1,6 @@
-import { createIcons, ArrowRight, ArrowUpRight, ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, Search, Menu, X, Phone, Mail, MapPin, Download, Calendar, CalendarDays, BookOpen, GraduationCap, Globe, Pause, Play, FileText, Users, Check, Languages, Award, Newspaper, Trophy } from 'lucide';
+import { createIcons, ArrowRight, ArrowUpRight, ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, Search, Menu, X, Phone, Mail, MapPin, Download, Calendar, CalendarDays, BookOpen, GraduationCap, Globe, Pause, Play, FileText, Users, Check, Languages, Award, Newspaper, Trophy, Clock, AlertCircle, ExternalLink, MessageCircle } from 'lucide';
 
-const icons = { ArrowRight, ArrowUpRight, ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, Search, Menu, X, Phone, Mail, MapPin, Download, Calendar, CalendarDays, BookOpen, GraduationCap, Globe, Pause, Play, FileText, Users, Check, Languages, Award, Newspaper, Trophy };
+const icons = { ArrowRight, ArrowUpRight, ArrowLeft, ChevronDown, ChevronLeft, ChevronRight, Search, Menu, X, Phone, Mail, MapPin, Download, Calendar, CalendarDays, BookOpen, GraduationCap, Globe, Pause, Play, FileText, Users, Check, Languages, Award, Newspaper, Trophy, Clock, AlertCircle, ExternalLink, MessageCircle };
 const refreshIcons = () => createIcons({ icons, attrs: { 'stroke-width': 1.7, 'aria-hidden': 'true' } });
 const announcementIdleDelay = 90_000;
 let cancelAnnouncementWait = () => {};

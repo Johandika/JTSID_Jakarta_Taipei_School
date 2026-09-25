@@ -153,7 +153,7 @@ class DemoContentSeeder extends Seeder
             }
         }
         foreach (Department::all() as $d) {
-            StaffProfile::create(['department_id' => $d->id, 'name' => 'Sample Staff '.$d->id, 'title' => 'Department Coordinator', 'extension' => '10'.$d->id]);
+            StaffProfile::create(['department_id' => $d->id, 'name' => 'Sample Staff '.$d->id, 'title' => 'Department Coordinator']);
         }
         foreach (['National Taiwan University', 'National Cheng Kung University', 'Universitas Indonesia', 'National Tsing Hua University'] as $i => $name) {
             UniversityAcceptance::create(['department_id' => $department->id, 'academic_year_id' => AcademicYear::latest('id')->value('id'),

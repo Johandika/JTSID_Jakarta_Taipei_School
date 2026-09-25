@@ -702,4 +702,11 @@
             </div>
         </section>
     @endif
+
+    {{-- Section: CTA Banner (Paling bawah sebelum footer) --}}
+    <section class="border-t border-line bg-white py-12 sm:py-16">
+        <div class="shell">
+            <x-cta-banner />
+        </div>
+    </section>
 </x-layouts.site>

@@ -149,10 +149,6 @@ URL bahasa:
   - Status: old content, renew CSS
 - Location & Contact
   - Sumber lama: `/infomation01.php`, `/infomation02.php`
-- History
-  - Sumber lama: `/about06.php`
-- Parent Association
-  - Sumber lama: `/about10.php`
 
 ### University Admission
 

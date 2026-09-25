@@ -7,7 +7,6 @@ use App\Filament\Support\CmsFields;
 use App\Models\StaffProfile;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Group;
@@ -49,20 +48,8 @@ class StaffProfileResource extends CmsResource
                                 ->required()
                                 ->maxLength(150),
                             CmsFields::department(),
-                            TextInput::make('extension')
-                                ->label('Nomor Ekstensi Telp')
-                                ->maxLength(50),
                         ])
                         ->columns(2),
-
-                    Section::make('Tanggung Jawab & Peran')
-                        ->description('Rincian tugas dan tanggung jawab di sekolah')
-                        ->schema([
-                            Textarea::make('responsibilities')
-                                ->label('Rincian Tugas')
-                                ->rows(4)
-                                ->columnSpanFull(),
-                        ]),
                 ])->columnSpan(['lg' => 2]),
 
                 Group::make()->schema([
@@ -99,8 +86,6 @@ class StaffProfileResource extends CmsResource
                     ->label('Jabatan'),
                 TextColumn::make('department.name')
                     ->label('Departemen'),
-                TextColumn::make('extension')
-                    ->label('Ekstensi'),
                 IconColumn::make('is_active')
                     ->label('Aktif')
                     ->boolean(),

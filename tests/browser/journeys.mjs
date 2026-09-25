@@ -34,6 +34,9 @@ try {
     await expect(desktopAbout).toHaveAttribute('aria-expanded', 'false');
     await desktopAbout.click();
     await expect(desktopAbout).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('#about-desktop-submenu a')).toHaveCount(4);
+    await expect(page.locator('#about-desktop-submenu')).not.toContainText('Our History');
+    await expect(page.locator('#about-desktop-submenu')).not.toContainText('Parent Association');
     await expect(page.locator('#about-desktop-submenu').getByRole('link', { name: 'School Profile' })).toHaveAttribute('href', '/school-profile');
     await page.keyboard.press('Escape');
     await expect(desktopAbout).toHaveAttribute('aria-expanded', 'false');
@@ -54,6 +57,9 @@ try {
     await expect(page.locator('#about-mobile-submenu')).toBeHidden();
     await mobileAbout.click();
     await expect(mobileAbout).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator('#about-mobile-submenu a')).toHaveCount(4);
+    await expect(page.locator('#about-mobile-submenu')).not.toContainText('Our History');
+    await expect(page.locator('#about-mobile-submenu')).not.toContainText('Parent Association');
     await expect(page.locator('#about-mobile-submenu').getByRole('link', { name: 'School Profile' })).toHaveAttribute('href', '/school-profile');
     await page.keyboard.press('Escape');
     await expect(page.locator('#mobile-menu')).toBeHidden();
@@ -69,12 +75,25 @@ try {
     await expect(page.getByRole('heading', { name: 'Kabar terbaru JTS' })).toBeVisible();
     await page.getByRole('button', { name: 'Buka navigasi', exact: true }).click();
     await page.locator('#mobile-menu').getByRole('button', { name: 'Tentang JTS' }).click();
+    await expect(page.locator('#about-mobile-submenu a')).toHaveCount(4);
+    await expect(page.locator('#about-mobile-submenu')).not.toContainText('Sejarah Sekolah');
+    await expect(page.locator('#about-mobile-submenu')).not.toContainText('Asosiasi Orang Tua');
     await expect(page.locator('#about-mobile-submenu').getByRole('link', { name: 'Profil Sekolah' })).toHaveAttribute('href', '/id/school-profile');
     await visit('/zh');
     await expect(page.getByRole('heading', { name: '校園最新消息' })).toBeVisible();
     await page.getByRole('button', { name: '開啟導覽', exact: true }).click();
     await page.locator('#mobile-menu').getByRole('button', { name: '認識學校' }).click();
+    await expect(page.locator('#about-mobile-submenu a')).toHaveCount(4);
+    await expect(page.locator('#about-mobile-submenu')).not.toContainText('學校歷史');
+    await expect(page.locator('#about-mobile-submenu')).not.toContainText('家長委員會');
     await expect(page.locator('#about-mobile-submenu').getByRole('link', { name: '學校概況' })).toHaveAttribute('href', '/zh/school-profile');
+    for (const [path, removedLabel] of [['/staff', 'Extension'], ['/id/staff', 'Ekstensi'], ['/zh/staff', '分機']]) {
+        await visit(path);
+        await expect(page.locator('main article').first()).toBeVisible();
+        await expect(page.locator('main')).not.toContainText(removedLabel);
+        await expect(page.locator('main')).not.toContainText('Sample profile for local testing');
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
     console.log('PASS: homepage, QR image, mobile navigation, Indonesian, Traditional Chinese');
 
     await page.setViewportSize({ width: 1440, height: 1000 });
@@ -131,14 +150,21 @@ try {
     await expect(page.getByRole('link', { name: 'Pages', exact: true })).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Contacts & QR', exact: true })).toHaveCount(0);
     await page.setViewportSize({ width: 1440, height: 1000 });
-    for (const path of ['/about', '/id/about', '/zh/about']) {
+    await visit('/admin/staff-profiles/create');
+    await expect(page.getByText('Nomor Ekstensi Telp', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Tanggung Jawab & Peran', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Rincian Tugas', { exact: true })).toHaveCount(0);
+    await visit('/admin/staff-profiles');
+    await expect(page.getByRole('columnheader', { name: 'Ekstensi' })).toHaveCount(0);
+    for (const path of ['/about', '/id/about', '/zh/about', '/history', '/id/history', '/zh/history', '/parent-association', '/id/parent-association', '/zh/parent-association']) {
         expect((await page.request.get(`http://localhost:8000${path}`)).status()).toBe(404);
     }
     await visit('/school-profile');
     await expect(page.getByRole('heading', { name: 'School Profile' })).toBeVisible();
-    await assertStaticContentAligned();
     await expect(page.locator('main aside')).toHaveCount(0);
     await expect(page.locator('main')).not.toContainText('Sample content for local testing');
+    await visit('/academics');
+    await assertStaticContentAligned();
     await page.setViewportSize({ width: 390, height: 844 });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await visit('/id/admissions');

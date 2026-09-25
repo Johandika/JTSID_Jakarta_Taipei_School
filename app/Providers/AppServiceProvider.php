@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Models\AcademicYear;
+use App\Models\AdmissionFee;
 use App\Models\AnnouncementPopup;
 use App\Models\AuditLog;
 use App\Models\Department;
+use App\Models\Director;
 use App\Models\HeroSlide;
 use App\Models\Post;
 use App\Models\StaffProfile;
@@ -45,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
         foreach ([Post::class, SubjectResource::class, StaffProfile::class, UniversityAcceptance::class] as $model) {
             Gate::policy($model, ContentPolicy::class);
         }
-        foreach ([AnnouncementPopup::class, UniversityLogo::class, HeroSlide::class, Department::class, AcademicYear::class] as $model) {
+        foreach ([AnnouncementPopup::class, UniversityLogo::class, HeroSlide::class, Department::class, AcademicYear::class, Director::class, AdmissionFee::class] as $model) {
             Gate::policy($model, GlobalContentPolicy::class);
         }
         Gate::policy(User::class, UserPolicy::class);

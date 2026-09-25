@@ -11,8 +11,6 @@ $staticPages = [
     'admissions',
     'board-of-directors',
     'school-profile',
-    'history',
-    'parent-association',
     'contact',
     'mandarin-program',
 ];

@@ -317,4 +317,13 @@
             align-items: center;
         }
     }
+
+    /* Left-align resource tabs (override default centering in Filament) */
+    .fi-sc-tabs,
+    .fi-sc-tabs .fi-tabs,
+    .fi-tabs:not(.fi-contained) {
+        margin-left: 0 !important;
+        margin-right: auto !important;
+        justify-content: flex-start !important;
+    }
 </style>

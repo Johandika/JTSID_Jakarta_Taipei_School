@@ -4,11 +4,11 @@
         $profile = __('pages.school_profile');
     @endphp
 
-    {{-- Headline Section with Supporting Background Image (Matching Sejarah Sekolah structure) --}}
-    <div class="relative overflow-hidden bg-neutral-900 border-b border-line py-12 sm:py-16 text-white">
+    {{-- Headline Section with Supporting Background Image (JTS Green Overlay) --}}
+    <div class="relative overflow-hidden bg-[#0a2e1f] border-b border-line py-12 sm:py-16 text-white">
         <div class="absolute inset-0 z-0">
-            <img src="{{ asset('images/school-profile-hero.jpg') }}" alt="Jakarta Taipei School" class="size-full object-cover object-center opacity-35" />
-            <div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/40"></div>
+            <img src="{{ asset('images/school-profile-hero.jpg') }}" alt="Jakarta Taipei School" class="size-full object-cover object-center opacity-55" />
+            <div class="absolute inset-0 bg-gradient-to-r from-[#0a2e1f]/90 via-[#0e3b2a]/65 to-[#176443]/30"></div>
         </div>
         <div class="shell relative z-10">
             <a href="{{ $site::path('/') }}" class="mb-5 inline-flex items-center gap-2 text-xs text-white/70 hover:text-white transition-colors">

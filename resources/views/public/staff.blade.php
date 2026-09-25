@@ -1,11 +1,89 @@
-<x-layouts.site :title="__('site.staff')">
-    <x-page-heading :title="__('site.staff')" :description="__('site.staff_copy')"/>
-    <div class="shell py-10">
-        <form class="mb-9 flex flex-wrap items-end gap-3" method="get"><label class="w-72"><span class="field-label">{{ __('site.department') }}</span><select name="department" class="field"><option value="">{{ __('site.all_departments') }}</option>@foreach($departments as $d)<option value="{{ $d->id }}" @selected(request('department') == $d->id)>{{ __('site.'.$d->code) }}</option>@endforeach</select></label><button class="btn btn-primary">{{ __('site.filter') }}</button></form>
-        <div class="grid gap-7 sm:grid-cols-2 lg:grid-cols-3">@forelse($staff as $person)
-            <article class="flex gap-4 border-b border-line pb-7">
-                @if($person->photo)<img src="{{ \App\Support\Site::image($person->photo) }}" alt="{{ $person->name }}" class="size-16 rounded object-cover" loading="lazy">@else<span class="flex size-14 shrink-0 items-center justify-center rounded bg-[#eef4f0] text-jts"><x-site-icon name="users" class="size-6"/></span>@endif
-                <div class="min-w-0"><p class="mb-2 text-xs text-jts">{{ __('site.'.$person->department->code) }}</p><h2 class="text-lg font-semibold">{{ $person->name }}</h2><p class="mt-1 text-sm text-muted">{{ $person->title }}</p>@if($person->extension)<p class="mt-3 text-xs text-muted">{{ __('site.extension') }} {{ $person->extension }}</p>@endif@if($person->responsibilities)<p class="mt-3 text-sm leading-6 text-muted">{{ $person->responsibilities }}</p>@endif</div>
-            </article>@empty<p>{{ __('site.no_results') }}</p>@endforelse</div>
+<x-layouts.site :title="__('site.staff')" :description="__('site.staff_copy')">
+    @php
+        $site = \App\Support\Site::class;
+    @endphp
+
+    {{-- Headline Section with Supporting Background Image (JTS Green Overlay) --}}
+    <div class="relative overflow-hidden bg-[#0a2e1f] border-b border-line py-12 sm:py-16 text-white">
+        <div class="absolute inset-0 z-0">
+            <img src="{{ asset('images/staff-hero.jpg') }}" alt="{{ __('site.staff') }}" class="size-full object-cover object-center opacity-55" />
+            <div class="absolute inset-0 bg-gradient-to-r from-[#0a2e1f]/90 via-[#0e3b2a]/65 to-[#176443]/30"></div>
+        </div>
+        <div class="shell relative z-10">
+            <a href="{{ $site::path('/') }}" class="mb-5 inline-flex items-center gap-2 text-xs text-white/70 hover:text-white transition-colors">
+                {{ __('site.home') }}<x-site-icon name="chevron-right" class="size-3"/>
+            </a>
+            <h1 class="text-4xl font-semibold leading-tight sm:text-5xl text-white">{{ __('site.staff') }}</h1>
+            <p class="mt-4 max-w-2xl text-base leading-7 text-white/90">{{ __('site.staff_copy') }}</p>
+        </div>
+    </div>
+
+    <div class="shell py-10 sm:py-14">
+        <form class="mb-10 flex flex-wrap items-end gap-3" method="get">
+            <label class="w-full sm:w-72">
+                <span class="field-label">{{ __('site.department') }}</span>
+                <select name="department" class="field cursor-pointer" onchange="this.value ? this.form.submit() : window.location.href='{{ $site::path('/staff') }}'">
+                    <option value="">{{ __('site.all_departments') }}</option>
+                    @foreach($departments as $department)
+                        <option value="{{ $department->id }}" @selected(request('department') == $department->id)>{{ __('site.'.$department->code) }}</option>
+                    @endforeach
+                </select>
+            </label>
+            @if(request('department'))
+                <a href="{{ $site::path('/staff') }}" class="btn btn-outline">
+                    {{ __('site.clear') }}
+                </a>
+            @endif
+        </form>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+            @forelse($staff as $person)
+                <article class="group flex flex-col">
+                    {{-- Photo Container --}}
+                    <div class="relative w-full aspect-square overflow-hidden rounded-2xl bg-neutral-100 border border-line/60">
+                        {{-- Department Green Badge in Top-Left Corner --}}
+                        <div class="absolute top-3 left-3 z-10">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-semibold tracking-wide bg-[#176443] text-white shadow-xs">
+                                {{ __('site.'.$person->department->code) }}
+                            </span>
+                        </div>
+
+                        @if($person->photo)
+                            <img
+                                src="{{ \App\Support\Site::image($person->photo) }}"
+                                alt="{{ $person->name }}"
+                                class="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
+                                loading="lazy"
+                            />
+                        @else
+                            <div class="w-full h-full flex flex-col items-center justify-center bg-[#f4f7f5] transition-transform duration-500 group-hover:scale-105">
+                                <svg class="size-16 text-[#176443]/30" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                                </svg>
+                            </div>
+                        @endif
+                    </div>
+
+                    {{-- Staff Info (Name & Role below image) --}}
+                    <div class="pt-3.5 pb-1">
+                        <h3 class="text-lg font-serif font-bold text-ink tracking-tight group-hover:text-jts transition-colors line-clamp-1">
+                            {{ $person->name }}
+                        </h3>
+                        <p class="mt-1 text-sm text-muted line-clamp-2">
+                            {{ $person->title }}
+                        </p>
+                    </div>
+                </article>
+            @empty
+                <div class="col-span-full py-12 text-center text-muted">
+                    <p class="text-base">{{ __('site.no_results') }}</p>
+                    @if(request('department'))
+                        <a href="{{ $site::path('/staff') }}" class="mt-3 inline-block text-sm font-semibold text-jts hover:underline">
+                            {{ __('site.clear') }}
+                        </a>
+                    @endif
+                </div>
+            @endforelse
+        </div>
     </div>
 </x-layouts.site>
