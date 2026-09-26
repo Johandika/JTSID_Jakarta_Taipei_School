@@ -88,7 +88,7 @@ class CmsTest extends TestCase
                     $response->assertSeeText($locale['summary'])
                         ->assertSee('class="prose"', false);
                 } elseif ($slug === 'board-of-directors') {
-                    $response->assertSee('images/directors/director-1.jpg', false);
+                    $response->assertSee('images/board-of-directors-hero.jpg', false);
                 } elseif ($slug === 'mandarin-program') {
                     $response->assertSeeText($locale['summary']);
                 } elseif ($slug === 'contact') {

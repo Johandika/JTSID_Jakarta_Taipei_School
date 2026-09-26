@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Filament\Resources\MandarinPrograms\MandarinProgramResource;
 use App\Models\MandarinProgram;
 use App\Models\User;
-use Database\Seeders\MandarinProgramSeeder;
 use Database\Seeders\ReferenceDataSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,7 +23,26 @@ class MandarinProgramTest extends TestCase
 
     public function test_mandarin_program_page_displays_active_programs_with_localization(): void
     {
-        $this->seed(MandarinProgramSeeder::class);
+        MandarinProgram::factory()->create([
+            'category' => MandarinProgram::CATEGORY_MANDARIN_CLASS,
+            'title' => ['en' => 'Mandarin Classes', 'id' => 'Mandarin Classes', 'zh-TW' => '華語班'],
+            'is_active' => true,
+        ]);
+        MandarinProgram::factory()->create([
+            'category' => MandarinProgram::CATEGORY_TOCFL,
+            'title' => ['en' => 'TOCFL Schedule Test', 'id' => 'TOCFL Schedule Test', 'zh-TW' => '華語文能力測驗 (TOCFL)'],
+            'is_active' => true,
+        ]);
+        MandarinProgram::factory()->create([
+            'category' => MandarinProgram::CATEGORY_WORKSHOP_EVENT,
+            'title' => ['en' => 'Chinese Culture Workshop', 'id' => 'Chinese Culture Workshop', 'zh-TW' => '中華文化體驗工作坊'],
+            'is_active' => true,
+        ]);
+        MandarinProgram::factory()->create([
+            'category' => MandarinProgram::CATEGORY_WORKSHOP_EVENT,
+            'title' => ['en' => 'Chinese Calligraphy Workshop', 'id' => 'Chinese Calligraphy Workshop', 'zh-TW' => '書法體驗課'],
+            'is_active' => true,
+        ]);
 
         $this->get('/mandarin-program')
             ->assertOk()
@@ -64,7 +82,13 @@ class MandarinProgramTest extends TestCase
 
     public function test_completed_programs_show_program_done_treatment(): void
     {
-        $this->seed(MandarinProgramSeeder::class);
+        MandarinProgram::factory()->create([
+            'title' => ['en' => 'Program Completed', 'id' => 'Program Selesai', 'zh-TW' => '已結束課程'],
+            'program_end_date' => now()->subDay(),
+            'registration_end_date' => now()->subDays(5),
+            'status_override' => MandarinProgram::STATUS_AUTO,
+            'is_active' => true,
+        ]);
 
         $this->get('/mandarin-program')
             ->assertOk()
@@ -86,9 +110,9 @@ class MandarinProgramTest extends TestCase
 
     public function test_mandarin_program_page_renders_pagination_when_programs_exceed_nine(): void
     {
-        $this->seed(MandarinProgramSeeder::class);
+        MandarinProgram::factory()->count(10)->create(['is_active' => true]);
 
-        // Seeder now provides 10 programs, exceeding the 3x3 (9) grid limit
+        // 10 programs exceed the 3x3 (9) grid limit
         $this->get('/mandarin-program')
             ->assertOk()
             ->assertSee('role="navigation"', false)

@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Filament\Resources\Directors\DirectorResource;
 use App\Models\Director;
 use App\Models\User;
-use Database\Seeders\DirectorSeeder;
 use Database\Seeders\ReferenceDataSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -24,7 +23,20 @@ class DirectorTest extends TestCase
 
     public function test_board_of_directors_page_displays_active_directors_with_localization(): void
     {
-        $this->seed(DirectorSeeder::class);
+        Director::factory()->create([
+            'name' => [
+                'en' => 'Dr. Olivia Chen, Ph.D.',
+                'id' => 'Dr. Olivia Chen, Ph.D.',
+                'zh-TW' => '陳美玲 博士',
+            ],
+            'role' => [
+                'en' => 'Chairman of the Board',
+                'id' => 'Ketua Dewan Pengurus',
+                'zh-TW' => '董事長',
+            ],
+            'photo' => 'images/directors/director-1.jpg',
+            'is_active' => true,
+        ]);
 
         $this->get('/board-of-directors')
             ->assertOk()
