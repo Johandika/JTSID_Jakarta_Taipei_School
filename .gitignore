@@ -31,3 +31,11 @@ _ide_helper.php
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Documentation / Specs / Superpowers
+/docs/superpowers/
+/docs/superpowers
+/docs/prd/
+/docs/prd
+*.prd.md
+

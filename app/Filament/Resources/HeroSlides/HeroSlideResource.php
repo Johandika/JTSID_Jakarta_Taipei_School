@@ -14,6 +14,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\ImageColumn;
@@ -40,19 +41,46 @@ class HeroSlideResource extends CmsResource
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
                 Group::make()->schema([
-                    Section::make('Gambar Hero')
-                        ->description('Foto latar belakang slider beresolusi tinggi')
+                    Section::make('Media Latar Hero (Foto / Video)')
+                        ->description('Wajib diisi salah satu: Foto resolusi tinggi ATAU Link Video YouTube')
                         ->schema([
                             CmsFields::image('image', 4096, 'Foto / Gambar Hero')
                                 ->label('Gambar Slide Hero')
-                                ->helperText('Disarankan foto lanskap kualitas tinggi (min. 1920x1080 px, format JPG, PNG, atau WebP, maks. 4MB)')
-                                ->required(),
+                                ->helperText('Wajib diunggah jika tidak mengisi Link Video YouTube. Format: JPG, PNG, WebP (maks. 4MB). Jika URL video diisi, gambar ini opsional sebagai poster cadangan.')
+                                ->rules([
+                                    fn (Get $get) => function (string $attribute, $value, \Closure $fail) use ($get) {
+                                        if (blank($value) && blank($get('video_url'))) {
+                                            $fail('Wajib mengisi minimal salah satu: Gambar Slide Hero atau URL Video YouTube.');
+                                        }
+                                    },
+                                ]),
+
+                            TextInput::make('video_url')
+                                ->label('URL Video YouTube (Opsional jika ada Gambar)')
+                                ->placeholder('https://www.youtube.com/watch?v=... atau https://youtu.be/...')
+                                ->maxLength(500)
+                                ->helperText('Wajib diisi jika tidak mengunggah Gambar. Video YouTube akan otomatis diputar tanpa suara (muted & loop) di latar belakang.')
+                                ->url()
+                                ->rules([
+                                    fn (Get $get) => function (string $attribute, $value, \Closure $fail) use ($get) {
+                                        if (blank($value) && blank($get('image'))) {
+                                            $fail('Wajib mengisi minimal salah satu: Gambar Slide Hero atau URL Video YouTube.');
+                                        }
+                                    },
+                                ]),
                         ]),
 
-                    Section::make('Konten Teks Slide')
-                        ->description('Teks headline, deskripsi, dan tombol CTA dalam berbagai bahasa')
+                    Section::make('Konten Teks & Shape Panel')
+                        ->description('Pengaturan tampilan teks dan shape hijau diagonal di atas latar hero')
                         ->schema([
+                            Toggle::make('show_text')
+                                ->label('Tampilkan Teks & Shape Panel Hijau')
+                                ->default(true)
+                                ->live()
+                                ->helperText('Jika dinonaktifkan, shape hijau diagonal beserta judul, deskripsi, dan tombol CTA tidak ditampilkan (latar video/foto tampil bersih 100% full-screen).'),
+
                             Tabs::make('SlideTranslations')
+                                ->visible(fn (Get $get): bool => (bool) ($get('show_text') ?? true))
                                 ->tabs([
                                     Tab::make('en')
                                         ->label('🇬🇧 English (Primary)')
@@ -64,7 +92,7 @@ class HeroSlideResource extends CmsResource
                                             TextInput::make('title.en')
                                                 ->label('Judul / Headline Utama (EN)')
                                                 ->placeholder('e.g. Excellence in Trilingual Education')
-                                                ->required()
+                                                ->required(fn (Get $get): bool => (bool) ($get('show_text') ?? true))
                                                 ->maxLength(191),
                                             Textarea::make('description.en')
                                                 ->label('Deskripsi Singkat (EN)')
@@ -127,6 +155,7 @@ class HeroSlideResource extends CmsResource
                 Group::make()->schema([
                     Section::make('Link Tombol CTA')
                         ->description('URL tujuan saat tombol aksi diklik')
+                        ->visible(fn (Get $get): bool => (bool) ($get('show_text') ?? true))
                         ->schema([
                             CmsFields::safeUrl('cta_url', 'Link URL Tujuan CTA')
                                 ->label('Link URL CTA')
@@ -156,15 +185,31 @@ class HeroSlideResource extends CmsResource
         return $table
             ->columns([
                 ImageColumn::make('image')
-                    ->label('Foto')
-                    ->disk('public')
+                    ->label('Foto / Poster')
+                    ->state(fn (HeroSlide $record): ?string => $record->getImageOrPosterUrl())
                     ->width(80)
                     ->height(50),
                 TextColumn::make('title.en')
                     ->label('Judul Headline (EN)')
                     ->searchable()
                     ->weight('medium')
-                    ->limit(45),
+                    ->placeholder('(Tanpa Teks / Full Media)')
+                    ->limit(40),
+                IconColumn::make('video_url')
+                    ->label('Video')
+                    ->boolean()
+                    ->state(fn (HeroSlide $record): bool => $record->hasVideo())
+                    ->trueIcon('heroicon-o-video-camera')
+                    ->falseIcon('heroicon-o-minus')
+                    ->trueColor('success')
+                    ->falseColor('gray'),
+                IconColumn::make('show_text')
+                    ->label('Shape & Teks')
+                    ->boolean()
+                    ->trueIcon('heroicon-o-chat-bubble-bottom-center-text')
+                    ->falseIcon('heroicon-o-eye-slash')
+                    ->trueColor('success')
+                    ->falseColor('gray'),
                 TextColumn::make('tagline.en')
                     ->label('Tagline')
                     ->placeholder('—')

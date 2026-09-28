@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use App\Support\SchoolLevel;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
@@ -42,7 +42,7 @@ class AdmissionForm extends Model
     }
 
     /**
-     * @return \Illuminate\Support\Collection<string, self>
+     * @return Collection<string, self>
      */
     public static function downloadableByLevel(): Collection
     {

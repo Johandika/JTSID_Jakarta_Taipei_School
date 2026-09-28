@@ -2,10 +2,13 @@
     @php
         $site = \App\Support\Site::class;
         $slides = collect($heroSlides ?? [])->map(function ($s) use ($site) {
-            $image = $s->image;
-            $imageUrl = str_starts_with($image, 'http')
-                ? $image
-                : (file_exists(public_path(ltrim($image, '/'))) ? asset(ltrim($image, '/')) : asset('storage/' . ltrim($image, '/')));
+            $imageUrl = method_exists($s, 'getImageOrPosterUrl') ? $s->getImageOrPosterUrl() : null;
+            if (! $imageUrl && ! empty($s->image)) {
+                $image = $s->image;
+                $imageUrl = str_starts_with($image, 'http')
+                    ? $image
+                    : (file_exists(public_path(ltrim($image, '/'))) ? asset(ltrim($image, '/')) : asset('storage/' . ltrim($image, '/')));
+            }
 
             $ctaUrl = $s->cta_url;
             if ($ctaUrl && ! str_starts_with($ctaUrl, 'http') && ! str_starts_with($ctaUrl, '#')) {
@@ -14,6 +17,8 @@
 
             return [
                 'image' => $imageUrl,
+                'video_embed_url' => method_exists($s, 'getYouTubeEmbedUrl') ? $s->getYouTubeEmbedUrl() : null,
+                'show_text' => (bool) ($s->show_text ?? true),
                 'tagline' => method_exists($s, 'trans') ? $s->trans('tagline') : ($s->tagline ?? ''),
                 'title' => method_exists($s, 'trans') ? $s->trans('title') : ($s->title ?? ''),
                 'description' => method_exists($s, 'trans') ? $s->trans('description') : ($s->description ?? ''),
@@ -65,33 +70,53 @@
              x-data="{
                  current: 0,
                  total: {{ count($slides) }},
-                 paused: false,
+                 isHovered: false,
                  timer: null,
                  slides: @js($slides),
                  init() {
-                     this.startTimer();
+                     this.syncPlayback();
                  },
                  startTimer() {
+                     this.stopTimer();
                      this.timer = setInterval(() => {
-                         if (!this.paused) {
+                         if (!this.isHovered && !this.isVideoSlide()) {
                              this.next();
                          }
                      }, 6500);
                  },
+                 stopTimer() {
+                     if (this.timer) {
+                         clearInterval(this.timer);
+                         this.timer = null;
+                     }
+                 },
+                 isVideoSlide() {
+                     return Boolean(this.slides[this.current]?.video_embed_url);
+                 },
+                 syncPlayback() {
+                     if (this.isVideoSlide()) {
+                         this.stopTimer();
+                     } else {
+                         this.startTimer();
+                     }
+                 },
                  next() {
                      this.current = (this.current + 1) % this.total;
+                     this.syncPlayback();
                  },
                  prev() {
                      this.current = (this.current - 1 + this.total) % this.total;
+                     this.syncPlayback();
                  },
                  goTo(i) {
                      this.current = i;
+                     this.syncPlayback();
                  }
              }"
-             @mouseenter="paused = true"
-             @mouseleave="paused = false">
+             @mouseenter="isHovered = true"
+             @mouseleave="isHovered = false">
 
-        {{-- Background Image Slides --}}
+        {{-- Background Image & Video Slides --}}
         @foreach($slides as $idx => $slide)
             <div x-show="current === {{ $idx }}"
                  x-transition:enter="transition ease-out duration-1000"
@@ -100,12 +125,30 @@
                  x-transition:leave="transition ease-in duration-800"
                  x-transition:leave-start="opacity-100"
                  x-transition:leave-end="opacity-0"
-                 class="absolute inset-0 size-full"
+                 class="absolute inset-0 size-full overflow-hidden"
                  @if($idx > 0) x-cloak @endif>
+                {{-- Fallback / Poster Image --}}
+                @if(!empty($slide['image']))
                 <img src="{{ $slide['image'] }}" alt="Jakarta Taipei School"
                      class="size-full object-cover object-center transform transition-transform duration-10000 ease-out"
                      @if($idx === 0) fetchpriority="high" @else loading="lazy" @endif
                      width="1920" height="1080">
+                @endif
+
+                @if(!empty($slide['video_embed_url']))
+                    {{-- Responsive Autoplay YouTube Background Embed --}}
+                    <div class="absolute inset-0 size-full overflow-hidden pointer-events-none">
+                        <iframe
+                            src="{{ $slide['video_embed_url'] }}"
+                            title="Jakarta Taipei School Video"
+                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.77777778vh] min-w-full h-[56.25vw] min-h-full object-cover border-0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            tabindex="-1"
+                            aria-hidden="true">
+                        </iframe>
+                    </div>
+                @endif
             </div>
         @endforeach
 
@@ -114,27 +157,34 @@
         <div class="absolute top-0 inset-x-0 h-36 sm:h-44 bg-gradient-to-b from-black/85 via-black/35 to-transparent pointer-events-none"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none"></div>
 
-        {{-- Left-Bottom Diagonal Info Panel --}}
-        <div class="absolute bottom-0 left-0 z-20 w-[95%] sm:w-[88%] md:w-[78%] lg:w-[62%] xl:w-[52%]">
+        {{-- Left-Bottom Diagonal Info Panel (Rendered only when show_text is active) --}}
+        <div x-show="slides[current].show_text"
+             x-transition:enter="transition ease-out duration-500"
+             x-transition:enter-start="opacity-0 translate-y-6"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:leave="transition ease-in duration-300"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 translate-y-6"
+             class="absolute bottom-0 left-0 z-20 w-[95%] sm:w-[88%] md:w-[78%] lg:w-[62%] xl:w-[52%]">
             <div class="hero-diagonal-panel bg-jts/95 backdrop-blur-md text-white shadow-2xl pt-4 pb-4 pl-4 pr-12 sm:pt-7 sm:pb-7 sm:pl-7 sm:pr-18 lg:pt-9 lg:pb-9 lg:pl-10 lg:pr-24 transition-all duration-300">
                 {{-- Tagline / Eyebrow --}}
-                <div class="mb-1.5 sm:mb-2.5 flex items-center gap-2 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-accent">
+                <div x-show="slides[current].tagline" class="mb-1.5 sm:mb-2.5 flex items-center gap-2 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-accent">
                     <span class="inline-block h-0.5 w-5 sm:w-6 bg-accent"></span>
                     <span x-text="slides[current].tagline"></span>
                 </div>
 
                 {{-- Headline --}}
-                <h1 class="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-white min-h-[2.2em] flex items-center"
+                <h1 x-show="slides[current].title" class="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-bold leading-tight tracking-tight text-white min-h-[2.2em] flex items-center"
                     x-text="slides[current].title">
                 </h1>
 
                 {{-- Description --}}
-                <p class="mb-3.5 sm:mb-5 mt-1 sm:mt-2 max-w-xl text-xs sm:text-sm md:text-base leading-relaxed text-white/90 font-normal line-clamp-2 sm:line-clamp-3 md:line-clamp-none min-h-[2.5em]"
+                <p x-show="slides[current].description" class="mb-3.5 sm:mb-5 mt-1 sm:mt-2 max-w-xl text-xs sm:text-sm md:text-base leading-relaxed text-white/90 font-normal line-clamp-2 sm:line-clamp-3 md:line-clamp-none min-h-[2.5em]"
                    x-text="slides[current].description">
                 </p>
 
                 {{-- White CTA Button --}}
-                <div class="flex flex-wrap items-center gap-4">
+                <div x-show="slides[current].cta_text" class="flex flex-wrap items-center gap-4">
                     <a :href="slides[current].cta_url"
                        class="inline-flex items-center gap-2.5 rounded bg-white px-4 py-2.5 sm:px-6 sm:py-3.5 text-xs sm:text-sm font-bold text-jts uppercase tracking-wider shadow-lg hover:bg-gray-100 hover:shadow-xl hover:translate-x-0.5 transition-all duration-200 group">
                         <span x-text="slides[current].cta_text"></span>
@@ -142,9 +192,9 @@
                     </a>
                 </div>
 
-                {{-- Mobile Navigation Controls (Inside Green Panel, matching reference) --}}
+                {{-- Mobile Navigation Controls (Inside Green Panel, when panel is visible) --}}
                 <div class="mt-3.5 flex items-center gap-4 md:hidden">
-                    <button @click="prev(); paused = true"
+                    <button @click="prev()"
                             aria-label="{{ __('site.previous') }}"
                             class="text-white hover:text-accent active:scale-90 transition-transform p-1">
                         <x-site-icon name="arrow-left" class="size-4.5"/>
@@ -152,14 +202,14 @@
 
                     <div class="flex items-center gap-1.5">
                         <template x-for="(slide, index) in slides" :key="index">
-                            <button @click="goTo(index); paused = true" :aria-label="'Slide ' + (index + 1)"
+                            <button @click="goTo(index)" :aria-label="'Slide ' + (index + 1)"
                                     class="h-2 rounded-full transition-all duration-300"
                                     :class="current === index ? 'w-4 bg-accent' : 'w-2 bg-white/50'">
                             </button>
                         </template>
                     </div>
 
-                    <button @click="next(); paused = true"
+                    <button @click="next()"
                             aria-label="{{ __('site.next') }}"
                             class="text-white hover:text-accent active:scale-90 transition-transform p-1">
                         <x-site-icon name="arrow-right" class="size-4.5"/>
@@ -168,12 +218,38 @@
             </div>
         </div>
 
+        {{-- Mobile Floating Navigation Controls (When Green Panel is Hidden) --}}
+        <div x-show="!slides[current].show_text"
+             class="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 flex md:hidden items-center gap-3 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-xl"
+             x-cloak>
+            <button @click="prev()"
+                    aria-label="{{ __('site.previous') }}"
+                    class="text-white hover:text-accent active:scale-90 transition-transform p-1">
+                <x-site-icon name="arrow-left" class="size-4.5"/>
+            </button>
+
+            <div class="flex items-center gap-1.5">
+                <template x-for="(slide, index) in slides" :key="index">
+                    <button @click="goTo(index)" :aria-label="'Slide ' + (index + 1)"
+                            class="h-2 rounded-full transition-all duration-300"
+                            :class="current === index ? 'w-4 bg-accent' : 'w-2 bg-white/50'">
+                    </button>
+                </template>
+            </div>
+
+            <button @click="next()"
+                    aria-label="{{ __('site.next') }}"
+                    class="text-white hover:text-accent active:scale-90 transition-transform p-1">
+                <x-site-icon name="arrow-right" class="size-4.5"/>
+            </button>
+        </div>
+
         {{-- Desktop Bottom-Right Carousel Controls (Pill) --}}
         <div class="absolute bottom-6 right-5 sm:bottom-8 sm:right-8 lg:right-12 z-30 hidden md:flex items-center gap-4 sm:gap-6 bg-black/40 backdrop-blur-md px-4 py-2.5 rounded-full border border-white/20 shadow-xl">
             {{-- Slide Dots --}}
             <div class="flex items-center gap-2">
                 <template x-for="(slide, index) in slides" :key="index">
-                    <button @click="goTo(index); paused = true" :aria-label="'Slide ' + (index + 1)"
+                    <button @click="goTo(index)" :aria-label="'Slide ' + (index + 1)"
                             class="h-2 rounded-full transition-all duration-300"
                             :class="current === index ? 'w-7 bg-accent' : 'w-2 bg-white/50 hover:bg-white/80'">
                     </button>
@@ -184,13 +260,13 @@
 
             {{-- Arrows --}}
             <div class="flex items-center gap-1.5">
-                <button @click="prev(); paused = true"
+                <button @click="prev()"
                         aria-label="{{ __('site.previous') }}"
                         title="{{ __('site.previous') }}"
                         class="flex size-9 items-center justify-center rounded-full text-white hover:bg-white/20 active:scale-95 transition-all">
                     <x-site-icon name="chevron-left" class="size-5"/>
                 </button>
-                <button @click="next(); paused = true"
+                <button @click="next()"
                         aria-label="{{ __('site.next') }}"
                         title="{{ __('site.next') }}"
                         class="flex size-9 items-center justify-center rounded-full text-white hover:bg-white/20 active:scale-95 transition-all">
