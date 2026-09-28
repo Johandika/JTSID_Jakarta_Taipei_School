@@ -13,6 +13,60 @@
             <div class="py-18 text-center"><x-site-icon name="search" class="mx-auto mb-4 size-8 text-muted"/><h2 class="text-xl font-semibold">{{ __('site.no_results') }}</h2><p class="mt-2 text-sm text-muted">{{ __('site.no_results_copy') }}</p></div>
         @elseif($kind === 'news')
             <div class="grid gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">@foreach($items as $post)<div wire:key="post-{{ $post->id }}"><x-news-item :post="$post"/></div>@endforeach</div>
+        @elseif($type === 'weekly_news')
+            <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                @foreach($items as $item)
+                    <article wire:key="weekly-news-{{ $item->id }}" class="group flex h-full flex-col overflow-hidden rounded-xl border border-line/80 bg-white shadow-2xs transition-all duration-300 hover:border-jts/40 hover:shadow-lg">
+                        <div class="relative aspect-[16/10] w-full overflow-hidden bg-gray-100">
+                            <img
+                                src="{{ $item->image_url }}"
+                                alt="{{ $item->title }}"
+                                class="size-full object-cover object-center transition-transform duration-400 ease-out group-hover:scale-105"
+                                loading="lazy"
+                                width="600"
+                                height="375"
+                            />
+
+                            <div class="absolute left-3 top-3 z-10">
+                                <span class="inline-flex items-center rounded-md bg-jts/95 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider text-white shadow-sm backdrop-blur-xs">
+                                    {{ __('site.weekly_news') }}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-1 flex-col p-5 sm:p-6">
+                            <div class="mb-3 flex items-center justify-between gap-2 text-xs text-muted">
+                                <span class="inline-flex items-center gap-1.5 font-medium">
+                                    <x-site-icon name="calendar" class="size-3.5 text-jts/80" />
+                                    {{ $item->upload_date->translatedFormat('d M Y') }}
+                                </span>
+                                <span class="inline-block rounded bg-gray-100 px-2 py-0.5 text-[11px] font-semibold text-ink">
+                                    {{ $item->school_level_label }}
+                                </span>
+                            </div>
+
+                            <h3 class="mb-2.5 text-base font-bold leading-snug text-ink transition-colors duration-200 group-hover:text-jts line-clamp-2 sm:text-lg">
+                                {{ $item->title }}
+                            </h3>
+
+                            @if($item->translation()?->summary)
+                                <p class="mb-4 flex-1 text-xs leading-relaxed text-muted line-clamp-2 sm:text-sm">
+                                    {{ $item->translation()?->summary }}
+                                </p>
+                            @else
+                                <div class="flex-1"></div>
+                            @endif
+
+                            <div class="mt-auto border-t border-line/60 pt-3">
+                                <a href="{{ \App\Support\Site::path('/download/resources/'.$item->id) }}" class="inline-flex items-center gap-2 text-xs font-bold text-jts transition-colors hover:text-jts/80 sm:text-sm">
+                                    <span>{{ __('site.download') }}</span>
+                                    <x-site-icon name="download" class="size-3.5" />
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                @endforeach
+            </div>
         @else
             <div class="overflow-x-auto rounded border border-line"><table class="data-table min-w-[660px]"><thead><tr><th>{{ __('site.topic') }}</th><th>{{ __('site.grade') }}</th><th>{{ __('site.department') }}</th><th>{{ __('site.date') }}</th><th><span class="sr-only">{{ __('site.download') }}</span></th></tr></thead><tbody>
                 @foreach($items as $item)<tr wire:key="resource-{{ $item->id }}"><td><p class="mb-1 text-xs text-jts">{{ __('site.'.$item->type->code) }}</p><a class="font-semibold hover:text-jts" href="{{ \App\Support\Site::path('/download/resources/'.$item->id) }}">{{ $item->title }}</a></td><td>{{ $item->school_level_label }}</td><td>{{ __('site.'.$item->department->code) }}</td><td class="whitespace-nowrap text-muted">{{ $item->upload_date->translatedFormat('d M Y') }}</td><td><a href="{{ \App\Support\Site::path('/download/resources/'.$item->id) }}" class="icon-btn" title="{{ __('site.download') }}" aria-label="{{ __('site.download') }} {{ $item->title }}"><x-site-icon name="download" class="size-4"/></a></td></tr>@endforeach

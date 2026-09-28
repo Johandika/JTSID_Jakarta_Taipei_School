@@ -19,23 +19,6 @@
     </div>
 
     <div class="shell py-10 sm:py-14">
-        <form class="mb-10 flex flex-wrap items-end gap-3" method="get">
-            <label class="w-full sm:w-72">
-                <span class="field-label">{{ __('site.department') }}</span>
-                <select name="department" class="field cursor-pointer" onchange="this.value ? this.form.submit() : window.location.href='{{ $site::path('/staff') }}'">
-                    <option value="">{{ __('site.all_departments') }}</option>
-                    @foreach($departments as $department)
-                        <option value="{{ $department->id }}" @selected(request('department') == $department->id)>{{ __('site.'.$department->code) }}</option>
-                    @endforeach
-                </select>
-            </label>
-            @if(request('department'))
-                <a href="{{ $site::path('/staff') }}" class="btn btn-outline">
-                    {{ __('site.clear') }}
-                </a>
-            @endif
-        </form>
-
         <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
             @forelse($staff as $person)
                 <article class="group flex flex-col">
@@ -57,9 +40,12 @@
                             />
                         @else
                             <div class="w-full h-full flex flex-col items-center justify-center bg-[#f4f7f5] transition-transform duration-500 group-hover:scale-105">
-                                <svg class="size-16 text-[#176443]/30" fill="currentColor" viewBox="0 0 24 24">
-                                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                                </svg>
+                                <img
+                                    src="{{ asset('images/jtsidlogo.svg') }}"
+                                    alt=""
+                                    class="h-32 w-auto max-w-[78%] object-contain opacity-80"
+                                    loading="lazy"
+                                />
                             </div>
                         @endif
                     </div>

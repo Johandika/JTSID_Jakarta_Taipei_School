@@ -37,12 +37,13 @@ class SubjectResourceResource extends CmsResource
             ->components([
                 Group::make()->schema([
                     Section::make('Materi & Dokumen Utama')
-                        ->description('Judul materi pembelajaran dan file berkas unduhan')
+                        ->description('Judul materi pembelajaran, gambar cover, dan file berkas unduhan')
                         ->schema([
                             TextInput::make('topic')
                                 ->label('Topik / Nama Materi')
                                 ->required()
                                 ->maxLength(191),
+                            CmsFields::image('image', 4096, 'Gambar Cover Weekly News / Materi'),
                             CmsFields::document(true, 'File Dokumen Materi (PDF, DOCX, RAR)'),
                         ]),
 

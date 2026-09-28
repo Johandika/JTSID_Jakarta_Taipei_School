@@ -144,6 +144,7 @@ return [
     'pillar_character_title' => 'Character & Leadership',
     'pillar_character_desc' => 'Nurturing integrity, curiosity, and leadership potential in every student.',
     'download_resource' => 'Download resource',
+    'download_admission_form' => 'Download registration form',
     'facilities_eyebrow' => 'JTS Facilities',
     'facilities_headline' => 'The best space to grow and learn',
     'facilities_desc' => 'Modern, safe, and comfortable facilities to support learning, creativity, and the development of every student.',

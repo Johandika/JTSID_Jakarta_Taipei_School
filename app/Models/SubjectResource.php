@@ -39,4 +39,9 @@ class SubjectResource extends CmsModel
     {
         return $this->belongsTo(GradeLevel::class);
     }
+
+    public function getImageUrlAttribute(): string
+    {
+        return $this->image ? asset('storage/'.$this->image) : asset('images/campus.jpg');
+    }
 }

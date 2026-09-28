@@ -5,6 +5,7 @@ node_modules
 tmp
 web.pdf
 public/storage
+public/hot
 storage/app/public
 storage/framework/cache/*
 storage/framework/sessions/*

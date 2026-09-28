@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdmissionForm;
 use App\Models\Post;
 use App\Models\SubjectResource;
 use Illuminate\Support\Facades\Storage;
@@ -9,6 +10,16 @@ use Illuminate\Support\Str;
 
 class DownloadController extends Controller
 {
+    public function admissionForm()
+    {
+        $form = AdmissionForm::current();
+        abort_unless($form, 404);
+
+        return Storage::disk('public')->download($form->file_path, $form->download_name, [
+            'X-Content-Type-Options' => 'nosniff', 'Cache-Control' => 'private, no-store',
+        ]);
+    }
+
     public function __invoke(string $kind, int $id)
     {
         $class = match ($kind) {

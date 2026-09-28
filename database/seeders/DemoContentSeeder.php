@@ -110,9 +110,6 @@ class DemoContentSeeder extends Seeder
                 ]));
             }
         }
-        if (Post::exists()) {
-            return;
-        }
         $headlines = [
             ['A new chapter of learning begins', 'Babak baru pembelajaran dimulai', '迎接學習的新篇章', 'news', 'seed-campus.jpg'],
             ['Small discoveries, big possibilities', 'Penemuan kecil, peluang besar', '小小探索，無限可能', 'activity', 'seed-library.jpg'],
@@ -124,40 +121,60 @@ class DemoContentSeeder extends Seeder
         $department = Department::where('code', 'academic')->firstOrFail();
         $other = Department::where('code', 'student_affairs')->firstOrFail();
         $file = $this->sampleDocument();
-        for ($i = 0; $i < 14; $i++) {
-            $h = $headlines[$i % count($headlines)];
-            $post = Post::create(['slug' => 'campus-story-'.($i + 1), 'topic' => $h[0].($i >= 6 ? ' #'.($i + 1) : ''),
-                'category_id' => PostCategory::where('code', $h[3])->value('id'), 'department_id' => $i % 2 ? $other->id : $department->id,
-                'image' => 'images/'.$h[4], 'file_path' => $i % 3 === 0 ? $file : null,
-                'status' => $i === 13 ? 'draft' : 'published', 'upload_date' => today()->subDays($i * 2), 'published_at' => now()->subDays($i * 2 + 1)]);
-            foreach (['en', 'id', 'zh-TW'] as $j => $locale) {
-                $post->translations()->create(['locale' => $locale, 'title' => $h[$j].($i >= 6 ? ' #'.($i + 1) : ''), 'summary' => match ($locale) {
-                    'id' => 'Ruang untuk rasa ingin tahu, pengalaman baru, dan kebersamaan dalam komunitas sekolah kami.',
-                    'zh-TW' => '在學校社群中，培養好奇心、開拓新體驗，一起成長。',
-                    default => 'Making room for curiosity, new experiences, and shared moments in our school community.',
-                }, 'body' => match ($locale) {
-                    'id' => "## Belajar dan bertumbuh bersama\n\nSetiap hari menghadirkan kesempatan untuk bertanya, berkreasi, dan berbagi. Komunitas sekolah mendukung siswa untuk menjelajahi ide melalui kegiatan belajar dan interaksi lintas budaya.\n\nHubungi sekolah untuk informasi kegiatan dan jadwal yang telah dikonfirmasi.",
-                    'zh-TW' => "## 共同學習與成長\n\n每一天都是提問、創作與分享的機會。學校社群支持學生透過學習活動與跨文化互動探索新觀點。\n\n如需已確認的活動資訊及時間，請聯絡學校。",
-                    default => "## Learning and growing together\n\nEvery day brings opportunities to ask questions, create, and share. Our school community supports students as they explore ideas through classroom experiences and cross-cultural connections.\n\nContact the school for confirmed activity details and schedules.",
-                }]);
+        if (! Post::exists()) {
+            for ($i = 0; $i < 14; $i++) {
+                $h = $headlines[$i % count($headlines)];
+                $post = Post::create(['slug' => 'campus-story-'.($i + 1), 'topic' => $h[0].($i >= 6 ? ' #'.($i + 1) : ''),
+                    'category_id' => PostCategory::where('code', $h[3])->value('id'), 'department_id' => $i % 2 ? $other->id : $department->id,
+                    'image' => 'images/'.$h[4], 'file_path' => $i % 3 === 0 ? $file : null,
+                    'status' => $i === 13 ? 'draft' : 'published', 'upload_date' => today()->subDays($i * 2), 'published_at' => now()->subDays($i * 2 + 1)]);
+                foreach (['en', 'id', 'zh-TW'] as $j => $locale) {
+                    $post->translations()->create(['locale' => $locale, 'title' => $h[$j].($i >= 6 ? ' #'.($i + 1) : ''), 'summary' => match ($locale) {
+                        'id' => 'Ruang untuk rasa ingin tahu, pengalaman baru, dan kebersamaan dalam komunitas sekolah kami.',
+                        'zh-TW' => '在學校社群中，培養好奇心、開拓新體驗，一起成長。',
+                        default => 'Making room for curiosity, new experiences, and shared moments in our school community.',
+                    }, 'body' => match ($locale) {
+                        'id' => "## Belajar dan bertumbuh bersama\n\nSetiap hari menghadirkan kesempatan untuk bertanya, berkreasi, dan berbagi. Komunitas sekolah mendukung siswa untuk menjelajahi ide melalui kegiatan belajar dan interaksi lintas budaya.\n\nHubungi sekolah untuk informasi kegiatan dan jadwal yang telah dikonfirmasi.",
+                        'zh-TW' => "## 共同學習與成長\n\n每一天都是提問、創作與分享的機會。學校社群支持學生透過學習活動與跨文化互動探索新觀點。\n\n如需已確認的活動資訊及時間，請聯絡學校。",
+                        default => "## Learning and growing together\n\nEvery day brings opportunities to ask questions, create, and share. Our school community supports students as they explore ideas through classroom experiences and cross-cultural connections.\n\nContact the school for confirmed activity details and schedules.",
+                    }]);
+                }
             }
         }
         foreach (SubjectResourceType::all() as $type) {
+            $resourceImage = match ($type->code) {
+                'weekly_news' => 'images/seed-classroom.jpg',
+                'calendar' => 'images/seed-campus.jpg',
+                'syllabus' => 'images/seed-library.jpg',
+                default => 'images/seed-highlight.jpg',
+            };
+
             foreach (GradeLevel::all() as $grade) {
-                $resource = SubjectResource::create(['topic' => $grade->name.' '.$type->name.' 2026 / 2027', 'type_id' => $type->id,
-                    'grade_level_id' => $grade->id, 'school_levels' => [$grade->code], 'department_id' => $department->id, 'file_path' => $file,
-                    'upload_date' => today()->subDays($type->id), 'published_at' => now()->subDay(), 'status' => 'published']);
+                $resource = SubjectResource::updateOrCreate(
+                    ['topic' => $grade->name.' '.$type->name.' 2026 / 2027', 'type_id' => $type->id],
+                    ['grade_level_id' => $grade->id, 'school_levels' => [$grade->code], 'department_id' => $department->id, 'file_path' => $file,
+                        'image' => $resourceImage, 'upload_date' => today()->subDays($type->id), 'published_at' => now()->subDay(), 'status' => 'published']
+                );
                 foreach (['en', 'id', 'zh-TW'] as $locale) {
-                    $resource->translations()->create(['locale' => $locale, 'title' => $grade->name.' '.__('site.'.$type->code, [], $locale).' 2026 / 2027']);
+                    $resource->translations()->updateOrCreate(
+                        ['locale' => $locale],
+                        ['title' => $grade->name.' '.__('site.'.$type->code, [], $locale).' 2026 / 2027']
+                    );
                 }
             }
         }
         foreach (Department::all() as $d) {
-            StaffProfile::create(['department_id' => $d->id, 'name' => 'Sample Staff '.$d->id, 'title' => 'Department Coordinator']);
+            StaffProfile::updateOrCreate(
+                ['department_id' => $d->id, 'name' => 'Sample Staff '.$d->id],
+                ['title' => 'Department Coordinator']
+            );
         }
         foreach (['National Taiwan University', 'National Cheng Kung University', 'Universitas Indonesia', 'National Tsing Hua University'] as $i => $name) {
-            UniversityAcceptance::create(['department_id' => $department->id, 'academic_year_id' => AcademicYear::latest('id')->value('id'),
-                'student_name' => 'Sample Student '.($i + 1), 'university_name' => $name, 'program_name' => 'Sample program', 'country' => $i === 2 ? 'Indonesia' : 'Taiwan']);
+            UniversityAcceptance::updateOrCreate(
+                ['student_name' => 'Sample Student '.($i + 1), 'university_name' => $name],
+                ['department_id' => $department->id, 'academic_year_id' => AcademicYear::latest('id')->value('id'),
+                    'program_name' => 'Sample program', 'country' => $i === 2 ? 'Indonesia' : 'Taiwan']
+            );
         }
 
         $uniLogos = [
@@ -174,12 +191,14 @@ class DemoContentSeeder extends Seeder
             ['logo' => 'university-logos/ntu.svg', 'title' => 'National Taiwan University (NTU)'],
         ];
         foreach ($uniLogos as $i => $item) {
-            UniversityLogo::create([
-                'logo' => $item['logo'],
-                'title' => $item['title'],
-                'sort_order' => $i + 1,
-                'is_active' => true,
-            ]);
+            UniversityLogo::updateOrCreate(
+                ['logo' => $item['logo']],
+                [
+                    'title' => $item['title'],
+                    'sort_order' => $i + 1,
+                    'is_active' => true,
+                ]
+            );
         }
     }
 

@@ -1,9 +1,17 @@
 <?php
 
 use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+
+ServeCommand::$passthroughVariables = array_values(array_unique([
+    ...ServeCommand::$passthroughVariables,
+    'TEMP',
+    'TMP',
+    'TMPDIR',
+]));
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(

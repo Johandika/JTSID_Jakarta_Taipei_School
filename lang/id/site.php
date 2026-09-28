@@ -144,6 +144,7 @@ return [
     'pillar_character_title' => 'Pembinaan Karakter & Prestasi',
     'pillar_character_desc' => 'Mendukung perkembangan moral, akademik, dan kepemimpinan di setiap jenjang usia.',
     'download_resource' => 'Unduh materi',
+    'download_admission_form' => 'Unduh form pendaftaran',
     'facilities_eyebrow' => 'Fasilitas JTS',
     'facilities_headline' => 'Ruang terbaik untuk tumbuh dan belajar',
     'facilities_desc' => 'Fasilitas modern, aman, dan nyaman untuk mendukung proses belajar, kreativitas, serta perkembangan setiap siswa.',

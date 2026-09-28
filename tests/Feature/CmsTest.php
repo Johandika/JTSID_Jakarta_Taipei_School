@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Filament\Resources\Posts\Pages\CreatePost;
+use App\Filament\Resources\AdmissionForms\Pages\EditAdmissionForm;
 use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
 use App\Filament\Resources\Posts\PostResource;
@@ -11,6 +12,7 @@ use App\Filament\Widgets\DashboardHeaderWidget;
 use App\Filament\Widgets\LatestContentWidget;
 use App\Filament\Widgets\NeedsAttentionWidget;
 use App\Livewire\ContentCatalog;
+use App\Models\AdmissionForm;
 use App\Models\AnnouncementPopup;
 use App\Models\Department;
 use App\Models\GradeLevel;
@@ -52,6 +54,15 @@ class CmsTest extends TestCase
         }
         $this->get('/id')->assertSee('Kabar terbaru JTS');
         $this->get('/zh')->assertSee('校園最新消息');
+        $this->get('/resources')
+            ->assertOk()
+            ->assertDontSeeText('All resources');
+        $this->get('/resources/weekly_news')
+            ->assertOk()
+            ->assertSee('weekly-news-', false)
+            ->assertSee('images/seed-classroom.jpg', false)
+            ->assertSee('/download/resources/', false)
+            ->assertDontSee('<table', false);
     }
 
     public function test_static_pages_are_localized_and_removed_from_the_admin_and_database(): void
@@ -369,6 +380,35 @@ class CmsTest extends TestCase
         $this->get('/download/unknown/1')->assertNotFound();
     }
 
+    public function test_admissions_page_links_to_admin_uploaded_registration_form(): void
+    {
+        Storage::fake('public');
+        $this->get('/admissions')
+            ->assertOk()
+            ->assertSeeText('Download registration form')
+            ->assertSee('downloadForms', false);
+
+        $this->get('/download/admission-form')->assertNotFound();
+
+        Storage::disk('public')->put('admission-forms/admission-form-tk.pdf', '%PDF-1.4 form');
+
+        AdmissionForm::where('school_level', 'tk')->firstOrFail()->update([
+            'title' => 'Form Pendaftaran JTS',
+            'file_path' => 'admission-forms/admission-form-tk.pdf',
+            'is_active' => true,
+        ]);
+
+        $this->get('/admissions')
+            ->assertOk()
+            ->assertSee('admission-form-tk.pdf', false)
+            ->assertSee('form-pendaftaran-jts.pdf', false);
+
+        $this->get('/download/admission-form')
+            ->assertOk()
+            ->assertHeader('x-content-type-options', 'nosniff')
+            ->assertDownload('form-pendaftaran-jts.pdf');
+    }
+
     public function test_admin_routes_require_login_and_viewer_cannot_mutate(): void
     {
         $this->get('/admin/posts')->assertRedirect('/admin/login');
@@ -485,17 +525,42 @@ class CmsTest extends TestCase
     public function test_resource_upload_accepts_pdf_and_rejects_executable_and_oversized_files(): void
     {
         Storage::fake('local');
+        Storage::fake('public');
         $this->actingAs(User::where('email', 'admin@jts.local')->first());
         $data = ['topic' => 'Test file', 'department_id' => Department::first()->id, 'type_id' => SubjectResourceType::first()->id, 'grade_level_id' => GradeLevel::first()->id,
             'upload_date' => today()->toDateString(), 'status' => 'published', 'translations' => [['locale' => 'en', 'title' => 'Test resource']]];
-        Livewire::test(CreateSubjectResource::class)->fillForm($data + ['file_path' => UploadedFile::fake()->create('sample.pdf', 100, 'application/pdf')])
+        Livewire::test(CreateSubjectResource::class)->fillForm($data + [
+            'image' => UploadedFile::fake()->image('weekly-news.jpg'),
+            'file_path' => UploadedFile::fake()->create('sample.pdf', 100, 'application/pdf'),
+        ])
             ->call('create')->assertHasNoFormErrors();
         $resource = SubjectResource::where('topic', 'Test file')->firstOrFail();
         Storage::disk('local')->assertExists($resource->file_path);
+        Storage::disk('public')->assertExists($resource->image);
         Livewire::test(CreateSubjectResource::class)->fillForm($data + ['file_path' => UploadedFile::fake()->create('shell.php', 10, 'application/x-php')])
             ->call('create')->assertHasFormErrors();
         Livewire::test(CreateSubjectResource::class)->fillForm($data + ['file_path' => UploadedFile::fake()->create('large.pdf', 16000, 'application/pdf')])
             ->call('create')->assertHasFormErrors();
+    }
+
+    public function test_admin_can_update_the_seeded_registration_form(): void
+    {
+        Storage::fake('public');
+        $this->actingAs(User::where('email', 'admin@jts.local')->first());
+        $form = AdmissionForm::firstOrFail();
+
+        Livewire::test(EditAdmissionForm::class, ['record' => $form->id])
+            ->fillForm([
+                'title' => 'Form Pendaftaran JTS',
+                'school_level' => 'tk',
+                'file_path' => UploadedFile::fake()->create('form-pendaftaran.pdf', 100, 'application/pdf'),
+                'is_active' => true,
+            ])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('Form Pendaftaran JTS', $form->fresh()->title);
+        Storage::disk('public')->assertExists($form->fresh()->file_path);
     }
 
     public function test_all_admin_lists_and_create_forms_render(): void

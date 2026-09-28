@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             DemoContentSeeder::class,
             DirectorSeeder::class,
             AdmissionFeeSeeder::class,
+            AdmissionFormSeeder::class,
             MandarinProgramSeeder::class,
         ]);
     }

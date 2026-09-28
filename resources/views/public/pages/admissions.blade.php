@@ -30,6 +30,16 @@
                 'icon' => 'graduation-cap',
             ],
         ];
+        $admissionFormsByLevel = \App\Models\AdmissionForm::downloadableByLevel();
+        $downloadForms = collect($levelTabs)
+            ->mapWithKeys(fn ($tab, $code) => [
+                $code => ($form = $admissionFormsByLevel->get($code)) ? [
+                    'url' => $form->download_url,
+                    'name' => $form->download_name,
+                    'label' => __('site.download_admission_form').' '.$form->school_level_label,
+                ] : null,
+            ])
+            ->all();
     @endphp
 
     {{-- Headline Section with Supporting Background Image (JTS Green Overlay) --}}
@@ -52,14 +62,27 @@
         <div class="space-y-16">
 
             {{-- 1. Rincian Biaya (Fee Structure) with 4 Interactive Tabs --}}
-            <div x-data="{ activeTab: 'tk' }" class="w-full">
-                <div>
-                    <h2 class="text-2xl font-bold tracking-tight text-ink sm:text-3xl">
-                        {{ $admissions['fees_heading'] }}
-                    </h2>
-                    <p class="mt-2 text-sm sm:text-base text-muted max-w-2xl">
-                        {{ $admissions['fees_subheading'] }}
-                    </p>
+            <div x-data="{ activeTab: 'tk', downloadForms: {{ \Illuminate\Support\Js::from($downloadForms) }} }" class="w-full">
+                <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold tracking-tight text-ink sm:text-3xl">
+                            {{ $admissions['fees_heading'] }}
+                        </h2>
+                        <p class="mt-2 text-sm sm:text-base text-muted max-w-2xl">
+                            {{ $admissions['fees_subheading'] }}
+                        </p>
+                    </div>
+
+                    <a
+                        :href="downloadForms[activeTab]?.url || '#'"
+                        :download="downloadForms[activeTab]?.name || null"
+                        :aria-disabled="downloadForms[activeTab] ? 'false' : 'true'"
+                        class="btn btn-primary inline-flex w-fit items-center gap-2 shadow-xs transition-all hover:shadow-md"
+                        :class="downloadForms[activeTab] ? '' : 'pointer-events-none opacity-60'"
+                    >
+                        <x-site-icon name="download" class="size-4" />
+                        <span x-text="downloadForms[activeTab]?.label || '{{ __('site.download_admission_form') }}'">{{ __('site.download_admission_form') }}</span>
+                    </a>
                 </div>
 
                 {{-- 4 Level Selection Tabs --}}

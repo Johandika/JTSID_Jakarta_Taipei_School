@@ -81,6 +81,8 @@ class StaffProfileCleanupTest extends TestCase
                 ->assertOk()
                 ->assertSeeText('Integration Teacher')
                 ->assertSeeText('Senior Teacher')
+                ->assertSee('images/jtsidlogo.svg', false)
+                ->assertDontSee('<select name="department"', false)
                 ->assertDontSeeText($removedLabel);
         }
     }

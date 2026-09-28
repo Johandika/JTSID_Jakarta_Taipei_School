@@ -144,6 +144,7 @@ return [
     'pillar_character_title' => '品格涵育與全人發展',
     'pillar_character_desc' => '營造溫馨安全的學習社群，啟發每一位學生的獨立思辨與領導力。',
     'download_resource' => '下載資源',
+    'download_admission_form' => '下載報名表',
     'facilities_eyebrow' => '雅加達臺灣學校設施',
     'facilities_headline' => '啟發成長與學習的最佳空間',
     'facilities_desc' => '現代化、安全且舒適的校園環境，全力支持每一位學生的學習歷程、創意思維與全人發展。',

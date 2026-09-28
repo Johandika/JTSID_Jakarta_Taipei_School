@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\AcademicYear;
-use App\Models\Department;
 use App\Models\Post;
 use App\Models\StaffProfile;
 use App\Models\SubjectResourceType;
@@ -43,7 +42,6 @@ class ContentController extends Controller
         return view('public.staff', [
             'staff' => StaffProfile::where('is_active', true)->with('department')
                 ->when($input['department'] ?? null, fn ($q, $id) => $q->where('department_id', $id))->orderBy('sort_order')->get(),
-            'departments' => Department::where('is_active', true)->orderBy('sort_order')->get(),
         ]);
     }
 
