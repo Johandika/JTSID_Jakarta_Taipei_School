@@ -18,6 +18,7 @@
             return [
                 'image' => $imageUrl,
                 'video_embed_url' => method_exists($s, 'getYouTubeEmbedUrl') ? $s->getYouTubeEmbedUrl() : null,
+                'direct_video_url' => (method_exists($s, 'isDirectVideo') && $s->isDirectVideo()) ? $s->video_url : null,
                 'show_text' => (bool) ($s->show_text ?? true),
                 'tagline' => method_exists($s, 'trans') ? $s->trans('tagline') : ($s->tagline ?? ''),
                 'title' => method_exists($s, 'trans') ? $s->trans('title') : ($s->title ?? ''),
@@ -72,13 +73,29 @@
                  total: {{ count($slides) }},
                  isHovered: false,
                  timer: null,
+                 videoReady: {},
                  slides: @js($slides),
+                 markVideoReady(idx) {
+                     setTimeout(() => {
+                         this.videoReady[idx] = true;
+                     }, 1800);
+                 },
                  init() {
                      this.syncPlayback();
                      window.addEventListener('message', (event) => {
                          try {
                              const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-                             if (data && data.event === 'onStateChange' && data.info === 0) {
+                             if (!data || data.event !== 'onStateChange') return;
+
+                             // State 1 = Playing: wait 1000ms until YouTube pause flash finishes fading, then reveal video
+                             if (data.info === 1) {
+                                 setTimeout(() => {
+                                     this.videoReady[this.current] = true;
+                                 }, 1000);
+                             }
+
+                             // State 0 = Ended: replay immediately
+                             if (data.info === 0) {
                                  document.querySelectorAll('.hero-yt-iframe').forEach((iframe) => {
                                      iframe.contentWindow?.postMessage(JSON.stringify({event: 'command', func: 'seekTo', args: [0, true]}), '*');
                                      iframe.contentWindow?.postMessage(JSON.stringify({event: 'command', func: 'playVideo', args: ''}), '*');
@@ -102,7 +119,7 @@
                      }
                  },
                  isVideoSlide() {
-                     return Boolean(this.slides[this.current]?.video_embed_url);
+                     return Boolean(this.slides[this.current]?.video_embed_url || this.slides[this.current]?.direct_video_url);
                  },
                  syncPlayback() {
                      if (this.isVideoSlide()) {
@@ -146,13 +163,23 @@
                      width="1920" height="1080">
                 @endif
 
-                @if(!empty($slide['video_embed_url']))
-                    {{-- Responsive Autoplay YouTube Background Embed (Completely insulated from clicks) --}}
+                @if(!empty($slide['direct_video_url']))
+                    {{-- Native HTML5 Direct Video (.mp4 / .webm) - Zero Controls, Zero Overlays --}}
+                    <div class="absolute inset-0 size-full overflow-hidden pointer-events-none select-none">
+                        <video autoplay muted loop playsinline
+                               class="size-full object-cover object-center pointer-events-none">
+                            <source src="{{ $slide['direct_video_url'] }}" type="video/mp4">
+                        </video>
+                    </div>
+                @elseif(!empty($slide['video_embed_url']))
+                    {{-- Responsive Autoplay YouTube Background Embed (Smooth Cross-Fade after pause indicator disappears) --}}
                     <div class="absolute inset-0 size-full overflow-hidden pointer-events-none select-none">
                         <iframe
                             src="{{ $slide['video_embed_url'] }}"
                             title="Jakarta Taipei School Video"
-                            class="hero-yt-iframe absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.77777778vh] min-w-full h-[56.25vw] min-h-full object-cover border-0 pointer-events-none select-none"
+                            @load="markVideoReady({{ $idx }})"
+                            :class="videoReady[{{ $idx }}] ? 'opacity-100' : 'opacity-0'"
+                            class="hero-yt-iframe absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.77777778vh] min-w-full h-[56.25vw] min-h-full object-cover border-0 pointer-events-none select-none transition-opacity duration-1000 ease-in-out"
                             style="pointer-events: none !important;"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             referrerpolicy="strict-origin-when-cross-origin"

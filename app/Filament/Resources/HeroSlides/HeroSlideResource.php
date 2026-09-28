@@ -56,15 +56,15 @@ class HeroSlideResource extends CmsResource
                                 ]),
 
                             TextInput::make('video_url')
-                                ->label('URL Video YouTube (Opsional jika ada Gambar)')
-                                ->placeholder('https://www.youtube.com/watch?v=... atau https://youtu.be/...')
+                                ->label('URL Video (YouTube atau File MP4)')
+                                ->placeholder('https://www.youtube.com/watch?v=... atau https://domain.com/video.mp4')
                                 ->maxLength(500)
-                                ->helperText('Wajib diisi jika tidak mengunggah Gambar. Video YouTube akan otomatis diputar tanpa suara (muted & loop) di latar belakang.')
+                                ->helperText('Wajib diisi jika tidak mengunggah Gambar. Mendukung link YouTube atau file video langsung (.mp4). Video akan otomatis diputar tanpa suara (muted & loop) di latar belakang.')
                                 ->url()
                                 ->rules([
                                     fn (Get $get) => function (string $attribute, $value, \Closure $fail) use ($get) {
                                         if (blank($value) && blank($get('image'))) {
-                                            $fail('Wajib mengisi minimal salah satu: Gambar Slide Hero atau URL Video YouTube.');
+                                            $fail('Wajib mengisi minimal salah satu: Gambar Slide Hero atau URL Video.');
                                         }
                                     },
                                 ]),

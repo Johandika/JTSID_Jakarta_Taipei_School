@@ -105,4 +105,24 @@ class HeroSlideVideoTest extends TestCase
         $response->assertSee('https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg', false);
         $response->assertSee('x-show="slides[current].show_text"', false);
     }
+
+    public function test_homepage_renders_direct_html5_video_without_iframe(): void
+    {
+        HeroSlide::query()->delete();
+
+        HeroSlide::create([
+            'image' => 'images/seed-campus.jpg',
+            'video_url' => 'https://example.com/videos/campus-tour.mp4',
+            'show_text' => true,
+            'title' => ['en' => 'Direct Video Slide', 'id' => 'Slide Video Langsung', 'zh-TW' => '直接影片輪播'],
+            'sort_order' => 0,
+            'is_active' => true,
+        ]);
+
+        $response = $this->get('/');
+        $response->assertOk();
+        $response->assertSee('<video autoplay muted loop playsinline', false);
+        $response->assertSee('https://example.com/videos/campus-tour.mp4', false);
+        $response->assertDontSee('youtube-nocookie.com', false);
+    }
 }

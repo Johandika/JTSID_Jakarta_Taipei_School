@@ -67,4 +67,21 @@ class HeroSlideTest extends TestCase
         $this->assertStringContainsString('fs=0', $embedUrl);
         $this->assertTrue($slide->hasVideo());
     }
+
+    public function test_detects_direct_video_urls(): void
+    {
+        $slide = new HeroSlide;
+
+        $slide->video_url = 'https://example.com/videos/campus.mp4';
+        $this->assertTrue($slide->isDirectVideo());
+        $this->assertTrue($slide->hasVideo());
+        $this->assertNull($slide->getYouTubeId());
+
+        $slide->video_url = 'https://example.com/videos/campus.webm';
+        $this->assertTrue($slide->isDirectVideo());
+
+        $slide->video_url = 'https://www.youtube.com/watch?v=dQw4w9WgXcQ';
+        $this->assertFalse($slide->isDirectVideo());
+        $this->assertTrue($slide->hasVideo());
+    }
 }

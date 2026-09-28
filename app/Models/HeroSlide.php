@@ -110,10 +110,30 @@ class HeroSlide extends CmsModel
     }
 
     /**
+     * Check if the video URL points to a direct video file (mp4, webm, ogg).
+     */
+    public function isDirectVideo(): bool
+    {
+        $url = trim((string) ($this->video_url ?? ''));
+        if ($url === '') {
+            return false;
+        }
+
+        $path = parse_url($url, PHP_URL_PATH);
+        if (! $path) {
+            return false;
+        }
+
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+        return in_array($extension, ['mp4', 'webm', 'ogg'], true);
+    }
+
+    /**
      * Check if the slide has a valid video attached.
      */
     public function hasVideo(): bool
     {
-        return ! empty($this->getYouTubeId());
+        return ! empty($this->getYouTubeId()) || $this->isDirectVideo();
     }
 }
