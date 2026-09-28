@@ -37,7 +37,7 @@ class HeroSlideVideoTest extends TestCase
         $response->assertSee('autoplay=1', false);
         $response->assertSee('mute=1', false);
         $response->assertSee('loop=1', false);
-        $response->assertSee('playlist=dQw4w9WgXcQ', false);
+        $response->assertSee('controls=0', false);
         $response->assertSee('images/seed-campus.jpg', false);
     }
 

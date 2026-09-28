@@ -96,11 +96,13 @@ class HeroSlide extends CmsModel
             'mute' => 1,
             'controls' => 0,
             'loop' => 1,
-            'playlist' => $id,
             'playsinline' => 1,
             'rel' => 0,
             'showinfo' => 0,
             'modestbranding' => 1,
+            'disablekb' => 1,
+            'fs' => 0,
+            'iv_load_policy' => 3,
             'enablejsapi' => 1,
         ]);
 

@@ -75,6 +75,17 @@
                  slides: @js($slides),
                  init() {
                      this.syncPlayback();
+                     window.addEventListener('message', (event) => {
+                         try {
+                             const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+                             if (data && data.event === 'onStateChange' && data.info === 0) {
+                                 document.querySelectorAll('.hero-yt-iframe').forEach((iframe) => {
+                                     iframe.contentWindow?.postMessage(JSON.stringify({event: 'command', func: 'seekTo', args: [0, true]}), '*');
+                                     iframe.contentWindow?.postMessage(JSON.stringify({event: 'command', func: 'playVideo', args: ''}), '*');
+                                 });
+                             }
+                         } catch (e) {}
+                     });
                  },
                  startTimer() {
                      this.stopTimer();
@@ -136,12 +147,13 @@
                 @endif
 
                 @if(!empty($slide['video_embed_url']))
-                    {{-- Responsive Autoplay YouTube Background Embed --}}
-                    <div class="absolute inset-0 size-full overflow-hidden pointer-events-none">
+                    {{-- Responsive Autoplay YouTube Background Embed (Completely insulated from clicks) --}}
+                    <div class="absolute inset-0 size-full overflow-hidden pointer-events-none select-none">
                         <iframe
                             src="{{ $slide['video_embed_url'] }}"
                             title="Jakarta Taipei School Video"
-                            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.77777778vh] min-w-full h-[56.25vw] min-h-full object-cover border-0"
+                            class="hero-yt-iframe absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.77777778vh] min-w-full h-[56.25vw] min-h-full object-cover border-0 pointer-events-none select-none"
+                            style="pointer-events: none !important;"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                             referrerpolicy="strict-origin-when-cross-origin"
                             tabindex="-1"
@@ -152,10 +164,11 @@
             </div>
         @endforeach
 
-        {{-- Multi-layered Dark Overlay for Text Legibility & Contrast --}}
-        <div class="absolute inset-0 bg-black/25 pointer-events-none"></div>
-        <div class="absolute top-0 inset-x-0 h-36 sm:h-44 bg-gradient-to-b from-black/85 via-black/35 to-transparent pointer-events-none"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none"></div>
+        {{-- Click Shield Overlay & Multi-layered Dark Gradients --}}
+        {{-- Shield Layer: Captures mouse/touch clicks on background so they NEVER penetrate to the YouTube player --}}
+        <div class="absolute inset-0 z-10 bg-black/25 select-none"></div>
+        <div class="absolute top-0 inset-x-0 z-10 h-36 sm:h-44 bg-gradient-to-b from-black/85 via-black/35 to-transparent pointer-events-none"></div>
+        <div class="absolute inset-0 z-10 bg-gradient-to-t from-black/90 via-black/40 to-transparent pointer-events-none"></div>
 
         {{-- Left-Bottom Diagonal Info Panel (Rendered only when show_text is active) --}}
         <div x-show="slides[current].show_text"

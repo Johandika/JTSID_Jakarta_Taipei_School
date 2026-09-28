@@ -62,8 +62,9 @@ class HeroSlideTest extends TestCase
         $this->assertStringContainsString('autoplay=1', $embedUrl);
         $this->assertStringContainsString('mute=1', $embedUrl);
         $this->assertStringContainsString('loop=1', $embedUrl);
-        $this->assertStringContainsString('playlist=dQw4w9WgXcQ', $embedUrl);
         $this->assertStringContainsString('controls=0', $embedUrl);
+        $this->assertStringContainsString('disablekb=1', $embedUrl);
+        $this->assertStringContainsString('fs=0', $embedUrl);
         $this->assertTrue($slide->hasVideo());
     }
 }
