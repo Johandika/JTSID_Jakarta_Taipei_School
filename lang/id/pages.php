@@ -10,6 +10,16 @@ $standardPage = [
 $summary = 'Mengenal komunitas, kegiatan belajar, dan kehidupan di Jakarta Taipei School.';
 
 return [
+    'facilities' => [
+        'title' => 'Fasilitas Sekolah',
+        'seo_title' => 'Fasilitas Sekolah',
+        'summary' => 'Menyediakan lingkungan belajar yang modern, aman, dan kondusif untuk mendukung potensi akademik, seni, dan olahraga setiap siswa.',
+        'eyebrow' => 'OUR FACILITIES',
+        'heading' => 'Jelajahi Fasilitas Jakarta Taipei School',
+        'subheading' => 'Fasilitas yang mendukung kegiatan belajar, aktivitas, dan keseharian komunitas JTS.',
+        'all_tab' => 'Semua Fasilitas',
+        'empty' => 'Belum ada foto fasilitas yang ditampilkan.',
+    ],
     'academics' => [
         'title' => 'Akademik',
         'summary' => $summary,

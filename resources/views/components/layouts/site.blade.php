@@ -9,6 +9,7 @@
             'children' => [
                 ['title' => __('site.board_of_directors'), 'url' => '/board-of-directors'],
                 ['title' => __('site.school_profile'), 'url' => '/school-profile'],
+                ['title' => __('site.facilities'), 'url' => '/facilities'],
                 ['title' => __('site.staff'), 'url' => '/staff'],
                 ['title' => __('site.contact'), 'url' => '/contact'],
             ],

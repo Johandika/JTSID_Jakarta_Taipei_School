@@ -19,6 +19,7 @@ return [
     'contact' => '聯絡我們',
     'board_of_directors' => '理董事會',
     'school_profile' => '學校概況',
+    'facilities' => '校園設施',
     'mandarin_program' => '短期華語課程',
     'school' => '雅加達臺灣學校',
     'tagline' => '立足文化，放眼世界。',

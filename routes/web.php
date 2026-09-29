@@ -31,6 +31,7 @@ foreach (['en' => '', 'zh' => 'zh', 'id' => 'id'] as $locale => $prefix) {
         Route::get('/news/{slug}', [ContentController::class, 'post'])->name('post');
         Route::get('/resources/{type?}', [ContentController::class, 'resources'])->name('resources');
         Route::get('/staff', [ContentController::class, 'staff'])->name('staff');
+        Route::get('/facilities', [ContentController::class, 'facilities'])->name('facilities');
         Route::get('/university-admission', [ContentController::class, 'universities'])->name('universities');
         Route::get('/download/admission-form', [DownloadController::class, 'admissionForm'])->name('download.admission-form');
         Route::get('/download/{kind}/{id}', DownloadController::class)->whereNumber('id')->name('download');

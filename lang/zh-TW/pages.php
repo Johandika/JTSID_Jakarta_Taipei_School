@@ -10,6 +10,16 @@ $standardPage = [
 $summary = '認識雅加達臺灣學校的社群、學習與校園生活。';
 
 return [
+    'facilities' => [
+        'title' => '校園設施',
+        'seo_title' => '校園設施',
+        'summary' => '提供現代化、安全且啟發潛能的優質學習環境，全面支持學術、藝術與體育發展。',
+        'eyebrow' => 'OUR FACILITIES',
+        'heading' => '探索雅加達臺灣學校校園設施',
+        'subheading' => '全方位支持學習、多元活動與校園生活的美好環境。',
+        'all_tab' => '全部設施',
+        'empty' => '目前尚無校園設施照片。',
+    ],
     'academics' => [
         'title' => '課程設計',
         'summary' => $summary,

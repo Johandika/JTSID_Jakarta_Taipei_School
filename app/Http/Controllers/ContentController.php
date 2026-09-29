@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AcademicYear;
+use App\Models\Facility;
 use App\Models\Post;
 use App\Models\StaffProfile;
 use App\Models\SubjectResourceType;
@@ -13,6 +13,22 @@ use Illuminate\View\View;
 
 class ContentController extends Controller
 {
+    public function facilities(): View
+    {
+        $facilities = Facility::orderBy('id')->get();
+
+        $categoriesWithFacilities = collect(Facility::CATEGORIES)
+            ->filter(fn ($labels, $key) => $facilities->contains('category', $key))
+            ->map(fn ($labels, $key) => [
+                'key' => $key,
+                'name' => Facility::getCategoryLabel($key),
+                'items' => $facilities->where('category', $key)->values(),
+            ])
+            ->values();
+
+        return view('public.pages.facilities', compact('categoriesWithFacilities'));
+    }
+
     public function post(string $slug): View
     {
         $post = Post::published()->with(['translations', 'department', 'category'])->where('slug', $slug)->firstOrFail();

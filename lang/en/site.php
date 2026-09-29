@@ -19,6 +19,7 @@ return [
     'contact' => 'Contact',
     'board_of_directors' => 'Board of Directors',
     'school_profile' => 'School Profile',
+    'facilities' => 'Facilities',
     'mandarin_program' => 'Short-term Mandarin Program',
     'school' => 'Jakarta Taipei School',
     'tagline' => 'Rooted in culture. Open to the world.',

@@ -19,6 +19,7 @@ return [
     'contact' => 'Kontak',
     'board_of_directors' => 'Dewan Pengurus',
     'school_profile' => 'Profil Sekolah',
+    'facilities' => 'Fasilitas',
     'mandarin_program' => 'Program Mandarin Jangka Pendek',
     'school' => 'Jakarta Taipei School',
     'tagline' => 'Berakar pada budaya. Terbuka pada dunia.',
