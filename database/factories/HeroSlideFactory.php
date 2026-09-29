@@ -18,7 +18,7 @@ class HeroSlideFactory extends Factory
     public function definition(): array
     {
         return [
-            'image' => 'images/seed-campus.jpg',
+            'image' => 'images/campus.webp',
             'title' => [
                 'en' => fake()->sentence(4),
                 'id' => fake()->sentence(4),

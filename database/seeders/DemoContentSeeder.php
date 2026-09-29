@@ -23,7 +23,7 @@ class DemoContentSeeder extends Seeder
         if (! app()->environment(['local', 'testing'])) {
             return;
         }
-        foreach (['campus.jpg', 'seed-campus.jpg', 'seed-library.jpg', 'seed-classroom.jpg', 'seed-highlight.jpg'] as $image) {
+        foreach (['campus.webp', 'library.webp', 'classroom.webp', 'highlight.webp'] as $image) {
             if (file_exists(public_path('images/'.$image)) && ! Storage::disk('public')->exists('images/'.$image)) {
                 Storage::disk('public')->put('images/'.$image, file_get_contents(public_path('images/'.$image)));
             }
@@ -31,7 +31,7 @@ class DemoContentSeeder extends Seeder
         if (HeroSlide::count() === 0) {
             $heroSlides = [
                 [
-                    'image' => 'images/campus.jpg',
+                    'image' => 'images/campus.webp',
                     'title' => [
                         'en' => 'Excellence in Trilingual Education',
                         'id' => 'Keunggulan Pendidikan Tiga Bahasa',
@@ -55,7 +55,7 @@ class DemoContentSeeder extends Seeder
                     'cta_url' => '/admissions',
                 ],
                 [
-                    'image' => 'images/seed-classroom.jpg',
+                    'image' => 'images/classroom.webp',
                     'title' => [
                         'en' => 'A Nurturing & Character-Driven Community',
                         'id' => 'Komunitas Belajar Berkarakter & Mengayomi',
@@ -79,7 +79,7 @@ class DemoContentSeeder extends Seeder
                     'cta_url' => '/school-profile',
                 ],
                 [
-                    'image' => 'images/seed-library.jpg',
+                    'image' => 'images/library.webp',
                     'title' => [
                         'en' => 'World-Class Pathways & Opportunities',
                         'id' => 'Peluang & Prestasi Berstandar Global',
@@ -111,12 +111,12 @@ class DemoContentSeeder extends Seeder
             }
         }
         $headlines = [
-            ['A new chapter of learning begins', 'Babak baru pembelajaran dimulai', '迎接學習的新篇章', 'news', 'seed-campus.jpg'],
-            ['Small discoveries, big possibilities', 'Penemuan kecil, peluang besar', '小小探索，無限可能', 'activity', 'seed-library.jpg'],
-            ['Connecting cultures through language', 'Menghubungkan budaya melalui bahasa', '透過語言連結文化', 'exchange', 'seed-classroom.jpg'],
-            ['An invitation to explore our campus', 'Undangan untuk mengenal kampus', '邀請您認識我們的校園', 'admission_notice', 'seed-campus.jpg'],
-            ['Learning together in the library', 'Belajar bersama di perpustakaan', '在圖書館共同學習', 'activity', 'seed-library.jpg'],
-            ['This month in our school community', 'Bulan ini di komunitas sekolah', '本月校園生活', 'newsletter', 'seed-classroom.jpg'],
+            ['A new chapter of learning begins', 'Babak baru pembelajaran dimulai', '迎接學習的新篇章', 'news', 'campus.webp'],
+            ['Small discoveries, big possibilities', 'Penemuan kecil, peluang besar', '小小探索，無限可能', 'activity', 'library.webp'],
+            ['Connecting cultures through language', 'Menghubungkan budaya melalui bahasa', '透過語言連結文化', 'exchange', 'classroom.webp'],
+            ['An invitation to explore our campus', 'Undangan untuk mengenal kampus', '邀請您認識我們的校園', 'admission_notice', 'campus.webp'],
+            ['Learning together in the library', 'Belajar bersama di perpustakaan', '在圖書館共同學習', 'activity', 'library.webp'],
+            ['This month in our school community', 'Bulan ini di komunitas sekolah', '本月校園生活', 'newsletter', 'classroom.webp'],
         ];
         $department = Department::where('code', 'academic')->firstOrFail();
         $other = Department::where('code', 'student_affairs')->firstOrFail();
@@ -143,10 +143,10 @@ class DemoContentSeeder extends Seeder
         }
         foreach (SubjectResourceType::all() as $type) {
             $resourceImage = match ($type->code) {
-                'weekly_news' => 'images/seed-classroom.jpg',
-                'calendar' => 'images/seed-campus.jpg',
-                'syllabus' => 'images/seed-library.jpg',
-                default => 'images/seed-highlight.jpg',
+                'weekly_news' => 'images/classroom.webp',
+                'calendar' => 'images/campus.webp',
+                'syllabus' => 'images/library.webp',
+                default => 'images/highlight.webp',
             };
 
             foreach (GradeLevel::all() as $grade) {

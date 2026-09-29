@@ -30,8 +30,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName(fn (): string => __('admin.brand_name'))
-            ->brandLogo(file_exists(public_path('images/logo.png')) ? asset('images/logo.png') : asset('images/logo.jpg'))
+            ->brandName(fn(): string => __('admin.brand_name'))
+            ->brandLogo(file_exists(public_path('images/logo.webp')) ? asset('images/logo.webp') : asset('images/logo.jpg'))
             ->brandLogoHeight('3.5rem')
             ->darkMode(false)
             ->databaseTransactions()
@@ -39,14 +39,14 @@ class AdminPanelProvider extends PanelProvider
             ->globalSearch(false)
             ->maxContentWidth(Width::Full)
             ->font('Plus Jakarta Sans')
-            ->renderHook(PanelsRenderHook::STYLES_AFTER, fn () => view('filament.custom-theme'))
-            ->renderHook(PanelsRenderHook::SIDEBAR_FOOTER, fn () => view('filament.sidebar-user-menu'))
+            ->renderHook(PanelsRenderHook::STYLES_AFTER, fn() => view('filament.custom-theme'))
+            ->renderHook(PanelsRenderHook::SIDEBAR_FOOTER, fn() => view('filament.sidebar-user-menu'))
             ->navigationGroups([
-                'Content' => NavigationGroup::make(fn (): string => __('admin.nav_groups.content')),
-                'Website' => NavigationGroup::make(fn (): string => __('admin.nav_groups.website')),
-                'School' => NavigationGroup::make(fn (): string => __('admin.nav_groups.school')),
-                'Admissions' => NavigationGroup::make(fn (): string => __('admin.nav_groups.admissions')),
-                'Settings' => NavigationGroup::make(fn (): string => __('admin.nav_groups.settings')),
+                'Content' => NavigationGroup::make(fn(): string => __('admin.nav_groups.content')),
+                'Website' => NavigationGroup::make(fn(): string => __('admin.nav_groups.website')),
+                'School' => NavigationGroup::make(fn(): string => __('admin.nav_groups.school')),
+                'Admissions' => NavigationGroup::make(fn(): string => __('admin.nav_groups.admissions')),
+                'Settings' => NavigationGroup::make(fn(): string => __('admin.nav_groups.settings')),
             ])
             ->userMenu(false)
             ->colors([

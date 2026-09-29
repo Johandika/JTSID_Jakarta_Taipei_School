@@ -276,7 +276,7 @@ class MandarinProgramResource extends CmsResource
                 ImageColumn::make('cover_image')
                     ->label('Brosur')
                     ->state(fn (MandarinProgram $record): ?string => $record->cover_image_url ?: null)
-                    ->defaultImageUrl(asset('images/logo.png'))
+                    ->defaultImageUrl(asset('images/logo.webp'))
                     ->square(),
 
                 TextColumn::make('title')

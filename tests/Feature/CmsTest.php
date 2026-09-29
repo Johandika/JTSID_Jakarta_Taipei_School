@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Filament\Resources\Posts\Pages\CreatePost;
 use App\Filament\Resources\AdmissionForms\Pages\EditAdmissionForm;
+use App\Filament\Resources\Posts\Pages\CreatePost;
 use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
 use App\Filament\Resources\Posts\PostResource;
@@ -60,7 +60,7 @@ class CmsTest extends TestCase
         $this->get('/resources/weekly_news')
             ->assertOk()
             ->assertSee('weekly-news-', false)
-            ->assertSee('images/seed-classroom.jpg', false)
+            ->assertSee('images/classroom.webp', false)
             ->assertSee('/download/resources/', false)
             ->assertDontSee('<table', false);
     }
@@ -99,14 +99,14 @@ class CmsTest extends TestCase
                     $response->assertSeeText($locale['summary'])
                         ->assertSee('class="prose"', false);
                 } elseif ($slug === 'board-of-directors') {
-                    $response->assertSee('images/board-of-directors-hero.jpg', false);
+                    $response->assertSee('images/board-of-directors-hero.webp', false);
                 } elseif ($slug === 'mandarin-program') {
                     $response->assertSeeText($locale['summary']);
                 } elseif ($slug === 'contact') {
                     $response->assertSee('google.com/maps/embed', false);
                 } else {
                     $response->assertSeeText($locale['summary'])
-                        ->assertSee('images/admissions-hero.jpg', false);
+                        ->assertSee('images/admissions-hero.webp', false);
                 }
             }
             foreach (['about', 'history', 'parent-association'] as $removedSlug) {
@@ -118,7 +118,7 @@ class CmsTest extends TestCase
         $this->get('/id/admissions')
             ->assertSee('href="/id/mandarin-program"', false)
             ->assertSeeText('Mulai perjalanan Anda di JTS')
-            ->assertSee('images/admissions-hero.jpg', false);
+            ->assertSee('images/admissions-hero.webp', false);
         $this->get('/zh/contact')
             ->assertSee('href="https://wa.me/6281385435909"', false)
             ->assertSeeText('透過 WhatsApp 聯絡');
@@ -300,7 +300,7 @@ class CmsTest extends TestCase
                 ->assertSee('href="https://www.facebook.com/profile.php?id=100057615161035"', false)
                 ->assertSee('href="https://www.instagram.com/jakartataipeischoolofficial/"', false)
                 ->assertSee('href="https://youtube.com/@jakartataipeischool?si=5LP55sxC05ZOteLH"', false)
-                ->assertSee('src="'.asset('images/qr-whatsapp.png').'"', false);
+                ->assertSee('src="'.asset('images/qr-whatsapp.webp').'"', false);
 
             $this->get($prefix.'/contact')
                 ->assertOk()
@@ -609,17 +609,17 @@ class CmsTest extends TestCase
         $this->get('/')
             ->assertOk()
             ->assertSee('Excellence in Trilingual Education')
-            ->assertSee('seed-classroom.jpg');
+            ->assertSee('classroom.webp');
 
         $this->get('/id')
             ->assertOk()
             ->assertSee('Keunggulan Pendidikan Tiga Bahasa')
-            ->assertSee('seed-classroom.jpg');
+            ->assertSee('classroom.webp');
 
         $this->get('/zh')
             ->assertOk()
             ->assertSee('深耕三語，開創卓越教育')
-            ->assertSee('seed-classroom.jpg');
+            ->assertSee('classroom.webp');
     }
 
     public function test_empty_hero_slides_hides_hero_section_without_error(): void

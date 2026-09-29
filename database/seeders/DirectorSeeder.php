@@ -14,7 +14,7 @@ class DirectorSeeder extends Seeder
     {
         $directors = [
             [
-                'photo' => 'images/directors/director-1.jpg',
+                'photo' => 'images/directors/director-1.webp',
                 'name' => [
                     'en' => 'Dr. Olivia Chen, Ph.D.',
                     'id' => 'Dr. Olivia Chen, Ph.D.',
@@ -48,7 +48,7 @@ class DirectorSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'photo' => 'images/directors/director-2.jpg',
+                'photo' => 'images/directors/director-2.webp',
                 'name' => [
                     'en' => 'Ir. John Hartono, M.B.A.',
                     'id' => 'Ir. John Hartono, M.B.A.',
@@ -82,7 +82,7 @@ class DirectorSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'photo' => 'images/directors/director-3.jpg',
+                'photo' => 'images/directors/director-3.webp',
                 'name' => [
                     'en' => 'Prof. Ava Lin, Ed.D.',
                     'id' => 'Prof. Ava Lin, Ed.D.',
@@ -116,7 +116,7 @@ class DirectorSeeder extends Seeder
                 'is_active' => true,
             ],
             [
-                'photo' => 'images/directors/director-4.jpg',
+                'photo' => 'images/directors/director-4.webp',
                 'name' => [
                     'en' => 'Peter Gordon, M.Sc., CPA',
                     'id' => 'Peter Gordon, M.Sc., CPA',

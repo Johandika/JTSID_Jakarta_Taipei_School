@@ -2,7 +2,7 @@
     {{-- Headline Section with Supporting Background Image (JTS Green Overlay) --}}
     <div class="relative overflow-hidden bg-[#0a2e1f] border-b border-line py-12 sm:py-16 text-white">
         <div class="absolute inset-0 z-0">
-            <img src="{{ asset('images/universities-hero.jpg') }}" alt="{{ __('site.universities') }}" class="size-full object-cover object-center opacity-55" />
+            <img src="{{ asset('images/universities-hero.webp') }}" alt="{{ __('site.universities') }}" class="size-full object-cover object-center opacity-55" />
             <div class="absolute inset-0 bg-gradient-to-r from-[#0a2e1f]/90 via-[#0e3b2a]/65 to-[#176443]/30"></div>
         </div>
         <div class="shell relative z-10">

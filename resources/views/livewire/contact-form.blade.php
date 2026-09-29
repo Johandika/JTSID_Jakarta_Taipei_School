@@ -134,7 +134,7 @@
                     {{ $page['message_label'] ?? 'Pesan' }} <span class="text-rose-500">*</span>
                 </label>
                 <span class="text-xs text-slate-400" id="message-counter">
-                    {{ strlen($message) }}/500
+                    {{ strlen($this->message) }}/500
                 </span>
             </div>
             <textarea

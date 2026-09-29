@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Foundation\Application;
-use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Foundation\Console\ServeCommand;
 use Illuminate\Http\Request;
 
 ServeCommand::$passthroughVariables = array_values(array_unique([

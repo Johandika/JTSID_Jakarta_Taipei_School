@@ -16,7 +16,7 @@
     $primaryLabel = $primaryLabel ?? __('pages.school_profile.cta_admissions');
     $secondaryUrl = $secondaryUrl ?? $site::path('/contact');
     $secondaryLabel = $secondaryLabel ?? __('pages.school_profile.cta_contact');
-    $image = $image ?? asset('images/cta-students.jpg');
+    $image = $image ?? asset('images/cta-students.webp');
 @endphp
 
 <div {{ $attributes->merge(['class' => 'relative overflow-hidden rounded-2xl sm:rounded-3xl bg-[#0a4a30] text-white shadow-xl']) }}>

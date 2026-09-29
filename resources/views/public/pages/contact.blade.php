@@ -8,7 +8,7 @@
     {{-- Hero Section (Dark Green Overlay consistent with other public pages) --}}
     <div class="relative overflow-hidden bg-[#0a2e1f] border-b border-line py-12 sm:py-16 text-white">
         <div class="absolute inset-0 z-0">
-            <img src="{{ asset('images/campus.jpg') }}" alt="{{ $page['title'] }}" class="size-full object-cover object-center opacity-45" />
+            <img src="{{ asset('images/campus.webp') }}" alt="{{ $page['title'] }}" class="size-full object-cover object-center opacity-45" />
             <div class="absolute inset-0 bg-gradient-to-r from-[#0a2e1f]/95 via-[#0e3b2a]/75 to-[#176443]/40"></div>
         </div>
         <div class="shell relative z-10">
@@ -27,7 +27,7 @@
             <div class="lg:col-span-5 bg-gradient-to-br from-[#f8faf9] via-[#f2f7f4] to-[#eaf2ee] rounded-3xl border border-slate-200/80 p-6 sm:p-8 lg:p-10 shadow-xs relative overflow-hidden flex flex-col justify-between h-full">
                 {{-- Subtle Decorative Watermark Pattern --}}
                 <div class="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.06] select-none">
-                    <img src="{{ asset('images/logo.png') }}" alt="" class="w-64 h-64 sm:w-80 sm:h-80 object-contain" />
+                    <img src="{{ asset('images/logo.webp') }}" alt="" class="w-64 h-64 sm:w-80 sm:h-80 object-contain" />
                 </div>
 
                 <div class="relative z-10">

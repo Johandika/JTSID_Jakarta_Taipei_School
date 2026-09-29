@@ -7,7 +7,7 @@
     {{-- Headline Section with Supporting Background Image (JTS Green Overlay) --}}
     <div class="relative overflow-hidden bg-[#0a2e1f] border-b border-line py-12 sm:py-16 text-white">
         <div class="absolute inset-0 z-0">
-            <img src="{{ asset('images/school-profile-hero.jpg') }}" alt="Jakarta Taipei School" class="size-full object-cover object-center opacity-55" />
+            <img src="{{ asset('images/school-profile-hero.webp') }}" alt="Jakarta Taipei School" class="size-full object-cover object-center opacity-55" />
             <div class="absolute inset-0 bg-gradient-to-r from-[#0a2e1f]/90 via-[#0e3b2a]/65 to-[#176443]/30"></div>
         </div>
         <div class="shell relative z-10">
@@ -28,7 +28,7 @@
                 <h2 class="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">{{ $profile['overview_title'] }}</h2>
 
                 <div class="mt-6 overflow-hidden rounded-2xl border border-line shadow-xs">
-                    <img src="{{ asset('images/campus.jpg') }}" alt="{{ $profile['overview_title'] }}" class="block w-full h-64 sm:h-80 md:h-[450px] lg:h-[520px] object-cover object-center" loading="lazy" />
+                    <img src="{{ asset('images/campus.webp') }}" alt="{{ $profile['overview_title'] }}" class="block w-full h-64 sm:h-80 md:h-[450px] lg:h-[520px] object-cover object-center" loading="lazy" />
                 </div>
 
                 <div class="mt-6">
@@ -84,7 +84,7 @@
                     <div class="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 sm:p-7 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col justify-between min-h-[310px]">
                         {{-- Right Landmark Image with Soft Gradient Fade --}}
                         <div class="absolute right-0 top-0 bottom-0 w-[42%] sm:w-[40%] pointer-events-none select-none overflow-hidden">
-                            <img src="{{ asset('images/trilingual/mandarin.jpg') }}" alt="Mandarin Pagoda" class="h-full w-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700" />
+                            <img src="{{ asset('images/trilingual/mandarin.webp') }}" alt="Mandarin Pagoda" class="h-full w-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700" />
                             <div class="absolute inset-0 bg-gradient-to-r from-white via-white/30 to-transparent"></div>
                             <div class="absolute inset-0 bg-gradient-to-t from-white/70 via-transparent to-transparent"></div>
                         </div>
@@ -126,7 +126,7 @@
                     <div class="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 sm:p-7 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col justify-between min-h-[310px]">
                         {{-- Right Landmark Image with Soft Gradient Fade --}}
                         <div class="absolute right-0 top-0 bottom-0 w-[42%] sm:w-[40%] pointer-events-none select-none overflow-hidden">
-                            <img src="{{ asset('images/trilingual/english.jpg') }}" alt="Big Ben London" class="h-full w-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700" />
+                            <img src="{{ asset('images/trilingual/english.webp') }}" alt="Big Ben London" class="h-full w-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700" />
                             <div class="absolute inset-0 bg-gradient-to-r from-white via-white/30 to-transparent"></div>
                             <div class="absolute inset-0 bg-gradient-to-t from-white/70 via-transparent to-transparent"></div>
                         </div>
@@ -171,7 +171,7 @@
                     <div class="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 sm:p-7 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col justify-between min-h-[310px]">
                         {{-- Right Landmark Image with Soft Gradient Fade --}}
                         <div class="absolute right-0 top-0 bottom-0 w-[42%] sm:w-[40%] pointer-events-none select-none overflow-hidden">
-                            <img src="{{ asset('images/trilingual/indonesia.jpg') }}" alt="Bendera Merah Putih" class="h-full w-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700" />
+                            <img src="{{ asset('images/trilingual/indonesia.webp') }}" alt="Bendera Merah Putih" class="h-full w-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700" />
                             <div class="absolute inset-0 bg-gradient-to-r from-white via-white/30 to-transparent"></div>
                             <div class="absolute inset-0 bg-gradient-to-t from-white/70 via-transparent to-transparent"></div>
                         </div>

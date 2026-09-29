@@ -25,7 +25,7 @@ return [
         'whatsapp' => [
             'display' => '+62 813-8543-5909',
             'url' => 'https://wa.me/6281385435909',
-            'qr_image' => 'images/qr-whatsapp.png',
+            'qr_image' => 'images/qr-whatsapp.webp',
         ],
         'social' => [
             'facebook' => 'https://www.facebook.com/profile.php?id=100057615161035',
