@@ -7,6 +7,11 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class Dashboard extends BaseDashboard
 {
+    public static function getNavigationLabel(): string
+    {
+        return __('admin.dashboard.navigation');
+    }
+
     public function getTitle(): string|Htmlable
     {
         return '';

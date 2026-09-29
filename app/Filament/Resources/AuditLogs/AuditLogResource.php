@@ -2,19 +2,21 @@
 
 namespace App\Filament\Resources\AuditLogs;
 
+use App\Filament\Resources\CmsResource;
 use App\Models\AuditLog;
-use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
-class AuditLogResource extends Resource
+class AuditLogResource extends CmsResource
 {
     protected static ?string $model = AuditLog::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clock';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Settings';
+
+    protected static ?int $navigationSort = 12;
 
     public static function canViewAny(): bool
     {

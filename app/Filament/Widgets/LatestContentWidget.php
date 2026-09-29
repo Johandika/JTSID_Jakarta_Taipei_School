@@ -20,23 +20,23 @@ class LatestContentWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
-            ->heading('Publikasi Berita & Media Terbaru')
+            ->heading(__('admin.widgets.latest_news'))
             ->query(PostResource::getEloquentQuery()->latest('upload_date'))
             ->columns([
                 TextColumn::make('topic')
-                    ->label('Topik Berita')
+                    ->label(__('admin.fields.news_topic'))
                     ->searchable()
                     ->limit(40)
                     ->weight('semibold'),
                 TextColumn::make('category.name')
-                    ->label('Kategori')
+                    ->label(__('admin.fields.category'))
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('status')
-                    ->label('Status')
+                    ->label(__('admin.fields.status'))
                     ->badge(),
                 TextColumn::make('upload_date')
-                    ->label('Tanggal Unggah')
+                    ->label(__('admin.fields.upload_date'))
                     ->date('d M Y'),
             ])
             ->recordUrl(fn (Post $record): ?string => PostResource::canEdit($record)

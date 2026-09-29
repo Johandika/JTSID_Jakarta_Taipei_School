@@ -4,6 +4,7 @@ use App\Http\Controllers\ContentController;
 use App\Http\Controllers\DownloadController;
 use App\Http\Controllers\HomeController;
 use App\Http\Middleware\SetLocale;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 $staticPages = [
@@ -14,6 +15,14 @@ $staticPages = [
     'contact',
     'mandarin-program',
 ];
+
+Route::get('/admin/language/{locale}', function (Request $request, string $locale) {
+    abort_unless(in_array($locale, ['en', 'id', 'zh-TW'], true), 404);
+
+    $request->session()->put('admin_locale', $locale === 'zh-TW' ? 'zh_TW' : $locale);
+
+    return redirect()->back(fallback: '/admin');
+})->middleware('web')->name('admin.language');
 
 foreach (['en' => '', 'zh' => 'zh', 'id' => 'id'] as $locale => $prefix) {
     Route::prefix($prefix)->name($locale.'.')->middleware(SetLocale::class)->group(function () use ($staticPages) {

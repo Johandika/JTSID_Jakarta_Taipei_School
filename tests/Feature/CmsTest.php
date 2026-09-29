@@ -421,19 +421,50 @@ class CmsTest extends TestCase
 
     public function test_admin_navigation_uses_sidebar_branding_and_user_menu_without_a_topbar(): void
     {
-        $this->actingAs(User::where('email', 'admin@jts.local')->firstOrFail())
-            ->get('/admin')
+        $response = $this->actingAs(User::where('email', 'admin@jts.local')->firstOrFail())
+            ->get('/admin');
+
+        $response
             ->assertOk()
             ->assertDontSee('class="fi-topbar"', false)
             ->assertSee('class="fi-sidebar-header-logo-ctn"', false)
             ->assertSee('class="fi-sidebar-footer ', false)
             ->assertSee('class="fi-user-menu', false)
+            ->assertSee('jts-user-menu-language', false)
+            ->assertDontSee('mb-2 rounded-lg border border-gray-200 bg-white/80', false)
             ->assertSee('x-float.placement.right-end', false)
             ->assertDontSee('Filament\\Livewire\\GlobalSearch', false);
+
+        $content = $response->getContent();
+        $positions = collect(['Content', 'Website', 'School', 'Admissions', 'Settings'])
+            ->mapWithKeys(fn (string $label): array => [$label => strpos($content, $label)]);
+
+        $positions->each(fn (int|false $position, string $label) => $this->assertNotFalse($position, "Missing sidebar group [{$label}]"));
+        $this->assertLessThan($positions['Website'], $positions['Content']);
+        $this->assertLessThan($positions['School'], $positions['Website']);
+        $this->assertLessThan($positions['Admissions'], $positions['School']);
+        $this->assertLessThan($positions['Settings'], $positions['Admissions']);
+    }
+
+    public function test_admin_dashboard_can_switch_to_traditional_chinese(): void
+    {
+        $this->actingAs(User::where('email', 'admin@jts.local')->firstOrFail())
+            ->get('/admin/language/zh-TW')
+            ->assertRedirect();
+
+        $this->get('/admin')
+            ->assertOk()
+            ->assertSeeText('儀表板')
+            ->assertSeeText('內容管理')
+            ->assertSeeText('新聞與媒體')
+            ->assertSeeText('繁體中文')
+            ->assertSeeText('查看網站');
     }
 
     public function test_dashboard_actions_links_and_counts_follow_user_permissions(): void
     {
+        app()->setLocale('id');
+
         Post::query()->update(['status' => 'published']);
         SubjectResource::query()->update(['status' => 'published']);
 

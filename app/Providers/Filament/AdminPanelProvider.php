@@ -3,10 +3,12 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Pages\Dashboard;
+use App\Http\Middleware\SetAdminLocale;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationGroup;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -28,7 +30,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->brandName('JTS Content Studio')
+            ->brandName(fn (): string => __('admin.brand_name'))
             ->brandLogo(file_exists(public_path('images/logo.png')) ? asset('images/logo.png') : asset('images/logo.jpg'))
             ->brandLogoHeight('3.5rem')
             ->darkMode(false)
@@ -39,7 +41,13 @@ class AdminPanelProvider extends PanelProvider
             ->font('Plus Jakarta Sans')
             ->renderHook(PanelsRenderHook::STYLES_AFTER, fn () => view('filament.custom-theme'))
             ->renderHook(PanelsRenderHook::SIDEBAR_FOOTER, fn () => view('filament.sidebar-user-menu'))
-            ->navigationGroups(['Content', 'Website', 'School', 'Settings'])
+            ->navigationGroups([
+                'Content' => NavigationGroup::make(fn (): string => __('admin.nav_groups.content')),
+                'Website' => NavigationGroup::make(fn (): string => __('admin.nav_groups.website')),
+                'School' => NavigationGroup::make(fn (): string => __('admin.nav_groups.school')),
+                'Admissions' => NavigationGroup::make(fn (): string => __('admin.nav_groups.admissions')),
+                'Settings' => NavigationGroup::make(fn (): string => __('admin.nav_groups.settings')),
+            ])
             ->userMenu(false)
             ->colors([
                 'primary' => Color::hex('#176443'),
@@ -57,6 +65,7 @@ class AdminPanelProvider extends PanelProvider
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
                 AuthenticateSession::class,
+                SetAdminLocale::class,
                 ShareErrorsFromSession::class,
                 PreventRequestForgery::class,
                 SubstituteBindings::class,

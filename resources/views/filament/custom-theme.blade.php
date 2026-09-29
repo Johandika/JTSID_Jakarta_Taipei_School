@@ -77,6 +77,54 @@
         color: #a1a1aa;
     }
 
+    .jts-user-menu-language {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .jts-user-menu-language-label {
+        color: #52525b;
+        font-size: 0.8125rem;
+        font-weight: 650;
+    }
+
+    .jts-user-menu-language-options {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.25rem;
+        padding: 0.25rem;
+        border: 1px solid #e4e4e7;
+        border-radius: 0.625rem;
+        background-color: #f8faf9;
+    }
+
+    .jts-user-menu-language-option {
+        min-width: 0;
+        border-radius: 0.45rem;
+        padding: 0.35rem 0.4rem;
+        color: #52525b;
+        font-size: 0.75rem;
+        font-weight: 650;
+        line-height: 1.1;
+        text-align: center;
+        text-decoration: none;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+
+    .jts-user-menu-language-option:hover,
+    .jts-user-menu-language-option:focus-visible {
+        background-color: #eaf4ee;
+        color: var(--brand-green);
+        outline: none;
+    }
+
+    .jts-user-menu-language-option.is-active {
+        background-color: var(--brand-green);
+        color: #ffffff;
+    }
+
     /* Sidebar navigation items */
     .fi-sidebar-item-btn {
         border-radius: 0.625rem !important;

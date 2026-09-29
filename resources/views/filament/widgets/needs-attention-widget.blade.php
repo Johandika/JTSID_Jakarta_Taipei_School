@@ -1,7 +1,7 @@
 <x-filament-widgets::widget>
     <x-filament::section>
-        <x-slot name="heading">Perlu perhatian</x-slot>
-        <x-slot name="description">Langkah tindak lanjut penting hari ini</x-slot>
+        <x-slot name="heading">{{ __('admin.widgets.needs_attention') }}</x-slot>
+        <x-slot name="description">{{ __('admin.widgets.needs_attention_desc') }}</x-slot>
 
         <div class="jts-attention-list">
             @foreach ($items as $item)
@@ -28,8 +28,8 @@
 
         <x-slot name="footer">
             <div class="jts-attention-footer">
-                <span>Status Konten</span>
-                <strong>Terkontrol &amp; Terkoordinasi</strong>
+                <span>{{ __('admin.widgets.content_status') }}</span>
+                <strong>{{ __('admin.widgets.content_status_value') }}</strong>
             </div>
         </x-slot>
     </x-filament::section>

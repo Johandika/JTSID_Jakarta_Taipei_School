@@ -3,18 +3,18 @@
         <div class="jts-dashboard-header">
             <div>
                 <div class="jts-dashboard-eyebrow">
-                    <span>Ruang Kerja</span>
+                    <span>{{ __('admin.dashboard.workspace') }}</span>
                     <span aria-hidden="true">/</span>
-                    <span class="jts-dashboard-eyebrow-current">Ringkasan</span>
+                    <span class="jts-dashboard-eyebrow-current">{{ __('admin.dashboard.summary') }}</span>
                     <span class="jts-dashboard-status">
                         <span class="jts-dashboard-status-dot" aria-hidden="true"></span>
-                        Studio Aktif
+                        {{ __('admin.dashboard.studio_active') }}
                     </span>
                 </div>
 
-                <h1 class="jts-dashboard-title">Ringkasan JTS Content Studio</h1>
+                <h1 class="jts-dashboard-title">{{ __('admin.dashboard.title') }}</h1>
                 <p class="jts-dashboard-description">
-                    Kelola publikasi berita, materi pelajaran, dan pusat informasi Jakarta Taipei School.
+                    {{ __('admin.dashboard.description') }}
                 </p>
             </div>
 
@@ -22,13 +22,13 @@
                 <div class="jts-dashboard-actions">
                     @if ($canCreatePosts)
                         <x-filament::button :href="$createPostUrl" tag="a" icon="heroicon-m-plus" color="primary">
-                            Buat Berita
+                            {{ __('admin.dashboard.create_news') }}
                         </x-filament::button>
                     @endif
 
                     @if ($canCreateResources)
                         <x-filament::button :href="$createResourceUrl" tag="a" icon="heroicon-m-arrow-up-tray" color="gray">
-                            Upload Materi
+                            {{ __('admin.dashboard.upload_resource') }}
                         </x-filament::button>
                     @endif
                 </div>
