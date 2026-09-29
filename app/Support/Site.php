@@ -28,6 +28,6 @@ class Site
 
     public static function image(?string $path): string
     {
-        return $path ? asset('storage/'.$path) : asset('images/campus.jpg');
+        return $path ? asset('storage/'.$path) : asset('images/campus.webp');
     }
 }

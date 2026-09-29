@@ -8,7 +8,7 @@
     {{-- Headline Section with Supporting Background Image (JTS Green Overlay) --}}
     <div class="relative overflow-hidden bg-[#0a2e1f] border-b border-line py-12 sm:py-16 text-white">
         <div class="absolute inset-0 z-0">
-            <img src="{{ asset('images/academics-hero.jpg') }}" alt="{{ $academics['title'] }}"
+            <img src="{{ asset('images/academics-hero.webp') }}" alt="{{ $academics['title'] }}"
                 class="size-full object-cover object-center opacity-55" />
             <div class="absolute inset-0 bg-gradient-to-r from-[#0a2e1f]/90 via-[#0e3b2a]/65 to-[#176443]/30"></div>
         </div>

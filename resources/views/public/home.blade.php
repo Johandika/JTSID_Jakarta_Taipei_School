@@ -32,7 +32,7 @@
         $curriculumPrograms = [
             [
                 'col' => 'lg:col-span-5',
-                'image' => asset('images/programs/kindergarten.jpg'),
+                'image' => asset('images/programs/kindergarten.webp'),
                 'title' => __('site.prog_kindergarten_title'),
                 'label' => __('site.prog_kindergarten_label'),
                 'description' => __('site.prog_kindergarten_desc'),
@@ -40,7 +40,7 @@
             ],
             [
                 'col' => 'lg:col-span-7',
-                'image' => asset('images/programs/primary.jpg'),
+                'image' => asset('images/programs/primary.webp'),
                 'title' => __('site.prog_primary_title'),
                 'label' => __('site.prog_primary_label'),
                 'description' => __('site.prog_primary_desc'),
@@ -48,7 +48,7 @@
             ],
             [
                 'col' => 'lg:col-span-7',
-                'image' => asset('images/programs/secondary.jpg'),
+                'image' => asset('images/programs/secondary.webp'),
                 'title' => __('site.prog_secondary_title'),
                 'label' => __('site.prog_secondary_label'),
                 'description' => __('site.prog_secondary_desc'),
@@ -56,7 +56,7 @@
             ],
             [
                 'col' => 'lg:col-span-5',
-                'image' => asset('images/programs/english.jpg'),
+                'image' => asset('images/programs/english.webp'),
                 'title' => __('site.prog_english_title'),
                 'label' => __('site.prog_english_label'),
                 'description' => __('site.prog_english_desc'),
@@ -463,7 +463,7 @@
                         {{-- Left Half of Bento: 1 Tall Card (Ruang Kelas Modern) --}}
                         <div class="sm:col-span-6 flex">
                             <div class="group relative w-full h-[320px] sm:h-[460px] lg:h-[490px] rounded-2xl overflow-hidden border border-line/70 bg-gray-900 shadow-sm hover:shadow-xl transition-all duration-300">
-                                <img src="{{ asset('images/programs/primary.jpg') }}"
+                                <img src="{{ asset('images/programs/primary.webp') }}"
                                      alt="{{ __('site.facility_classroom') }}"
                                      class="size-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-105"
                                      loading="lazy">
@@ -494,7 +494,7 @@
                         <div class="sm:col-span-6 flex flex-col gap-3.5 sm:gap-4 lg:gap-5 h-full">
                             {{-- Top Horizontal Card (Laboratorium Sains) --}}
                             <div class="group relative w-full h-[180px] sm:h-[220px] lg:h-[235px] rounded-2xl overflow-hidden border border-line/70 bg-gray-900 shadow-sm hover:shadow-xl transition-all duration-300">
-                                <img src="{{ asset('images/programs/secondary.jpg') }}"
+                                <img src="{{ asset('images/programs/secondary.webp') }}"
                                      alt="{{ __('site.facility_lab') }}"
                                      class="size-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-105"
                                      loading="lazy">
@@ -521,7 +521,7 @@
                             <div class="grid grid-cols-2 gap-3.5 sm:gap-4 lg:gap-5 flex-1">
                                 {{-- Card 3: Perpustakaan --}}
                                 <div class="group relative w-full h-[160px] sm:h-[220px] lg:h-[235px] rounded-2xl overflow-hidden border border-line/70 bg-gray-900 shadow-sm hover:shadow-xl transition-all duration-300">
-                                    <img src="{{ asset('images/seed-library.jpg') }}"
+                                    <img src="{{ asset('images/library.webp') }}"
                                          alt="{{ __('site.facility_library') }}"
                                          class="size-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-105"
                                          loading="lazy">
@@ -546,7 +546,7 @@
 
                                 {{-- Card 4: Fasilitas Olahraga --}}
                                 <div class="group relative w-full h-[160px] sm:h-[220px] lg:h-[235px] rounded-2xl overflow-hidden border border-line/70 bg-gray-900 shadow-sm hover:shadow-xl transition-all duration-300">
-                                    <img src="{{ asset('images/seed-classroom.jpg') }}"
+                                    <img src="{{ asset('images/classroom.webp') }}"
                                          alt="{{ __('site.facility_sports') }}"
                                          class="size-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-105"
                                          loading="lazy">

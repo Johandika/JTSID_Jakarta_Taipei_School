@@ -34,7 +34,7 @@ class DirectorTest extends TestCase
                 'id' => 'Ketua Dewan Pengurus',
                 'zh-TW' => '董事長',
             ],
-            'photo' => 'images/directors/director-1.jpg',
+            'photo' => 'images/directors/director-1.webp',
             'is_active' => true,
         ]);
 

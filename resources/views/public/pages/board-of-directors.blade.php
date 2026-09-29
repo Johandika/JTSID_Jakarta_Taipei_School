@@ -8,7 +8,7 @@
     {{-- Headline Section with Supporting Background Image (JTS Green Overlay) --}}
     <div class="relative overflow-hidden bg-[#0a2e1f] border-b border-line py-12 sm:py-16 text-white">
         <div class="absolute inset-0 z-0">
-            <img src="{{ asset('images/board-of-directors-hero.jpg') }}" alt="{{ $page['heading'] ?? $page['title'] }}" class="size-full object-cover object-center opacity-55" />
+            <img src="{{ asset('images/board-of-directors-hero.webp') }}" alt="{{ $page['heading'] ?? $page['title'] }}" class="size-full object-cover object-center opacity-55" />
             <div class="absolute inset-0 bg-gradient-to-r from-[#0a2e1f]/90 via-[#0e3b2a]/65 to-[#176443]/30"></div>
         </div>
         <div class="shell relative z-10">
@@ -28,7 +28,7 @@
                 @php
                     $directorName = $director instanceof \App\Models\Director ? $director->trans('name') : ($director['name'] ?? '');
                     $directorRole = $director instanceof \App\Models\Director ? $director->trans('role') : ($director['role'] ?? '');
-                    $directorPhoto = $director instanceof \App\Models\Director ? $director->photo_url : asset($director['image'] ?? 'images/logo.png');
+                    $directorPhoto = $director instanceof \App\Models\Director ? $director->photo_url : asset($director['image'] ?? 'images/logo.webp');
                     $directorEducation = $director instanceof \App\Models\Director ? $director->getEducationList() : ($director['education'] ?? []);
                     $directorBio = $director instanceof \App\Models\Director ? $director->trans('bio') : ($director['bio'] ?? '');
                 @endphp

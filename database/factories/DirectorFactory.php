@@ -32,7 +32,7 @@ class DirectorFactory extends Factory
                 'id' => fake()->jobTitle(),
                 'zh-TW' => fake()->jobTitle(),
             ],
-            'photo' => 'images/directors/director-1.jpg',
+            'photo' => 'images/directors/director-1.webp',
             'education' => [
                 'en' => [fake()->sentence(4), fake()->sentence(4)],
                 'id' => [fake()->sentence(4), fake()->sentence(4)],

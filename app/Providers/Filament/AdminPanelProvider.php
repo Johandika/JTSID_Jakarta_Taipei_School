@@ -29,7 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('JTS Content Studio')
-            ->brandLogo(file_exists(public_path('images/logo.png')) ? asset('images/logo.png') : asset('images/logo.jpg'))
+            ->brandLogo(asset('images/logo.webp'))
             ->brandLogoHeight('3.5rem')
             ->darkMode(false)
             ->databaseTransactions()

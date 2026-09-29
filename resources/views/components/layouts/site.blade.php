@@ -43,7 +43,7 @@
     @endforeach
     <meta property="og:title" content="{{ $title ?: 'Jakarta Taipei School' }}">
     <meta property="og:description" content="{{ $description ?: __('site.hero_copy') }}">
-    <meta property="og:image" content="{{ $image ?: asset('images/campus.jpg') }}">
+    <meta property="og:image" content="{{ $image ?: asset('images/campus.webp') }}">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:type" content="website">
     <link rel="icon" href="{{ asset('favicon.ico') }}" sizes="any">
@@ -99,10 +99,10 @@
         {{-- Main Navbar --}}
         <div class="shell flex min-h-20 sm:min-h-22 items-center justify-between gap-5 transition-all duration-300">
             <a href="{{ $site::path('/') }}" aria-label="Jakarta Taipei School" class="group flex items-center">
-                <img src="{{ asset('images/logo-white.png') }}" alt="Jakarta Taipei School" width="234" height="57"
+                <img src="{{ asset('images/logo-white.webp') }}" alt="Jakarta Taipei School" width="234" height="57"
                     x-show="!scrolled && isTransparent"
                     class="h-auto w-48 sm:w-56 transition-opacity duration-300 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)]">
-                <img src="{{ file_exists(public_path('images/logo.png')) ? asset('images/logo.png') : asset('images/logo.jpg') }}" alt="Jakarta Taipei School" width="234" height="57"
+                <img src="{{ asset('images/logo.webp') }}" alt="Jakarta Taipei School" width="234" height="57"
                     x-show="scrolled || !isTransparent"
                     class="h-auto w-48 sm:w-56 transition-opacity duration-300">
             </a>
@@ -195,7 +195,7 @@
     <footer class="mt-16 relative text-white overflow-hidden bg-[#071d13] border-t border-emerald-950">
         {{-- Background Campus Image with Visible Architecture & Slightly Darker Forest Overlay --}}
         <div class="absolute inset-0 z-0 pointer-events-none">
-            <img src="{{ asset('images/campus.jpg') }}" alt="JTS Campus"
+            <img src="{{ asset('images/campus.webp') }}" alt="JTS Campus"
                 class="w-full h-full object-cover object-center brightness-75 contrast-110">
             <div class="absolute inset-0 bg-gradient-to-b from-[#08281a]/82 via-[#051e13]/86 to-[#02100a]/92"></div>
         </div>
@@ -230,7 +230,7 @@
                 {{-- Center Column: Brand Identity, Logo & Social Hub --}}
                 <div class="flex flex-col items-center justify-center text-center px-2">
                     <a href="{{ $site::path('/') }}" class="inline-block transition-transform hover:scale-[1.02] duration-200" title="Jakarta Taipei School">
-                        <img src="{{ file_exists(public_path('images/logo-white.png')) ? asset('images/logo-white.png') : asset('images/logo.png') }}"
+                        <img src="{{ asset('images/logo-white.webp') }}"
                             alt="Jakarta Taipei School"
                             width="280" height="70"
                             class="h-14 md:h-16 w-auto max-w-[280px] object-contain drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] mx-auto brightness-110">

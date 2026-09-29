@@ -18,7 +18,7 @@ class HeroSlideVideoTest extends TestCase
         HeroSlide::query()->delete();
 
         HeroSlide::create([
-            'image' => 'images/seed-campus.jpg',
+            'image' => 'images/campus.webp',
             'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
             'title' => ['en' => 'Welcome to Jakarta Taipei School', 'id' => 'Selamat Datang', 'zh-TW' => '歡迎'],
             'description' => ['en' => 'Leading trilingual school', 'id' => 'Sekolah trilingual terkemuka', 'zh-TW' => '頂尖三語學校'],
@@ -38,13 +38,13 @@ class HeroSlideVideoTest extends TestCase
         $response->assertSee('mute=1', false);
         $response->assertSee('loop=1', false);
         $response->assertSee('controls=0', false);
-        $response->assertSee('images/seed-campus.jpg', false);
+        $response->assertSee('images/campus.webp', false);
     }
 
     public function test_hero_slide_video_url_is_persisted(): void
     {
         $slide = HeroSlide::create([
-            'image' => 'images/seed-campus.jpg',
+            'image' => 'images/campus.webp',
             'video_url' => 'https://youtu.be/dQw4w9WgXcQ',
             'title' => ['en' => 'Video Slide', 'id' => 'Slide Video', 'zh-TW' => '影片輪播'],
             'sort_order' => 1,
@@ -65,7 +65,7 @@ class HeroSlideVideoTest extends TestCase
         HeroSlide::query()->delete();
 
         HeroSlide::create([
-            'image' => 'images/seed-campus.jpg',
+            'image' => 'images/campus.webp',
             'video_url' => null,
             'title' => ['en' => 'Image Only Slide', 'id' => 'Slide Gambar Saja', 'zh-TW' => '僅圖片輪播'],
             'sort_order' => 0,
@@ -111,7 +111,7 @@ class HeroSlideVideoTest extends TestCase
         HeroSlide::query()->delete();
 
         HeroSlide::create([
-            'image' => 'images/seed-campus.jpg',
+            'image' => 'images/campus.webp',
             'video_url' => 'https://example.com/videos/campus-tour.mp4',
             'show_text' => true,
             'title' => ['en' => 'Direct Video Slide', 'id' => 'Slide Video Langsung', 'zh-TW' => '直接影片輪播'],

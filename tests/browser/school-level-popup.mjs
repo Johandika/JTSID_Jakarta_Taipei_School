@@ -35,7 +35,7 @@ try {
     await page.getByRole('textbox', { name: /^Title/ }).fill(title);
     await page.getByRole('textbox', { name: 'Message', exact: true }).fill('Selamat kepada siswa JTS atas prestasinya.');
     await page.getByRole('switch').click();
-    await page.locator('input[type="file"]').setInputFiles('public/images/seed-highlight.jpg');
+    await page.locator('input[type="file"]').setInputFiles('public/images/highlight.webp');
     await expect(page.locator('.filepond--item')).toHaveCount(1);
     await expect(page.locator('.filepond--item[data-filepond-item-state="processing-complete"]')).toHaveCount(1);
     await page.getByRole('button', { name: 'Create', exact: true }).click();
