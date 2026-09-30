@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Facility;
+use App\Models\AcademicYear;
 use App\Models\Post;
 use App\Models\StaffProfile;
 use App\Models\SubjectResourceType;
@@ -69,7 +70,7 @@ class ContentController extends Controller
             'acceptances' => UniversityAcceptance::where('is_active', true)->with('academicYear')
                 ->when($input['year'] ?? null, fn ($q, $id) => $q->where('academic_year_id', $id))
                 ->when($input['search'] ?? null, fn ($q, $s) => $q->where(fn ($q) => $q->where('university_name', 'ilike', '%'.$s.'%')->orWhere('student_name', 'ilike', '%'.$s.'%')))
-                ->orderByDesc('academic_year_id')->orderBy('sort_order')->paginate(10)->withQueryString(),
+                ->orderByDesc('academic_year_id')->orderBy('sort_order')->paginate(50)->withQueryString(),
             'years' => AcademicYear::orderByDesc('id')->get(),
         ]);
     }

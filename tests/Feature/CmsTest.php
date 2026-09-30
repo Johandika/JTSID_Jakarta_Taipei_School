@@ -125,8 +125,8 @@ class CmsTest extends TestCase
         $this->get('/page-that-does-not-exist')->assertNotFound();
 
         $this->actingAs(User::where('email', 'admin@jts.local')->first());
-        $this->get('/admin/pages')->assertNotFound();
-        $this->get('/admin/pages/create')->assertNotFound();
+        $this->get('/jts-secure-portal/pages')->assertNotFound();
+        $this->get('/jts-secure-portal/pages/create')->assertNotFound();
     }
 
     public function test_pages_removal_migration_can_be_rolled_back(): void
@@ -261,7 +261,7 @@ class CmsTest extends TestCase
         }
 
         $this->actingAs(User::where('email', 'admin@jts.local')->first())
-            ->get('/admin/menu-items')
+            ->get('/jts-secure-portal/menu-items')
             ->assertNotFound();
     }
 
@@ -311,9 +311,9 @@ class CmsTest extends TestCase
         }
 
         $this->actingAs(User::where('email', 'admin@jts.local')->firstOrFail());
-        $this->get('/admin/contact-channels')->assertNotFound();
-        $this->get('/admin/contact-channels/create')->assertNotFound();
-        $this->get('/admin/contact-channels/1/edit')->assertNotFound();
+        $this->get('/jts-secure-portal/contact-channels')->assertNotFound();
+        $this->get('/jts-secure-portal/contact-channels/create')->assertNotFound();
+        $this->get('/jts-secure-portal/contact-channels/1/edit')->assertNotFound();
     }
 
     public function test_contacts_removal_migration_can_be_rolled_back(): void
@@ -411,18 +411,19 @@ class CmsTest extends TestCase
 
     public function test_admin_routes_require_login_and_viewer_cannot_mutate(): void
     {
-        $this->get('/admin/posts')->assertRedirect('/admin/login');
+        $this->get('/admin')->assertNotFound();
+        $this->get('/jts-secure-portal/posts')->assertRedirect('/jts-secure-portal/login');
         $viewer = User::where('email', 'viewer@jts.local')->first();
-        $this->actingAs($viewer)->get('/admin/posts')->assertOk();
-        $this->get('/admin/posts/create')->assertForbidden();
-        $this->get('/admin/users')->assertForbidden();
+        $this->actingAs($viewer)->get('/jts-secure-portal/posts')->assertOk();
+        $this->get('/jts-secure-portal/posts/create')->assertForbidden();
+        $this->get('/jts-secure-portal/users')->assertForbidden();
         $this->assertFalse(Gate::forUser($viewer)->allows('update', Post::first()));
     }
 
     public function test_admin_navigation_uses_sidebar_branding_and_user_menu_without_a_topbar(): void
     {
         $response = $this->actingAs(User::where('email', 'admin@jts.local')->firstOrFail())
-            ->get('/admin');
+            ->get('/jts-secure-portal');
 
         $response
             ->assertOk()
@@ -449,10 +450,10 @@ class CmsTest extends TestCase
     public function test_admin_dashboard_can_switch_to_traditional_chinese(): void
     {
         $this->actingAs(User::where('email', 'admin@jts.local')->firstOrFail())
-            ->get('/admin/language/zh-TW')
+            ->get('/jts-secure-portal/language/zh-TW')
             ->assertRedirect();
 
-        $this->get('/admin')
+        $this->get('/jts-secure-portal')
             ->assertOk()
             ->assertSeeText('儀表板')
             ->assertSeeText('內容管理')
@@ -519,9 +520,9 @@ class CmsTest extends TestCase
         $this->assertTrue(Gate::allows('update', $own));
         $this->assertFalse(Gate::allows('update', $other));
         Livewire::test(ListPosts::class)->assertCanSeeTableRecords([$own])->assertCanNotSeeTableRecords([$other]);
-        $this->get('/admin/posts/'.$other->id.'/edit')->assertNotFound();
-        $this->get('/admin/pages')->assertNotFound();
-        $this->get('/admin/users')->assertForbidden();
+        $this->get('/jts-secure-portal/posts/'.$other->id.'/edit')->assertNotFound();
+        $this->get('/jts-secure-portal/pages')->assertNotFound();
+        $this->get('/jts-secure-portal/users')->assertForbidden();
         $this->expectException(ValidationException::class);
         $own->update(['department_id' => $other->department_id]);
     }
@@ -558,7 +559,7 @@ class CmsTest extends TestCase
         Storage::fake('local');
         Storage::fake('public');
         $this->actingAs(User::where('email', 'admin@jts.local')->first());
-        $data = ['topic' => 'Test file', 'department_id' => Department::first()->id, 'type_id' => SubjectResourceType::first()->id, 'grade_level_id' => GradeLevel::first()->id,
+        $data = ['topic' => 'Test file', 'department_id' => Department::first()->id, 'type_id' => SubjectResourceType::where('code', 'weekly_news')->value('id'), 'grade_level_id' => GradeLevel::first()->id,
             'upload_date' => today()->toDateString(), 'status' => 'published', 'translations' => [['locale' => 'en', 'title' => 'Test resource']]];
         Livewire::test(CreateSubjectResource::class)->fillForm($data + [
             'image' => UploadedFile::fake()->image('weekly-news.jpg'),
@@ -598,10 +599,10 @@ class CmsTest extends TestCase
     {
         $this->actingAs(User::where('email', 'admin@jts.local')->first());
         foreach (['posts', 'subject-resources', 'staff-profiles', 'university-acceptances', 'university-logos', 'hero-slides', 'departments', 'academic-years', 'users'] as $path) {
-            $this->get('/admin/'.$path)->assertOk();
-            $this->get('/admin/'.$path.'/create')->assertOk();
+            $this->get('/jts-secure-portal/'.$path)->assertOk();
+            $this->get('/jts-secure-portal/'.$path.'/create')->assertOk();
         }
-        $this->get('/admin/audit-logs')->assertOk();
+        $this->get('/jts-secure-portal/audit-logs')->assertOk();
     }
 
     public function test_hero_slides_render_on_homepage_with_translations(): void

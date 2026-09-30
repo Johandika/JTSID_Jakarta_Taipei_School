@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'admin_path' => trim((string) (env('ADMIN_PANEL_PATH') ?: 'jts-secure-portal'), '/'),
+
     'contact' => [
         'address' => [
             'street' => 'Jl. Raya Kelapa Hybrida Blok QA3, Kelapa Gading',

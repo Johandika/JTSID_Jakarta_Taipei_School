@@ -13,15 +13,15 @@ console.log('IMAGES', await page.locator('img').evaluateAll(images => images.map
 await page.setViewportSize({ width: 390, height: 844 });
 await page.screenshot({ path: 'test-results/home-mobile.png', fullPage: true });
 console.log('OVERFLOW', await page.evaluate(() => document.documentElement.scrollWidth > innerWidth));
-await page.goto('http://localhost:8000/admin/login', { waitUntil: 'networkidle' });
+await page.goto('http://localhost:8000/jts-secure-portal/login', { waitUntil: 'networkidle' });
 console.log('LOGIN', (await page.locator('body').innerText()).slice(0, 1000));
 await page.setViewportSize({ width: 1440, height: 1000 });
 await page.getByLabel('Email address').fill('admin@jts.local');
 await page.locator('input[type="password"]').fill('JtsLocal2026!');
 await page.getByRole('button', { name: 'Sign in' }).click();
-await page.waitForURL('**/admin', { timeout: 60000 });
+await page.waitForURL('**/jts-secure-portal', { timeout: 60000 });
 await page.waitForLoadState('networkidle');
-await page.screenshot({ path: 'test-results/admin-desktop.png', fullPage: true });
+await page.screenshot({ path: 'test-results/jts-secure-portal-desktop.png', fullPage: true });
 console.log('ADMIN', (await page.locator('body').innerText()).slice(0, 1600));
 console.log('JS ERRORS', errors);
 await browser.close();

@@ -28,7 +28,7 @@ class CmsFields
             ->columnSpanFull();
     }
 
-    public static function translations(string $titleLabel = 'Judul Konten'): Repeater
+    public static function translations(string $titleLabel = 'Judul Konten', bool|\Closure $showSummary = true, bool $showArticle = true): Repeater
     {
         $schema = [
             Select::make('locale')
@@ -46,14 +46,17 @@ class CmsFields
                 ->maxLength(191),
             Textarea::make('summary')
                 ->label('Ringkasan Singkat')
+                ->visible($showSummary)
                 ->rows(2)
                 ->maxLength(1000)
                 ->columnSpanFull(),
             MarkdownEditor::make('body')
                 ->label('Isi Konten')
+                ->visible($showArticle)
                 ->toolbarButtons(['bold', 'italic', 'heading', 'bulletList', 'orderedList', 'link', 'blockquote', 'undo', 'redo'])
                 ->columnSpanFull(),
             Section::make('SEO & Metadata Search Engine')
+                ->visible($showArticle)
                 ->description('Pengaturan meta title dan description untuk mesin pencari (Opsional)')
                 ->schema([
                     TextInput::make('seo_title')

@@ -26,12 +26,12 @@ try {
     await visit(page, '/id/resources/calendar');
     await expect(page.locator('tbody tr')).toHaveCount(4);
 
-    await visit(page, '/admin/login');
+    await visit(page, '/jts-secure-portal/login');
     await page.getByLabel('Email address').fill('admin@jts.local');
     await page.locator('input[type="password"]').fill('JtsLocal2026!');
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-    await page.waitForURL('**/admin');
-    await visit(page, '/admin/announcement-popups/create');
+    await page.waitForURL('**/jts-secure-portal');
+    await visit(page, '/jts-secure-portal/announcement-popups/create');
     await page.getByRole('textbox', { name: /^Title/ }).fill(title);
     await page.getByRole('textbox', { name: 'Message', exact: true }).fill('Selamat kepada siswa JTS atas prestasinya.');
     await page.getByRole('switch').click();
@@ -39,7 +39,7 @@ try {
     await expect(page.locator('.filepond--item')).toHaveCount(1);
     await expect(page.locator('.filepond--item[data-filepond-item-state="processing-complete"]')).toHaveCount(1);
     await page.getByRole('button', { name: 'Create', exact: true }).click();
-    await page.waitForURL(/\/admin\/announcement-popups\/\d+\/edit/);
+    await page.waitForURL(/\/jts-secure-portal\/announcement-popups\/\d+\/edit/);
     editUrl = page.url();
     await page.screenshot({ path: 'test-results/popup-admin.png', fullPage: true });
 
@@ -95,7 +95,7 @@ try {
         await page.goto(editUrl, { waitUntil: 'networkidle' });
         await page.getByRole('button', { name: 'Delete', exact: true }).click();
         await page.getByRole('alertdialog').getByRole('button', { name: 'Delete', exact: true }).click();
-        await page.waitForURL('**/admin/announcement-popups');
+        await page.waitForURL('**/jts-secure-portal/announcement-popups');
     }
     await browser.close();
 }

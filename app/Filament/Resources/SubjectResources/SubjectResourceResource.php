@@ -5,12 +5,14 @@ namespace App\Filament\Resources\SubjectResources;
 use App\Filament\Resources\CmsResource;
 use App\Filament\Support\CmsFields;
 use App\Models\SubjectResource;
+use App\Models\SubjectResourceType;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -35,22 +37,34 @@ class SubjectResourceResource extends CmsResource
         return $schema
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
+                Section::make('Jenis Materi')
+                    ->schema([
+                        Select::make('type_id')
+                            ->label('Tipe / Jenis Materi')
+                            ->relationship('type', 'name')
+                            ->required()
+                            ->live()
+                            ->searchable()
+                            ->preload(),
+                    ])
+                    ->columnSpanFull(),
                 Group::make()->schema([
                     Section::make('Materi & Dokumen Utama')
-                        ->description('Judul materi pembelajaran, gambar cover, dan file berkas unduhan')
                         ->schema([
                             TextInput::make('topic')
                                 ->label('Topik / Nama Materi')
                                 ->required()
                                 ->maxLength(191),
-                            CmsFields::image('image', 4096, 'Gambar Cover Weekly News / Materi'),
+                            CmsFields::image('image', 4096, 'Gambar Cover Weekly News')
+                                ->visible(fn (Get $get): bool => self::isWeeklyNews((int) $get('type_id'))),
                             CmsFields::document(true, 'File Dokumen Materi (PDF, DOCX, RAR)'),
                         ]),
 
-                    Section::make('Deskripsi & Terjemahan')
-                        ->description('Instruksi dan deskripsi materi dalam berbagai bahasa')
+                    Section::make('Judul & Terjemahan')
                         ->schema([
-                            CmsFields::translations('Judul Materi'),
+                            CmsFields::translations('Judul Materi',
+                                showSummary: fn (Get $get): bool => self::isWeeklyNews((int) $get('../../type_id')),
+                                showArticle: false),
                         ]),
                 ])->columnSpan(['lg' => 2]),
 
@@ -60,14 +74,20 @@ class SubjectResourceResource extends CmsResource
                     Section::make('Klasifikasi Materi')
                         ->description('Tipe berkas, departemen, dan jenjang sasaran')
                         ->schema([
-                            Select::make('type_id')
-                                ->label('Tipe / Jenis Materi')
-                                ->relationship('type', 'name')
-                                ->required()
-                                ->searchable()
-                                ->preload(),
                             CmsFields::department(),
-                            CmsFields::schoolLevels(),
+                            CmsFields::schoolLevels()
+                                ->visible(fn (Get $get): bool => ! self::isDetailedType((int) $get('type_id'))),
+                            Select::make('class_level')
+                                ->label('Kelas')
+                                ->options(SubjectResource::CLASS_LEVEL_OPTIONS)
+                                ->required(fn (Get $get): bool => self::isDetailedType((int) $get('type_id')))
+                                ->visible(fn (Get $get): bool => self::isDetailedType((int) $get('type_id')))
+                                ->searchable(),
+                            Select::make('semester')
+                                ->label('Semester')
+                                ->options(SubjectResource::SEMESTER_OPTIONS)
+                                ->required(fn (Get $get): bool => self::isDetailedType((int) $get('type_id')))
+                                ->visible(fn (Get $get): bool => self::isDetailedType((int) $get('type_id'))),
                             CmsFields::uploadDate(),
                         ]),
                 ])->columnSpan(['lg' => 1]),
@@ -88,7 +108,12 @@ class SubjectResourceResource extends CmsResource
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('school_level_label')
-                    ->label('Jenjang'),
+                    ->label('Jenjang')
+                    ->formatStateUsing(fn (SubjectResource $record): ?string => $record->usesDetailedAcademicPeriod() ? null : $record->school_level_label)
+                    ->placeholder('-'),
+                TextColumn::make('resource_level_label')
+                    ->label('Kelas / Semester')
+                    ->placeholder('-'),
                 TextColumn::make('department.name')
                     ->label('Departemen'),
                 TextColumn::make('status')
@@ -125,5 +150,15 @@ class SubjectResourceResource extends CmsResource
             'create' => Pages\CreateSubjectResource::route('/create'),
             'edit' => Pages\EditSubjectResource::route('/{record}/edit'),
         ];
+    }
+
+    private static function isDetailedType(int $typeId): bool
+    {
+        return in_array($typeId, SubjectResource::detailedTypeIds(), true);
+    }
+
+    private static function isWeeklyNews(int $typeId): bool
+    {
+        return SubjectResourceType::whereKey($typeId)->where('code', 'weekly_news')->exists();
     }
 }

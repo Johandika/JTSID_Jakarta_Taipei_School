@@ -123,11 +123,11 @@ try {
     }
 
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await visit('/admin/login');
+    await visit('/jts-secure-portal/login');
     await page.getByLabel('Email address').fill('admin@jts.local');
     await page.locator('input[type="password"]').fill('JtsLocal2026!');
     await page.getByRole('button', { name: 'Sign in', exact: true }).click();
-    await page.waitForURL('**/admin', { timeout: 60000 });
+    await page.waitForURL('**/jts-secure-portal', { timeout: 60000 });
     await page.waitForLoadState('networkidle');
     await expect(page.locator('.fi-topbar')).toHaveCount(0);
     await expect(page.locator('.fi-sidebar-header-logo-ctn img')).toBeVisible();
@@ -140,21 +140,21 @@ try {
     const profileMenuBox = await profileMenu.boundingBox();
     expect(profileMenuBox.x).toBeGreaterThanOrEqual(profileTriggerBox.x + profileTriggerBox.width);
     await page.keyboard.press('Escape');
-    await page.screenshot({ path: 'test-results/admin-desktop.png', fullPage: true });
+    await page.screenshot({ path: 'test-results/jts-secure-portal-desktop.png', fullPage: true });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.getByRole('button', { name: 'Expand sidebar' }).click();
     await expect(page.locator('.fi-sidebar-header-logo-ctn img')).toBeVisible();
     await expect(page.locator('.fi-sidebar-footer .fi-user-menu')).toBeVisible();
-    await page.screenshot({ path: 'test-results/admin-mobile.png', fullPage: true, animations: 'disabled' });
+    await page.screenshot({ path: 'test-results/jts-secure-portal-mobile.png', fullPage: true, animations: 'disabled' });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await expect(page.getByRole('link', { name: 'Pages', exact: true })).toHaveCount(0);
     await expect(page.getByRole('link', { name: 'Contacts & QR', exact: true })).toHaveCount(0);
     await page.setViewportSize({ width: 1440, height: 1000 });
-    await visit('/admin/staff-profiles/create');
+    await visit('/jts-secure-portal/staff-profiles/create');
     await expect(page.getByText('Nomor Ekstensi Telp', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Tanggung Jawab & Peran', { exact: true })).toHaveCount(0);
     await expect(page.getByText('Rincian Tugas', { exact: true })).toHaveCount(0);
-    await visit('/admin/staff-profiles');
+    await visit('/jts-secure-portal/staff-profiles');
     await expect(page.getByRole('columnheader', { name: 'Ekstensi' })).toHaveCount(0);
     for (const path of ['/about', '/id/about', '/zh/about', '/history', '/id/history', '/zh/history', '/parent-association', '/id/parent-association', '/zh/parent-association']) {
         expect((await page.request.get(`http://localhost:8000${path}`)).status()).toBe(404);

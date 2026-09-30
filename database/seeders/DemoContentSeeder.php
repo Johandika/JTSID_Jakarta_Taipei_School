@@ -4,13 +4,10 @@ namespace Database\Seeders;
 
 use App\Models\AcademicYear;
 use App\Models\Department;
-use App\Models\GradeLevel;
 use App\Models\HeroSlide;
 use App\Models\Post;
 use App\Models\PostCategory;
 use App\Models\StaffProfile;
-use App\Models\SubjectResource;
-use App\Models\SubjectResourceType;
 use App\Models\UniversityAcceptance;
 use App\Models\UniversityLogo;
 use Illuminate\Database\Seeder;
@@ -141,28 +138,7 @@ class DemoContentSeeder extends Seeder
                 }
             }
         }
-        foreach (SubjectResourceType::all() as $type) {
-            $resourceImage = match ($type->code) {
-                'weekly_news' => 'images/classroom.webp',
-                'calendar' => 'images/campus.webp',
-                'syllabus' => 'images/library.webp',
-                default => 'images/highlight.webp',
-            };
-
-            foreach (GradeLevel::all() as $grade) {
-                $resource = SubjectResource::updateOrCreate(
-                    ['topic' => $grade->name.' '.$type->name.' 2026 / 2027', 'type_id' => $type->id],
-                    ['grade_level_id' => $grade->id, 'school_levels' => [$grade->code], 'department_id' => $department->id, 'file_path' => $file,
-                        'image' => $resourceImage, 'upload_date' => today()->subDays($type->id), 'published_at' => now()->subDay(), 'status' => 'published']
-                );
-                foreach (['en', 'id', 'zh-TW'] as $locale) {
-                    $resource->translations()->updateOrCreate(
-                        ['locale' => $locale],
-                        ['title' => $grade->name.' '.__('site.'.$type->code, [], $locale).' 2026 / 2027']
-                    );
-                }
-            }
-        }
+        $this->call(SubjectResourceSeeder::class);
         foreach (Department::all() as $d) {
             StaffProfile::updateOrCreate(
                 ['department_id' => $d->id, 'name' => 'Sample Staff '.$d->id],
@@ -202,7 +178,7 @@ class DemoContentSeeder extends Seeder
         }
     }
 
-    private function sampleDocument(): string
+    public function sampleDocument(): string
     {
         $stream = 'BT /F1 20 Tf 60 740 Td (Jakarta Taipei School) Tj 0 -40 Td /F1 12 Tf (SAMPLE DOCUMENT - LOCAL TESTING ONLY) Tj 0 -30 Td (Replace this file with an approved school document.) Tj ET';
         $objects = ['<< /Type /Catalog /Pages 2 0 R >>', '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',

@@ -14,6 +14,7 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -58,6 +59,12 @@ class UniversityAcceptanceResource extends CmsResource
                             TextInput::make('country')
                                 ->label('Negara Universitas')
                                 ->maxLength(100),
+                            TextInput::make('image_url')
+                                ->label('Link Foto / Gambar')
+                                ->placeholder('https://drive.google.com/file/d/... atau https://...')
+                                ->url()
+                                ->maxLength(2048)
+                                ->helperText('Opsional. Untuk bulk import, isi kolom image_url dengan link gambar yang bisa diakses publik.'),
                         ])
                         ->columns(2),
                 ])->columnSpan(['lg' => 2]),
@@ -94,6 +101,12 @@ class UniversityAcceptanceResource extends CmsResource
     {
         return $table
             ->columns([
+                ImageColumn::make('image_url')
+                    ->label('Gambar')
+                    ->state(fn (UniversityAcceptance $record): ?string => $record->publicImageUrl())
+                    ->placeholder('-')
+                    ->square()
+                    ->size(56),
                 TextColumn::make('student_name')
                     ->label('Nama Siswa')
                     ->searchable()

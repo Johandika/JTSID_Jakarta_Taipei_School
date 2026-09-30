@@ -16,12 +16,14 @@ $staticPages = [
     'mandarin-program',
 ];
 
-Route::get('/admin/language/{locale}', function (Request $request, string $locale) {
+$adminPath = config('site.admin_path');
+
+Route::get('/'.$adminPath.'/language/{locale}', function (Request $request, string $locale) use ($adminPath) {
     abort_unless(in_array($locale, ['en', 'id', 'zh-TW'], true), 404);
 
     $request->session()->put('admin_locale', $locale === 'zh-TW' ? 'zh_TW' : $locale);
 
-    return redirect()->back(fallback: '/admin');
+    return redirect()->back(fallback: '/'.$adminPath);
 })->middleware('web')->name('admin.language');
 
 foreach (['en' => '', 'zh' => 'zh', 'id' => 'id'] as $locale => $prefix) {

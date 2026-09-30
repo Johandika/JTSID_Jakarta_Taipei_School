@@ -101,8 +101,8 @@ class AnnouncementPopupTest extends TestCase
             $this->assertSame($allowed, $gate->allows('update', $popup));
             $this->assertSame($allowed, $gate->allows('delete', $popup));
         }
-        $this->get('/admin/announcement-popups')->assertRedirect('/admin/login');
-        $this->actingAs(User::where('email', 'viewer@jts.local')->first())->get('/admin/announcement-popups/create')->assertForbidden();
+        $this->get('/jts-secure-portal/announcement-popups')->assertRedirect('/jts-secure-portal/login');
+        $this->actingAs(User::where('email', 'viewer@jts.local')->first())->get('/jts-secure-portal/announcement-popups/create')->assertForbidden();
     }
 
     public function test_popup_text_is_escaped(): void

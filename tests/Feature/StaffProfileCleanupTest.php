@@ -30,7 +30,7 @@ class StaffProfileCleanupTest extends TestCase
     {
         $this->actingAs(User::where('email', 'admin@jts.local')->firstOrFail());
 
-        $this->get('/admin/staff-profiles/create')
+        $this->get('/jts-secure-portal/staff-profiles/create')
             ->assertOk()
             ->assertDontSeeText('Nomor Ekstensi Telp')
             ->assertDontSeeText('Tanggung Jawab & Peran')
@@ -49,11 +49,11 @@ class StaffProfileCleanupTest extends TestCase
 
         $staff = StaffProfile::where('name', 'Integration Teacher')->firstOrFail();
 
-        $this->get('/admin/staff-profiles')
+        $this->get('/jts-secure-portal/staff-profiles')
             ->assertOk()
             ->assertSeeText('Integration Teacher')
             ->assertDontSeeText('Ekstensi');
-        $this->get('/admin/staff-profiles/'.$staff->id.'/edit')
+        $this->get('/jts-secure-portal/staff-profiles/'.$staff->id.'/edit')
             ->assertOk()
             ->assertDontSeeText('Nomor Ekstensi Telp')
             ->assertDontSeeText('Rincian Tugas');

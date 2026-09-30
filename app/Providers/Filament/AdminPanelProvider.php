@@ -29,7 +29,7 @@ class AdminPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('admin')
-            ->path('admin')
+            ->path(config('site.admin_path'))
             ->login(Login::class)
             ->brandName(fn (): string => __('admin.brand_name'))
             ->brandLogo(file_exists(public_path('images/logo.webp')) ? asset('images/logo.webp') : asset('images/logo.jpg'))

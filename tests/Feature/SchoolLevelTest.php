@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Filament\Resources\Posts\Pages\CreatePost;
+use App\Filament\Resources\SubjectResources\Pages\CreateSubjectResource;
 use App\Filament\Resources\SubjectResources\Pages\EditSubjectResource;
 use App\Livewire\ContentCatalog;
 use App\Models\AnnouncementPopup;
@@ -17,6 +18,7 @@ use App\Models\User;
 use Database\Seeders\ReferenceDataSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
@@ -46,6 +48,58 @@ class SchoolLevelTest extends TestCase
         return $post;
     }
 
+    public function test_resource_fields_follow_the_selected_type_on_create_and_edit(): void
+    {
+        Storage::fake('local');
+        $this->actingAs(User::where('email', 'admin@jts.local')->first());
+        $form = Livewire::test(CreateSubjectResource::class);
+
+        foreach (SubjectResourceType::all() as $type) {
+            $form->set('data.type_id', $type->id)
+                ->assertFormFieldVisible('file_path')
+                ->assertDontSee('Isi Konten')
+                ->assertDontSee('SEO Meta Title');
+
+            if ($type->code === 'weekly_news') {
+                $form->assertFormFieldVisible('image')->assertSee('Ringkasan Singkat');
+            } else {
+                $form->assertFormFieldHidden('image')->assertDontSee('Ringkasan Singkat');
+            }
+
+            if (in_array($type->code, ['calendar', 'syllabus', 'textbook'], true)) {
+                $form->assertFormFieldVisible('class_level')->assertFormFieldVisible('semester')
+                    ->assertFormFieldHidden('school_levels');
+            } else {
+                $form->assertFormFieldHidden('class_level')->assertFormFieldHidden('semester')
+                    ->assertFormFieldVisible('school_levels');
+            }
+        }
+
+        $form->fillForm([
+            'topic' => 'Semester calendar',
+            'type_id' => SubjectResourceType::where('code', 'calendar')->value('id'),
+            'department_id' => Department::first()->id,
+            'class_level' => 'smp_1',
+            'semester' => 'semester_1',
+            'file_path' => UploadedFile::fake()->create('calendar.pdf', 10, 'application/pdf'),
+            'upload_date' => today()->toDateString(),
+            'status' => 'draft',
+            'translations' => [['locale' => 'en', 'title' => 'Semester calendar']],
+        ])->call('create')->assertHasNoFormErrors();
+
+        $resource = SubjectResource::where('topic', 'Semester calendar')->firstOrFail();
+        $this->assertNull($resource->image);
+        Storage::disk('local')->assertExists($resource->file_path);
+
+        Livewire::test(EditSubjectResource::class, ['record' => $resource->id])
+            ->assertFormFieldHidden('image')
+            ->set('data.type_id', SubjectResourceType::where('code', 'weekly_news')->value('id'))
+            ->assertFormFieldVisible('image')
+            ->assertSee('Ringkasan Singkat')
+            ->call('save')->assertHasNoFormErrors();
+        $this->assertNull($resource->fresh()->semester);
+    }
+
     public function test_school_level_filters_only_the_news_catalog_and_is_not_saved_in_session(): void
     {
         $this->createPost('SD announcement', ['sd']);
@@ -69,26 +123,84 @@ class SchoolLevelTest extends TestCase
 
     public function test_resources_support_multiple_levels_and_general_content_and_legacy_records(): void
     {
-        foreach (['General calendar' => [], 'Shared calendar' => ['sd', 'smp'], 'SMA calendar' => ['sma']] as $title => $levels) {
+        foreach (['General progress' => [], 'Shared progress' => ['sd', 'smp'], 'SMA progress' => ['sma']] as $title => $levels) {
             $resource = SubjectResource::create([
                 'topic' => $title, 'department_id' => Department::first()->id,
-                'type_id' => SubjectResourceType::where('code', 'calendar')->value('id'),
-                'school_levels' => $levels, 'file_path' => 'documents/calendar.pdf', 'upload_date' => today(), 'status' => 'published',
+                'type_id' => SubjectResourceType::where('code', 'lesson_progress')->value('id'),
+                'school_levels' => $levels, 'file_path' => 'documents/progress.pdf', 'upload_date' => today(), 'status' => 'published',
             ]);
             $resource->translations()->create(['locale' => 'en', 'title' => $title]);
         }
         $legacy = SubjectResource::create([
-            'topic' => 'TK legacy calendar', 'department_id' => Department::first()->id,
-            'type_id' => SubjectResourceType::where('code', 'calendar')->value('id'),
+            'topic' => 'TK legacy progress', 'department_id' => Department::first()->id,
+            'type_id' => SubjectResourceType::where('code', 'lesson_progress')->value('id'),
             'grade_level_id' => GradeLevel::where('code', 'tk')->value('id'),
-            'file_path' => 'documents/calendar.pdf', 'upload_date' => today(), 'status' => 'published',
+            'file_path' => 'documents/progress.pdf', 'upload_date' => today(), 'status' => 'published',
         ]);
-        $legacy->translations()->create(['locale' => 'en', 'title' => 'TK legacy calendar']);
+        $legacy->translations()->create(['locale' => 'en', 'title' => 'TK legacy progress']);
 
-        $this->get('/resources/calendar?school_level=sd')->assertSee('General calendar')->assertSee('Shared calendar')
-            ->assertDontSee('SMA calendar')->assertDontSee('TK legacy calendar');
-        $this->get('/resources/calendar?school_level=tk')->assertSee('General calendar')->assertSee('TK legacy calendar')->assertDontSee('Shared calendar');
+        $this->get('/resources/lesson_progress?school_level=sd')->assertSee('General progress')->assertSee('Shared progress')
+            ->assertDontSee('SMA progress')->assertDontSee('TK legacy progress');
+        $this->get('/resources/lesson_progress?school_level=tk')->assertSee('General progress')->assertSee('TK legacy progress')->assertDontSee('Shared progress');
         $this->assertSame(['tk'], $legacy->fresh()->school_levels);
+    }
+
+    public function test_calendar_syllabus_and_textbook_use_class_level_and_semester_filters_only(): void
+    {
+        foreach ([
+            ['calendar', 'SMP 1 semester 1 calendar', 'smp_1', 'semester_1'],
+            ['calendar', 'SMP 1 semester 2 calendar', 'smp_1', 'semester_2'],
+            ['calendar', 'SMA 1 semester 1 calendar', 'sma_1', 'semester_1'],
+            ['syllabus', 'SMP 1 syllabus', 'smp_1', 'semester_1'],
+            ['textbook', 'SMA 2 textbook', 'sma_2', 'semester_2'],
+        ] as [$type, $title, $classLevel, $semester]) {
+            $resource = SubjectResource::create([
+                'topic' => $title,
+                'department_id' => Department::first()->id,
+                'type_id' => SubjectResourceType::where('code', $type)->value('id'),
+                'class_level' => $classLevel,
+                'semester' => $semester,
+                'school_levels' => ['sma'],
+                'grade_level_id' => GradeLevel::where('code', 'sma')->value('id'),
+                'file_path' => 'documents/resource.pdf',
+                'upload_date' => today(),
+                'status' => 'published',
+            ]);
+            $resource->translations()->create(['locale' => 'en', 'title' => $title]);
+        }
+
+        $this->get('/resources/calendar?school_level=sma&class_level=smp_1&semester=semester_1')
+            ->assertSee('SMP 1 semester 1 calendar')
+            ->assertSee('SMP 1 - Semester 1')
+            ->assertDontSee('SMP 1 semester 2 calendar')
+            ->assertDontSee('SMA 1 semester 1 calendar')
+            ->assertSee('aria-label="Class"', false)
+            ->assertSee('aria-label="Semester"', false)
+            ->assertDontSee('aria-label="School level"', false);
+
+        Livewire::test(ContentCatalog::class, ['kind' => 'resources', 'type' => 'calendar'])
+            ->assertSee('Class')
+            ->assertSee('Semester')
+            ->assertDontSee('School level')
+            ->set('classLevel', 'smp_1')
+            ->set('semester', 'semester_2')
+            ->assertSee('SMP 1 semester 2 calendar')
+            ->assertDontSee('SMP 1 semester 1 calendar')
+            ->set('classLevel', 'college')
+            ->assertSet('classLevel', '')
+            ->set('semester', '')
+            ->assertSee('SMA 1 semester 1 calendar');
+
+        Livewire::test(ContentCatalog::class, ['kind' => 'resources', 'type' => 'weekly_news'])
+            ->assertSee('School level')
+            ->assertDontSee('Class')
+            ->assertDontSee('Semester');
+
+        $calendar = SubjectResource::where('topic', 'SMP 1 semester 1 calendar')->firstOrFail();
+        $this->assertSame('smp_1', $calendar->class_level);
+        $this->assertSame('semester_1', $calendar->semester);
+        $this->assertSame([], $calendar->school_levels);
+        $this->assertNull($calendar->grade_level_id);
     }
 
     public function test_global_pages_staff_highlights_and_popups_ignore_school_level_query(): void
@@ -140,10 +252,10 @@ class SchoolLevelTest extends TestCase
     {
         $this->actingAs(User::where('email', 'admin@jts.local')->first());
 
-        $this->get('/admin/posts/create')->assertOk()->assertSeeText('Jenjang Sekolah');
-        $this->get('/admin/subject-resources/create')->assertOk()->assertSeeText('Jenjang Sekolah');
+        $this->get('/jts-secure-portal/posts/create')->assertOk()->assertSeeText('Jenjang Sekolah');
+        $this->get('/jts-secure-portal/subject-resources/create')->assertOk()->assertSeeText('Jenjang Sekolah');
         foreach (['staff-profiles', 'announcement-popups'] as $resource) {
-            $this->get('/admin/'.$resource.'/create')->assertOk()->assertDontSeeText('School levels');
+            $this->get('/jts-secure-portal/'.$resource.'/create')->assertOk()->assertDontSeeText('School levels');
         }
     }
 
@@ -151,7 +263,7 @@ class SchoolLevelTest extends TestCase
     {
         $resource = SubjectResource::create([
             'topic' => 'Existing resource', 'department_id' => Department::first()->id,
-            'type_id' => SubjectResourceType::first()->id, 'grade_level_id' => GradeLevel::where('code', 'sd')->value('id'),
+            'type_id' => SubjectResourceType::where('code', 'lesson_progress')->value('id'), 'grade_level_id' => GradeLevel::where('code', 'sd')->value('id'),
             'file_path' => 'documents/resource.pdf', 'upload_date' => today(), 'status' => 'draft',
         ]);
         $resource->translations()->create(['locale' => 'en', 'title' => 'Existing resource']);
@@ -173,7 +285,7 @@ class SchoolLevelTest extends TestCase
     {
         $resource = SubjectResource::create([
             'topic' => 'Pre-existing SD resource', 'department_id' => Department::first()->id,
-            'type_id' => SubjectResourceType::first()->id, 'grade_level_id' => GradeLevel::where('code', 'sd')->value('id'),
+            'type_id' => SubjectResourceType::where('code', 'lesson_progress')->value('id'), 'grade_level_id' => GradeLevel::where('code', 'sd')->value('id'),
             'file_path' => 'documents/resource.pdf', 'upload_date' => today(), 'status' => 'draft',
         ]);
         $globalContentMigration = require database_path('migrations/2026_09_20_173012_remove_school_levels_from_global_content_tables.php');

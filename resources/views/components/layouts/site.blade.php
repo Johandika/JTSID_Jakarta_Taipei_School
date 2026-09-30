@@ -315,7 +315,7 @@
                         <a href="{{ $site::path('/mandarin-program') }}" class="hover:text-emerald-300 hover:translate-x-0.5 md:hover:-translate-x-0.5 transition-all uppercase">
                             Program Bahasa Mandarin
                         </a>
-                        <a href="/admin" class="hover:text-emerald-300 hover:translate-x-0.5 md:hover:-translate-x-0.5 transition-all uppercase text-emerald-400">
+                        <a href="{{ url(config('site.admin_path')) }}" class="hover:text-emerald-300 hover:translate-x-0.5 md:hover:-translate-x-0.5 transition-all uppercase text-emerald-400">
                             Portal Content Studio &rarr;
                         </a>
                     </nav>
@@ -414,7 +414,7 @@
                 <span class="text-white/20">•</span>
                 <a href="{{ $site::path('/contact') }}" class="hover:text-emerald-300 transition-colors">Aksesibilitas</a>
                 <span class="text-white/20">•</span>
-                <a href="/admin" class="hover:text-emerald-300 transition-colors">Admin JTS</a>
+                <a href="{{ url(config('site.admin_path')) }}" class="hover:text-emerald-300 transition-colors">Admin JTS</a>
             </div>
         </div>
 
