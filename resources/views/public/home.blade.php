@@ -486,7 +486,7 @@
                                     </h3>
                                 </div>
 
-                                <a href="{{ $site::path('/profile') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_classroom') }}"></a>
+                                <a href="{{ $site::path('/facilities') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_classroom') }}"></a>
                             </div>
                         </div>
 
@@ -514,7 +514,7 @@
                                     </h3>
                                 </div>
 
-                                <a href="{{ $site::path('/profile') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_lab') }}"></a>
+                                <a href="{{ $site::path('/facilities') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_lab') }}"></a>
                             </div>
 
                             {{-- Bottom Row: 2 Cards Side-by-Side --}}
@@ -541,7 +541,7 @@
                                         </h3>
                                     </div>
 
-                                    <a href="{{ $site::path('/profile') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_library') }}"></a>
+                                    <a href="{{ $site::path('/facilities') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_library') }}"></a>
                                 </div>
 
                                 {{-- Card 4: Fasilitas Olahraga --}}
@@ -566,7 +566,7 @@
                                         </h3>
                                     </div>
 
-                                    <a href="{{ $site::path('/profile') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_sports') }}"></a>
+                                    <a href="{{ $site::path('/facilities') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_sports') }}"></a>
                                 </div>
                             </div>
                         </div>
@@ -626,7 +626,7 @@
 
                     {{-- Text Link with Arrow --}}
                     <div>
-                        <a href="{{ $site::path('/profile') }}" class="inline-flex items-center gap-2 text-sm sm:text-base font-bold text-jts hover:text-[#104a31] transition-colors group">
+                        <a href="{{ $site::path('/facilities') }}" class="inline-flex items-center gap-2 text-sm sm:text-base font-bold text-jts hover:text-[#104a31] transition-colors group">
                             <span>{{ __('site.explore_facilities') }}</span>
                             <x-site-icon name="arrow-right" class="size-4.5 transition-transform duration-200 group-hover:translate-x-1.5" />
                         </a>

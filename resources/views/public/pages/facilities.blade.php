@@ -28,32 +28,9 @@
         }"
         class="shell py-12 sm:py-16 lg:py-20"
     >
-        {{-- Section Header matching visual reference --}}
-        <div class="text-center max-w-3xl mx-auto">
-            <div class="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-jts">
-                <span class="inline-block h-0.5 w-6 bg-jts"></span>
-                <span>{{ $facilitiesPage['eyebrow'] }}</span>
-                <span class="inline-block h-0.5 w-6 bg-jts"></span>
-            </div>
-
-            <h2 class="mt-3 text-3xl font-bold tracking-tight text-ink sm:text-4xl md:text-5xl">
-                @if(app()->getLocale() === 'en')
-                    Explore <span class="text-jts">Jakarta Taipei School</span> Facilities
-                @elseif(app()->getLocale() === 'zh' || app()->getLocale() === 'zh_TW')
-                    探索 <span class="text-jts">雅加達臺灣學校</span> 校園設施
-                @else
-                    Jelajahi Fasilitas <span class="text-jts">Jakarta Taipei School</span>
-                @endif
-            </h2>
-
-            <p class="mt-3 text-base sm:text-lg text-muted max-w-2xl mx-auto">
-                {{ $facilitiesPage['subheading'] }}
-            </p>
-        </div>
-
         {{-- Interactive Filter Tabs (Hanya menampilkan kategori yang memiliki foto) --}}
         @if($categoriesWithFacilities->isNotEmpty())
-            <div class="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
+            <div class="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
                 @foreach($categoriesWithFacilities as $category)
                     <button
                         type="button"

@@ -73,4 +73,13 @@ class FacilitiesTest extends TestCase
         $this->assertArrayHasKey('smp', $options);
         $this->assertArrayHasKey('sma', $options);
     }
+
+    public function test_footer_does_not_contain_admin_portal_links(): void
+    {
+        $response = $this->get('/facilities');
+        $response->assertStatus(200);
+        $response->assertDontSee('Portal Content Studio');
+        $response->assertDontSee('Admin JTS');
+        $response->assertDontSee(url(config('site.admin_path')));
+    }
 }
