@@ -62,10 +62,10 @@
                                 <div class="flex-1"></div>
                             @endif
 
-                            <div class="mt-auto border-t border-line/60 pt-3">
-                                <a href="{{ \App\Support\Site::path('/download/resources/'.$item->id) }}" class="inline-flex items-center gap-2 text-xs font-bold text-jts transition-colors hover:text-jts/80 sm:text-sm">
+                            <div class="mt-auto flex justify-center border-t border-line/60 pt-4">
+                                <a href="{{ \App\Support\Site::path('/download/resources/'.$item->id) }}" class="btn btn-primary w-full">
                                     <span>{{ __('site.download') }}</span>
-                                    <x-site-icon name="download" class="size-3.5" />
+                                    <x-site-icon name="download" class="size-4" />
                                 </a>
                             </div>
                         </div>

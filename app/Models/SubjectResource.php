@@ -17,7 +17,8 @@ class SubjectResource extends CmsModel
     public const DETAILED_TYPE_CODES = ['calendar', 'syllabus', 'textbook'];
 
     public const CLASS_LEVEL_OPTIONS = [
-        'tk' => 'TK',
+        'tk1' => 'TK1',
+        'tk2' => 'TK2',
         'sd_1' => 'SD 1',
         'sd_2' => 'SD 2',
         'sd_3' => 'SD 3',

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Locale;
 use Database\Factories\DirectorFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -32,7 +33,7 @@ class Director extends CmsModel
      */
     public function trans(string $field, ?string $locale = null): string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale = Locale::content($locale);
         $value = $this->{$field};
 
         if (! is_array($value)) {
@@ -49,7 +50,7 @@ class Director extends CmsModel
      */
     public function getEducationList(?string $locale = null): array
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale = Locale::content($locale);
         $val = $this->education;
 
         if (! is_array($val)) {

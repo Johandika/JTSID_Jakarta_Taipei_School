@@ -56,69 +56,69 @@ class ContactMessageResource extends CmsResource
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
                 Group::make()->schema([
-                    Section::make('Informasi Pengirim')
-                        ->description('Data diri dan kontak pengirim pesan')
+                    Section::make(__('admin.sections.sender_information'))
+                        ->description(__('admin.descriptions.sender_information'))
                         ->schema([
                             TextInput::make('name')
-                                ->label('Nama Lengkap')
+                                ->label(__('admin.labels.full_name'))
                                 ->readOnly(),
 
                             TextInput::make('email')
-                                ->label('Alamat Email')
+                                ->label(__('admin.labels.email_address'))
                                 ->readOnly(),
 
                             TextInput::make('phone')
-                                ->label('Nomor Telepon')
+                                ->label(__('admin.labels.phone'))
                                 ->readOnly()
                                 ->placeholder('—'),
 
                             Select::make('subject')
-                                ->label('Subjek / Kategori')
+                                ->label(__('admin.labels.subject_category'))
                                 ->options([
-                                    ContactMessage::SUBJECT_ADMISSIONS => 'Penerimaan Siswa Baru (Admissions)',
-                                    ContactMessage::SUBJECT_MANDARIN_PROGRAM => 'Program Mandarin / TOCFL',
-                                    ContactMessage::SUBJECT_GENERAL => 'Pertanyaan Umum',
-                                    ContactMessage::SUBJECT_ACADEMICS => 'Akademik & Kurikulum',
-                                    ContactMessage::SUBJECT_OTHER => 'Lainnya',
+                                    ContactMessage::SUBJECT_ADMISSIONS => __('admin.contact.subjects.admissions'),
+                                    ContactMessage::SUBJECT_MANDARIN_PROGRAM => __('admin.contact.subjects.mandarin_program'),
+                                    ContactMessage::SUBJECT_GENERAL => __('admin.contact.subjects.general'),
+                                    ContactMessage::SUBJECT_ACADEMICS => __('admin.contact.subjects.academics'),
+                                    ContactMessage::SUBJECT_OTHER => __('admin.contact.subjects.other'),
                                 ])
                                 ->disabled(),
                         ])
                         ->columns(2),
 
-                    Section::make('Isi Pesan')
+                    Section::make(__('admin.sections.message_content'))
                         ->schema([
                             Textarea::make('message')
-                                ->label('Pesan yang Dikirim')
+                                ->label(__('admin.labels.message_body'))
                                 ->rows(7)
                                 ->readOnly(),
                         ]),
                 ])->columnSpan(['lg' => 2]),
 
                 Group::make()->schema([
-                    Section::make('Status & Tindak Lanjut')
-                        ->description('Ubah status pesan dan beri catatan internal')
+                    Section::make(__('admin.sections.message_follow_up'))
+                        ->description(__('admin.descriptions.message_follow_up'))
                         ->schema([
                             Select::make('status')
-                                ->label('Status Pesan')
+                                ->label(__('admin.labels.message_status'))
                                 ->options([
-                                    ContactMessage::STATUS_UNREAD => 'Belum Dibaca',
-                                    ContactMessage::STATUS_READ => 'Sudah Dibaca',
-                                    ContactMessage::STATUS_REPLIED => 'Sudah Dibalas',
-                                    ContactMessage::STATUS_ARCHIVED => 'Diarsipkan',
+                                    ContactMessage::STATUS_UNREAD => __('admin.contact.statuses.unread'),
+                                    ContactMessage::STATUS_READ => __('admin.contact.statuses.read'),
+                                    ContactMessage::STATUS_REPLIED => __('admin.contact.statuses.replied'),
+                                    ContactMessage::STATUS_ARCHIVED => __('admin.contact.statuses.archived'),
                                 ])
                                 ->required(),
 
                             Textarea::make('admin_notes')
-                                ->label('Catatan Admin')
-                                ->placeholder('Tulis catatan tindak lanjut internal di sini...')
+                                ->label(__('admin.labels.admin_notes'))
+                                ->placeholder(__('admin.placeholders.admin_notes'))
                                 ->rows(4),
 
                             DateTimePicker::make('created_at')
-                                ->label('Waktu Dikirim')
+                                ->label(__('admin.labels.sent_at'))
                                 ->readOnly(),
 
                             TextInput::make('ip_address')
-                                ->label('Alamat IP')
+                                ->label(__('admin.fields.ip_address'))
                                 ->readOnly(),
                         ]),
                 ])->columnSpan(['lg' => 1]),
@@ -130,7 +130,7 @@ class ContactMessageResource extends CmsResource
         return $table
             ->columns([
                 TextColumn::make('status')
-                    ->label('Status')
+                    ->label(__('admin.fields.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         ContactMessage::STATUS_UNREAD => 'warning',
@@ -142,66 +142,66 @@ class ContactMessageResource extends CmsResource
                     ->formatStateUsing(fn (ContactMessage $record): string => $record->getStatusLabel()),
 
                 TextColumn::make('name')
-                    ->label('Pengirim')
+                    ->label(__('admin.labels.sender'))
                     ->searchable()
                     ->weight('semibold')
                     ->description(fn (ContactMessage $record): ?string => $record->phone),
 
                 TextColumn::make('email')
-                    ->label('Email')
+                    ->label(__('admin.fields.email'))
                     ->searchable()
                     ->copyable()
-                    ->copyMessage('Alamat email disalin'),
+                    ->copyMessage(__('admin.messages.email_copied')),
 
                 TextColumn::make('subject')
-                    ->label('Subjek')
+                    ->label(__('admin.labels.subject'))
                     ->badge()
                     ->color('gray')
                     ->formatStateUsing(fn (ContactMessage $record): string => $record->getSubjectLabel()),
 
                 TextColumn::make('message')
-                    ->label('Cuplikan Pesan')
+                    ->label(__('admin.labels.message_excerpt'))
                     ->limit(45)
                     ->color('gray'),
 
                 TextColumn::make('created_at')
-                    ->label('Tanggal Masuk')
+                    ->label(__('admin.labels.received_at'))
                     ->dateTime('d M Y, H:i')
                     ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
                 SelectFilter::make('status')
-                    ->label('Status Pesan')
+                    ->label(__('admin.labels.message_status'))
                     ->options([
-                        ContactMessage::STATUS_UNREAD => 'Belum Dibaca',
-                        ContactMessage::STATUS_READ => 'Sudah Dibaca',
-                        ContactMessage::STATUS_REPLIED => 'Sudah Dibalas',
-                        ContactMessage::STATUS_ARCHIVED => 'Diarsipkan',
+                        ContactMessage::STATUS_UNREAD => __('admin.contact.statuses.unread'),
+                        ContactMessage::STATUS_READ => __('admin.contact.statuses.read'),
+                        ContactMessage::STATUS_REPLIED => __('admin.contact.statuses.replied'),
+                        ContactMessage::STATUS_ARCHIVED => __('admin.contact.statuses.archived'),
                     ]),
                 SelectFilter::make('subject')
-                    ->label('Kategori Subjek')
+                    ->label(__('admin.labels.subject_category_filter'))
                     ->options([
-                        ContactMessage::SUBJECT_ADMISSIONS => 'Penerimaan Siswa Baru',
-                        ContactMessage::SUBJECT_MANDARIN_PROGRAM => 'Program Mandarin / TOCFL',
-                        ContactMessage::SUBJECT_GENERAL => 'Pertanyaan Umum',
-                        ContactMessage::SUBJECT_ACADEMICS => 'Akademik & Kurikulum',
-                        ContactMessage::SUBJECT_OTHER => 'Lainnya',
+                        ContactMessage::SUBJECT_ADMISSIONS => __('admin.contact.subjects.admissions_short'),
+                        ContactMessage::SUBJECT_MANDARIN_PROGRAM => __('admin.contact.subjects.mandarin_program'),
+                        ContactMessage::SUBJECT_GENERAL => __('admin.contact.subjects.general'),
+                        ContactMessage::SUBJECT_ACADEMICS => __('admin.contact.subjects.academics'),
+                        ContactMessage::SUBJECT_OTHER => __('admin.contact.subjects.other'),
                     ]),
             ])
             ->recordActions([
                 EditAction::make()
-                    ->label('Buka Pesan'),
+                    ->label(__('admin.actions.open_message')),
                 DeleteAction::make(),
             ])
             ->bulkActions([
                 BulkAction::make('mark_as_read')
-                    ->label('Tandai Sudah Dibaca')
+                    ->label(__('admin.actions.mark_as_read'))
                     ->icon('heroicon-o-check')
                     ->action(fn (Collection $records) => $records->each->update(['status' => ContactMessage::STATUS_READ]))
                     ->deselectRecordsAfterCompletion(),
                 BulkAction::make('mark_as_replied')
-                    ->label('Tandai Sudah Dibalas')
+                    ->label(__('admin.actions.mark_as_replied'))
                     ->icon('heroicon-o-paper-airplane')
                     ->action(fn (Collection $records) => $records->each->update(['status' => ContactMessage::STATUS_REPLIED]))
                     ->deselectRecordsAfterCompletion(),

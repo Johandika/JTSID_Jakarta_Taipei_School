@@ -15,21 +15,21 @@ class AdmissionFormsTable
         return $table
             ->columns([
                 TextColumn::make('school_level_label')
-                    ->label('Jenjang')
+                    ->label(__('admin.fields.school_level'))
                     ->badge()
                     ->sortable(query: fn ($query, string $direction) => $query->orderByRaw("case school_level when 'tk' then 1 when 'sd' then 2 when 'smp' then 3 when 'sma' then 4 else 5 end {$direction}")),
                 TextColumn::make('title')
-                    ->label('Judul')
+                    ->label(__('admin.labels.title'))
                     ->weight('medium')
                     ->searchable(),
                 TextColumn::make('file_path')
-                    ->label('File')
+                    ->label(__('admin.labels.file'))
                     ->limit(48),
                 IconColumn::make('is_active')
-                    ->label('Aktif')
+                    ->label(__('admin.fields.active'))
                     ->boolean(),
                 TextColumn::make('updated_at')
-                    ->label('Terakhir Diubah')
+                    ->label(__('admin.labels.updated_at'))
                     ->dateTime('d M Y H:i')
                     ->sortable(),
             ])

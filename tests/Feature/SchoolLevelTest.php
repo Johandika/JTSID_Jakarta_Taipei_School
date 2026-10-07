@@ -61,9 +61,9 @@ class SchoolLevelTest extends TestCase
                 ->assertDontSee('SEO Meta Title');
 
             if ($type->code === 'weekly_news') {
-                $form->assertFormFieldVisible('image')->assertSee('Ringkasan Singkat');
+                $form->assertFormFieldVisible('image')->assertSee(__('admin.dashboard.summary'));
             } else {
-                $form->assertFormFieldHidden('image')->assertDontSee('Ringkasan Singkat');
+                $form->assertFormFieldHidden('image')->assertDontSee(__('admin.dashboard.summary'));
             }
 
             if (in_array($type->code, ['calendar', 'syllabus', 'textbook'], true)) {
@@ -79,7 +79,7 @@ class SchoolLevelTest extends TestCase
             'topic' => 'Semester calendar',
             'type_id' => SubjectResourceType::where('code', 'calendar')->value('id'),
             'department_id' => Department::first()->id,
-            'class_level' => 'smp_1',
+            'class_level' => 'tk2',
             'semester' => 'semester_1',
             'file_path' => UploadedFile::fake()->create('calendar.pdf', 10, 'application/pdf'),
             'upload_date' => today()->toDateString(),
@@ -88,6 +88,7 @@ class SchoolLevelTest extends TestCase
         ])->call('create')->assertHasNoFormErrors();
 
         $resource = SubjectResource::where('topic', 'Semester calendar')->firstOrFail();
+        $this->assertSame('tk2', $resource->class_level);
         $this->assertNull($resource->image);
         Storage::disk('local')->assertExists($resource->file_path);
 
@@ -95,7 +96,7 @@ class SchoolLevelTest extends TestCase
             ->assertFormFieldHidden('image')
             ->set('data.type_id', SubjectResourceType::where('code', 'weekly_news')->value('id'))
             ->assertFormFieldVisible('image')
-            ->assertSee('Ringkasan Singkat')
+            ->assertSee(__('admin.dashboard.summary'))
             ->call('save')->assertHasNoFormErrors();
         $this->assertNull($resource->fresh()->semester);
     }
@@ -148,6 +149,8 @@ class SchoolLevelTest extends TestCase
     public function test_calendar_syllabus_and_textbook_use_class_level_and_semester_filters_only(): void
     {
         foreach ([
+            ['calendar', 'TK1 semester 1 calendar', 'tk1', 'semester_1'],
+            ['calendar', 'TK2 semester 1 calendar', 'tk2', 'semester_1'],
             ['calendar', 'SMP 1 semester 1 calendar', 'smp_1', 'semester_1'],
             ['calendar', 'SMP 1 semester 2 calendar', 'smp_1', 'semester_2'],
             ['calendar', 'SMA 1 semester 1 calendar', 'sma_1', 'semester_1'],
@@ -182,6 +185,12 @@ class SchoolLevelTest extends TestCase
             ->assertSee('Class')
             ->assertSee('Semester')
             ->assertDontSee('School level')
+            ->assertSee('TK1')
+            ->assertSee('TK2')
+            ->set('classLevel', 'tk1')
+            ->set('semester', 'semester_1')
+            ->assertSee('TK1 semester 1 calendar')
+            ->assertDontSee('TK2 semester 1 calendar')
             ->set('classLevel', 'smp_1')
             ->set('semester', 'semester_2')
             ->assertSee('SMP 1 semester 2 calendar')
@@ -201,6 +210,38 @@ class SchoolLevelTest extends TestCase
         $this->assertSame('semester_1', $calendar->semester);
         $this->assertSame([], $calendar->school_levels);
         $this->assertNull($calendar->grade_level_id);
+    }
+
+    public function test_migration_splits_legacy_tk_class_level_into_tk1(): void
+    {
+        DB::table('subject_resources')->insert([
+            'topic' => 'Legacy TK calendar',
+            'department_id' => Department::first()->id,
+            'type_id' => SubjectResourceType::where('code', 'calendar')->value('id'),
+            'class_level' => 'tk',
+            'semester' => 'semester_1',
+            'school_levels' => json_encode([]),
+            'file_path' => 'documents/resource.pdf',
+            'upload_date' => today(),
+            'status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        $migration = require database_path('migrations/2026_10_07_105230_split_subject_resource_tk_class_level.php');
+        $migration->up();
+
+        $this->assertDatabaseHas('subject_resources', [
+            'topic' => 'Legacy TK calendar',
+            'class_level' => 'tk1',
+        ]);
+
+        $migration->down();
+
+        $this->assertDatabaseHas('subject_resources', [
+            'topic' => 'Legacy TK calendar',
+            'class_level' => 'tk',
+        ]);
     }
 
     public function test_global_pages_staff_highlights_and_popups_ignore_school_level_query(): void
@@ -252,8 +293,8 @@ class SchoolLevelTest extends TestCase
     {
         $this->actingAs(User::where('email', 'admin@jts.local')->first());
 
-        $this->get('/jts-secure-portal/posts/create')->assertOk()->assertSeeText('Jenjang Sekolah');
-        $this->get('/jts-secure-portal/subject-resources/create')->assertOk()->assertSeeText('Jenjang Sekolah');
+        $this->get('/jts-secure-portal/posts/create')->assertOk()->assertSeeText(__('admin.labels.school_levels'));
+        $this->get('/jts-secure-portal/subject-resources/create')->assertOk()->assertSeeText(__('admin.labels.school_levels'));
         foreach (['staff-profiles', 'announcement-popups'] as $resource) {
             $this->get('/jts-secure-portal/'.$resource.'/create')->assertOk()->assertDontSeeText('School levels');
         }

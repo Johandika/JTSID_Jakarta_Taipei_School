@@ -36,16 +36,16 @@ class PostResource extends CmsResource
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
                 Group::make()->schema([
-                    Section::make('Informasi Utama')
-                        ->description('Judul topik utama dan alamat URL berita')
+                    Section::make(__('admin.sections.main_information'))
+                        ->description(__('admin.descriptions.main_information'))
                         ->schema([
                             TextInput::make('topic')
-                                ->label('Topik / Judul Berita')
+                                ->label(__('admin.labels.topic_news'))
                                 ->required()
                                 ->maxLength(191),
                             TextInput::make('slug')
-                                ->label('Slug URL')
-                                ->helperText('Format: huruf-kecil-tanda-hubung (contoh: pentas-seni-2026)')
+                                ->label(__('admin.fields.slug_url'))
+                                ->helperText(__('admin.helpers.slug_format'))
                                 ->required()
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(191)
@@ -53,21 +53,21 @@ class PostResource extends CmsResource
                         ])
                         ->columns(2),
 
-                    Section::make('Konten & Terjemahan')
-                        ->description('Isi konten artikel dalam berbagai bahasa (Wajib menyertakan bahasa Inggris)')
+                    Section::make(__('admin.sections.content_translations'))
+                        ->description(__('admin.descriptions.content_translations'))
                         ->schema([
-                            CmsFields::translations('Judul Artikel'),
+                            CmsFields::translations(__('admin.labels.news_title')),
                         ]),
                 ])->columnSpan(['lg' => 2]),
 
                 Group::make()->schema([
                     CmsFields::publishing(),
 
-                    Section::make('Klasifikasi & Sasaran')
-                        ->description('Kategori, departemen, dan jenjang')
+                    Section::make(__('admin.sections.classification_targets'))
+                        ->description(__('admin.descriptions.classification_targets'))
                         ->schema([
                             Select::make('category_id')
-                                ->label('Kategori Berita')
+                                ->label(__('admin.labels.news_category'))
                                 ->relationship('category', 'name')
                                 ->required()
                                 ->searchable()
@@ -76,12 +76,12 @@ class PostResource extends CmsResource
                             CmsFields::schoolLevels(),
                         ]),
 
-                    Section::make('Media & Lampiran')
-                        ->description('Cover visual dan lampiran')
+                    Section::make(__('admin.sections.media_attachments'))
+                        ->description(__('admin.descriptions.media_attachments'))
                         ->schema([
                             CmsFields::uploadDate(),
-                            CmsFields::image('image', 4096, 'Gambar Cover Berita'),
-                            CmsFields::document(false, 'File Dokumen (Opsional)'),
+                            CmsFields::image('image', 4096, __('admin.labels.news_cover')),
+                            CmsFields::document(false, __('admin.labels.document_optional')),
                         ]),
                 ])->columnSpan(['lg' => 1]),
             ]);
@@ -92,35 +92,35 @@ class PostResource extends CmsResource
         return $table
             ->columns([
                 TextColumn::make('topic')
-                    ->label('Topik Berita')
+                    ->label(__('admin.fields.news_topic'))
                     ->searchable()
                     ->weight('medium')
                     ->limit(40),
                 TextColumn::make('category.name')
-                    ->label('Kategori')
+                    ->label(__('admin.fields.category'))
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('school_level_label')
-                    ->label('Jenjang'),
+                    ->label(__('admin.fields.school_level')),
                 TextColumn::make('department.name')
-                    ->label('Departemen'),
+                    ->label(__('admin.fields.department')),
                 TextColumn::make('status')
-                    ->label('Status')
+                    ->label(__('admin.fields.status'))
                     ->badge(),
                 TextColumn::make('upload_date')
-                    ->label('Tanggal Unggah')
+                    ->label(__('admin.fields.upload_date'))
                     ->date('d M Y')
                     ->sortable(),
                 TextColumn::make('translation_status')
-                    ->label('Terjemahan')
+                    ->label(__('admin.fields.translations'))
                     ->badge(),
             ])
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draft',
-                        'published' => 'Published',
-                        'archived' => 'Archived',
+                        'draft' => __('admin.options.draft'),
+                        'published' => __('admin.options.published'),
+                        'archived' => __('admin.options.archived'),
                     ]),
             ])
             ->defaultSort('upload_date', 'desc')

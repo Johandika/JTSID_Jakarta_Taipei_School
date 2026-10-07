@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Locale;
 use Database\Factories\MandarinProgramFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -60,7 +61,7 @@ class MandarinProgram extends CmsModel
      */
     public function trans(string $field, ?string $locale = null): string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale = Locale::content($locale);
         $value = $this->{$field};
 
         if (! is_array($value)) {
@@ -120,7 +121,7 @@ class MandarinProgram extends CmsModel
     public function getStatusLabel(?string $status = null, ?string $locale = null): string
     {
         $status = $status ?? $this->computed_status;
-        $locale = $locale ?? app()->getLocale();
+        $locale = Locale::content($locale);
 
         $labels = [
             self::STATUS_UPCOMING => [
@@ -153,7 +154,7 @@ class MandarinProgram extends CmsModel
      */
     public function getCategoryLabel(?string $locale = null): string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale = Locale::content($locale);
 
         $labels = [
             self::CATEGORY_MANDARIN_CLASS => [

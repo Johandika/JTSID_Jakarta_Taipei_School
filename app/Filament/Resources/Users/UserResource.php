@@ -39,48 +39,48 @@ class UserResource extends CmsResource
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
                 Group::make()->schema([
-                    Section::make('Informasi Akun Pengguna')
-                        ->description('Identitas akun dan kata sandi akses sistem')
+                    Section::make(__('admin.sections.account_information'))
+                        ->description(__('admin.descriptions.account_information'))
                         ->schema([
                             TextInput::make('name')
-                                ->label('Nama Lengkap')
+                                ->label(__('admin.labels.full_name'))
                                 ->required()
                                 ->maxLength(150),
                             TextInput::make('email')
-                                ->label('Alamat Email')
+                                ->label(__('admin.labels.email_address'))
                                 ->email()
                                 ->required()
                                 ->unique(ignoreRecord: true)
                                 ->maxLength(191),
                             TextInput::make('password')
-                                ->label('Kata Sandi')
+                                ->label(__('admin.labels.password'))
                                 ->password()
                                 ->revealable()
                                 ->minLength(12)
                                 ->required(fn (string $operation) => $operation === 'create')
                                 ->dehydrated(fn ($state) => filled($state))
-                                ->helperText('Minimal 12 karakter. Kosongkan saat edit jika tidak ingin mengubah sandi.')
+                                ->helperText(__('admin.helpers.password_edit'))
                                 ->columnSpanFull(),
                         ])
                         ->columns(2),
                 ])->columnSpan(['lg' => 2]),
 
                 Group::make()->schema([
-                    Section::make('Peran & Hak Akses')
-                        ->description('Penetapan izin dan departemen')
+                    Section::make(__('admin.sections.role_permissions'))
+                        ->description(__('admin.descriptions.role_permissions'))
                         ->schema([
                             Select::make('role_id')
-                                ->label('Peran / Role')
+                                ->label(__('admin.labels.role'))
                                 ->relationship('role', 'name')
                                 ->required()
                                 ->live()
                                 ->disabled(fn (?Model $record) => $record?->id === auth()->id()),
                             Select::make('department_id')
-                                ->label('Departemen Pengelola')
+                                ->label(__('admin.labels.managed_department'))
                                 ->relationship('department', 'name')
                                 ->required(fn (Get $get) => Role::find($get('role_id'))?->code === 'department_admin'),
                             Toggle::make('is_active')
-                                ->label('Status Aktif')
+                                ->label(__('admin.fields.active_status'))
                                 ->default(true)
                                 ->disabled(fn (?Model $record) => $record?->id === auth()->id()),
                         ]),
@@ -93,21 +93,21 @@ class UserResource extends CmsResource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nama Pengguna')
+                    ->label(__('admin.labels.user_name'))
                     ->searchable()
                     ->weight('medium'),
                 TextColumn::make('email')
-                    ->label('Email')
+                    ->label(__('admin.fields.email'))
                     ->searchable(),
                 TextColumn::make('role.name')
-                    ->label('Peran')
+                    ->label(__('admin.labels.role'))
                     ->badge()
                     ->color('primary'),
                 TextColumn::make('department.name')
-                    ->label('Departemen')
+                    ->label(__('admin.fields.department'))
                     ->placeholder('—'),
                 IconColumn::make('is_active')
-                    ->label('Status Aktif')
+                    ->label(__('admin.fields.active_status'))
                     ->boolean(),
             ])
             ->defaultSort('id', 'desc')

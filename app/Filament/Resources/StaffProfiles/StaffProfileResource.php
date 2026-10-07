@@ -36,15 +36,15 @@ class StaffProfileResource extends CmsResource
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
                 Group::make()->schema([
-                    Section::make('Informasi Pribadi & Posisi')
-                        ->description('Identitas, jabatan, dan departemen staf pengajar')
+                    Section::make(__('admin.sections.personal_position'))
+                        ->description(__('admin.descriptions.personal_position'))
                         ->schema([
                             TextInput::make('name')
-                                ->label('Nama Lengkap')
+                                ->label(__('admin.labels.full_name'))
                                 ->required()
                                 ->maxLength(150),
                             TextInput::make('title')
-                                ->label('Jabatan / Posisi')
+                                ->label(__('admin.labels.position'))
                                 ->required()
                                 ->maxLength(150),
                             CmsFields::department(),
@@ -53,21 +53,21 @@ class StaffProfileResource extends CmsResource
                 ])->columnSpan(['lg' => 2]),
 
                 Group::make()->schema([
-                    Section::make('Foto Profil')
+                    Section::make(__('admin.sections.profile_photo'))
                         ->schema([
-                            CmsFields::image('photo', 2048, 'Foto Profil'),
+                            CmsFields::image('photo', 2048, __('admin.sections.profile_photo')),
                         ]),
 
-                    Section::make('Status & Urutan')
+                    Section::make(__('admin.sections.status_order'))
                         ->schema([
                             TextInput::make('sort_order')
-                                ->label('Urutan Tampilan')
+                                ->label(__('admin.fields.display_order'))
                                 ->integer()
                                 ->minValue(0)
                                 ->default(0)
                                 ->required(),
                             Toggle::make('is_active')
-                                ->label('Aktif / Tampilkan')
+                                ->label(__('admin.labels.active_show'))
                                 ->default(true),
                         ]),
                 ])->columnSpan(['lg' => 1]),
@@ -79,15 +79,15 @@ class StaffProfileResource extends CmsResource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nama Staf')
+                    ->label(__('admin.labels.staff_name'))
                     ->searchable()
                     ->weight('medium'),
                 TextColumn::make('title')
-                    ->label('Jabatan'),
+                    ->label(__('admin.labels.position')),
                 TextColumn::make('department.name')
-                    ->label('Departemen'),
+                    ->label(__('admin.fields.department')),
                 IconColumn::make('is_active')
-                    ->label('Aktif')
+                    ->label(__('admin.fields.active'))
                     ->boolean(),
             ])
             ->defaultSort('sort_order', 'asc')

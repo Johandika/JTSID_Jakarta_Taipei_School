@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Locale;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class HeroSlide extends CmsModel
@@ -55,7 +56,7 @@ class HeroSlide extends CmsModel
             return (string) ($value ?? '');
         }
 
-        $locale = app()->getLocale();
+        $locale = Locale::content();
 
         return (string) ($value[$locale] ?? $value['en'] ?? (reset($value) ?: ''));
     }

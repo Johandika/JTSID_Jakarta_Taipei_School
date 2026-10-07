@@ -42,8 +42,8 @@ class DirectorResource extends CmsResource
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
                 Group::make()->schema([
-                    Section::make('Informasi Anggota Dewan Pengurus')
-                        ->description('Data profil trilingual (Indonesia, Inggris, dan Mandarin)')
+                    Section::make(__('admin.sections.director_information'))
+                        ->description(__('admin.descriptions.trilingual_profile'))
                         ->schema([
                             Tabs::make('DirectorTranslations')
                                 ->tabs([
@@ -51,25 +51,25 @@ class DirectorResource extends CmsResource
                                         ->label('🇮🇩 Indonesian (Bahasa Indonesia)')
                                         ->schema([
                                             TextInput::make('name.id')
-                                                ->label('Nama Lengkap (ID)')
-                                                ->placeholder('cth. Dr. Olivia Chen, Ph.D.')
+                                                ->label(__('admin.labels.full_name_id'))
+                                                ->placeholder(__('admin.placeholders.person_name'))
                                                 ->required()
                                                 ->maxLength(150),
                                             TextInput::make('role.id')
-                                                ->label('Jabatan / Posisi (ID)')
-                                                ->placeholder('cth. Ketua Dewan Pengurus')
+                                                ->label(__('admin.labels.position_id'))
+                                                ->placeholder(__('admin.placeholders.director_position'))
                                                 ->required()
                                                 ->maxLength(150),
                                             Textarea::make('education.id')
-                                                ->label('Riwayat Pendidikan (ID)')
-                                                ->placeholder('Satu gelar/kampus per baris...')
+                                                ->label(__('admin.labels.education_id'))
+                                                ->placeholder(__('admin.placeholders.education_lines'))
                                                 ->rows(3)
                                                 ->formatStateUsing(fn ($state) => is_array($state) ? implode("\n", $state) : (string) ($state ?? ''))
                                                 ->dehydrateStateUsing(fn ($state) => is_string($state) ? array_values(array_filter(array_map('trim', preg_split('/\r\n|\r|\n/', $state)))) : (array) ($state ?? []))
-                                                ->helperText('Tuliskan satu riwayat pendidikan per baris (tekan Enter untuk baris baru)'),
+                                                ->helperText(__('admin.helpers.education_lines')),
                                             Textarea::make('bio.id')
-                                                ->label('Profil & Pengalaman (ID)')
-                                                ->placeholder('Deskripsi singkat pengalaman atau dedikasi kepemimpinan...')
+                                                ->label(__('admin.labels.profile_experience_id'))
+                                                ->placeholder(__('admin.placeholders.profile_experience'))
                                                 ->rows(3)
                                                 ->maxLength(1000),
                                         ]),
@@ -128,23 +128,23 @@ class DirectorResource extends CmsResource
                 ])->columnSpan(['lg' => 2]),
 
                 Group::make()->schema([
-                    Section::make('Foto Profil')
-                        ->description('Foto portrait studio')
+                    Section::make(__('admin.sections.profile_photo'))
+                        ->description(__('admin.descriptions.profile_photo'))
                         ->schema([
-                            CmsFields::image('photo', 3072, 'Foto Profil')
-                                ->helperText('Disarankan foto portrait monokrom (min. 600x600 px, maks. 3MB)'),
+                            CmsFields::image('photo', 3072, __('admin.sections.profile_photo'))
+                                ->helperText(__('admin.helpers.profile_photo')),
                         ]),
 
-                    Section::make('Status & Urutan')
+                    Section::make(__('admin.sections.status_order'))
                         ->schema([
                             TextInput::make('sort_order')
-                                ->label('Urutan Tampilan')
+                                ->label(__('admin.fields.display_order'))
                                 ->integer()
                                 ->minValue(0)
                                 ->default(0)
                                 ->required(),
                             Toggle::make('is_active')
-                                ->label('Aktif / Tampilkan di Website')
+                                ->label(__('admin.labels.active_show_website'))
                                 ->default(true),
                         ]),
                 ])->columnSpan(['lg' => 1]),
@@ -156,24 +156,24 @@ class DirectorResource extends CmsResource
         return $table
             ->columns([
                 ImageColumn::make('photo')
-                    ->label('Foto')
+                    ->label(__('admin.fields.image'))
                     ->state(fn (Director $record): string => $record->photo_url)
                     ->circular(),
                 TextColumn::make('name')
-                    ->label('Nama')
+                    ->label(__('admin.fields.name'))
                     ->state(fn (Director $record): string => $record->trans('name'))
                     ->searchable(query: function ($query, string $search) {
                         return $query->where('name', 'ilike', '%'.$search.'%');
                     })
                     ->weight('medium'),
                 TextColumn::make('role')
-                    ->label('Jabatan')
+                    ->label(__('admin.labels.position'))
                     ->state(fn (Director $record): string => $record->trans('role')),
                 TextColumn::make('sort_order')
-                    ->label('Urutan')
+                    ->label(__('admin.fields.sort_order'))
                     ->sortable(),
                 IconColumn::make('is_active')
-                    ->label('Aktif')
+                    ->label(__('admin.fields.active'))
                     ->boolean(),
             ])
             ->defaultSort('sort_order', 'asc')

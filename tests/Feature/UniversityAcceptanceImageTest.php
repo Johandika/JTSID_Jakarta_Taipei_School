@@ -135,4 +135,32 @@ class UniversityAcceptanceImageTest extends TestCase
         $this->assertSame('Updated Program', $acceptance->fresh()->program_name);
         $this->assertSame(2, $acceptance->fresh()->sort_order);
     }
+
+    public function test_university_acceptance_importer_creates_rows_from_xlsx_template(): void
+    {
+        Department::create([
+            'code' => 'academic',
+            'name' => 'Academic Office',
+        ]);
+
+        $path = tempnam(sys_get_temp_dir(), 'university-acceptances-template-').'.xlsx';
+
+        try {
+            UniversityAcceptanceImporter::writeTemplateToPath($path);
+
+            $result = UniversityAcceptanceImporter::importFromPath($path, 'xlsx');
+        } finally {
+            if (file_exists($path)) {
+                unlink($path);
+            }
+        }
+
+        $this->assertSame(['created' => 2, 'updated' => 0], $result);
+        $this->assertSame(2, UniversityAcceptance::count());
+        $this->assertTrue(
+            UniversityAcceptance::where('student_name', 'Sample Student 1')
+                ->where('university_name', 'National Taiwan University')
+                ->exists(),
+        );
+    }
 }

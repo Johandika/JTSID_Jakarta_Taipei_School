@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use League\Csv\Info;
 use League\Csv\Reader;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Reader\XLSX\Reader as XlsxReader;
+use OpenSpout\Writer\XLSX\Writer as XlsxWriter;
 
 class UniversityAcceptanceImporter
 {
@@ -58,6 +61,41 @@ class UniversityAcceptanceImporter
         ],
     ];
 
+    public static function writeTemplateToPath(string $path): void
+    {
+        $writer = new XlsxWriter();
+        $writer->openToFile($path);
+        $writer->addRow(Row::fromValues(self::TEMPLATE_HEADERS));
+
+        foreach (self::TEMPLATE_ROWS as $row) {
+            $writer->addRow(Row::fromValues($row));
+        }
+
+        $writer->close();
+    }
+
+    /**
+     * @return array{created: int, updated: int}
+     *
+     * @throws ValidationException
+     */
+    public static function importFromPath(string $path, ?string $extension = null): array
+    {
+        if (strtolower((string) $extension) === 'xlsx') {
+            return self::importFromXlsxPath($path);
+        }
+
+        $stream = fopen($path, 'r');
+
+        try {
+            return self::importFromStream($stream);
+        } finally {
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+        }
+    }
+
     /**
      * @param  resource  $stream
      * @return array{created: int, updated: int}
@@ -75,14 +113,82 @@ class UniversityAcceptanceImporter
 
         if ($missingHeaders !== []) {
             throw ValidationException::withMessages([
-                'file' => 'Kolom wajib tidak ditemukan: '.implode(', ', $missingHeaders).'. Download template CSV terbaru lalu isi sesuai kolom tersebut.',
+                'file' => __('admin.imports.missing_headers', ['headers' => implode(', ', $missingHeaders)]),
             ]);
+        }
+
+        return self::importRecords($csv->getRecords());
+    }
+
+    /**
+     * @return array{created: int, updated: int}
+     *
+     * @throws ValidationException
+     */
+    private static function importFromXlsxPath(string $path): array
+    {
+        $reader = new XlsxReader();
+        $reader->open($path);
+
+        try {
+            foreach ($reader->getSheetIterator() as $sheet) {
+                $header = null;
+                $records = [];
+
+                foreach ($sheet->getRowIterator() as $row) {
+                    $values = array_map(
+                        static fn (mixed $value): string => trim((string) $value),
+                        $row->toArray(),
+                    );
+
+                    if (self::isEmptyRow($values)) {
+                        continue;
+                    }
+
+                    if ($header === null) {
+                        $header = array_map(self::normalizeHeader(...), $values);
+
+                        continue;
+                    }
+
+                    $records[] = array_combine(
+                        $header,
+                        array_slice(array_pad($values, count($header), ''), 0, count($header)),
+                    );
+                }
+
+                return self::importRecords($records, $header ?? []);
+            }
+        } finally {
+            $reader->close();
+        }
+
+        return self::importRecords([], []);
+    }
+
+    /**
+     * @param  iterable<array<string, mixed>>  $records
+     * @param  array<int, string>|null  $headers
+     * @return array{created: int, updated: int}
+     *
+     * @throws ValidationException
+     */
+    private static function importRecords(iterable $records, ?array $headers = null): array
+    {
+        if ($headers !== null) {
+            $missingHeaders = array_diff(self::TEMPLATE_HEADERS, $headers);
+
+            if ($missingHeaders !== []) {
+                throw ValidationException::withMessages([
+                    'file' => __('admin.imports.missing_headers', ['headers' => implode(', ', $missingHeaders)]),
+                ]);
+            }
         }
 
         $created = 0;
         $updated = 0;
 
-        foreach ($csv->getRecords() as $index => $row) {
+        foreach ($records as $index => $row) {
             $rowNumber = $index + 2;
             $data = self::normalizeRow($row);
 
@@ -101,7 +207,7 @@ class UniversityAcceptanceImporter
                         'max:100',
                         fn (string $attribute, mixed $value, \Closure $fail): mixed => self::resolveDepartmentId($value) !== null
                             ? null
-                            : $fail('Departemen tidak ditemukan. Gunakan nama/kode departemen yang sudah ada.'),
+                            : $fail(__('admin.imports.department_not_found')),
                     ],
                     'image_url' => ['nullable', 'url', 'max:2048'],
                     'sort_order' => ['nullable', 'integer', 'min:0'],
@@ -109,10 +215,10 @@ class UniversityAcceptanceImporter
                 ],
                 [],
                 [
-                    'student_name' => 'Nama Siswa',
-                    'university_name' => 'Nama Universitas',
-                    'academic_year' => 'Tahun Ajaran',
-                    'department' => 'Departemen',
+                    'student_name' => __('admin.labels.student_name'),
+                    'university_name' => __('admin.labels.university_name'),
+                    'academic_year' => __('admin.fields.academic_year'),
+                    'department' => __('admin.fields.department'),
                 ],
             )->validateWithBag('Row '.$rowNumber);
 
@@ -143,6 +249,14 @@ class UniversityAcceptanceImporter
             'created' => $created,
             'updated' => $updated,
         ];
+    }
+
+    /**
+     * @param  array<int, string>  $values
+     */
+    private static function isEmptyRow(array $values): bool
+    {
+        return implode('', $values) === '';
     }
 
     private static function guessDelimiter(Reader $csv): string

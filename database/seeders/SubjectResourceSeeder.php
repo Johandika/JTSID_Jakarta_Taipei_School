@@ -16,10 +16,6 @@ class SubjectResourceSeeder extends Seeder
      */
     public function run(): void
     {
-        if (! app()->environment(['local', 'testing'])) {
-            return;
-        }
-
         $departmentId = Department::where('code', 'academic')->firstOrFail()->id;
         $file = app(DemoContentSeeder::class)->sampleDocument();
         $image = 'images/classroom.webp';

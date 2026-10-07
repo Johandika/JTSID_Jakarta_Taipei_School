@@ -41,43 +41,43 @@ class HeroSlideResource extends CmsResource
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
                 Group::make()->schema([
-                    Section::make('Media Latar Hero (Foto / Video)')
-                        ->description('Wajib diisi salah satu: Foto resolusi tinggi ATAU Link Video YouTube')
+                    Section::make(__('admin.sections.hero_media'))
+                        ->description(__('admin.descriptions.hero_media'))
                         ->schema([
-                            CmsFields::image('image', 4096, 'Foto / Gambar Hero')
-                                ->label('Gambar Slide Hero')
-                                ->helperText('Wajib diunggah jika tidak mengisi Link Video YouTube. Format: JPG, PNG, WebP (maks. 4MB). Jika URL video diisi, gambar ini opsional sebagai poster cadangan.')
+                            CmsFields::image('image', 4096, __('admin.labels.hero_image'))
+                                ->label(__('admin.labels.hero_slide_image'))
+                                ->helperText(__('admin.helpers.hero_image'))
                                 ->rules([
                                     fn (Get $get) => function (string $attribute, $value, \Closure $fail) use ($get) {
                                         if (blank($value) && blank($get('video_url'))) {
-                                            $fail('Wajib mengisi minimal salah satu: Gambar Slide Hero atau URL Video YouTube.');
+                                            $fail(__('admin.validation.hero_image_or_youtube'));
                                         }
                                     },
                                 ]),
 
                             TextInput::make('video_url')
-                                ->label('URL Video (YouTube atau File MP4)')
-                                ->placeholder('https://www.youtube.com/watch?v=... atau https://domain.com/video.mp4')
+                                ->label(__('admin.labels.video_url'))
+                                ->placeholder(__('admin.placeholders.video_url'))
                                 ->maxLength(500)
-                                ->helperText('Wajib diisi jika tidak mengunggah Gambar. Mendukung link YouTube atau file video langsung (.mp4). Video akan otomatis diputar tanpa suara (muted & loop) di latar belakang.')
+                                ->helperText(__('admin.helpers.video_url'))
                                 ->url()
                                 ->rules([
                                     fn (Get $get) => function (string $attribute, $value, \Closure $fail) use ($get) {
                                         if (blank($value) && blank($get('image'))) {
-                                            $fail('Wajib mengisi minimal salah satu: Gambar Slide Hero atau URL Video.');
+                                            $fail(__('admin.validation.hero_image_or_video'));
                                         }
                                     },
                                 ]),
                         ]),
 
-                    Section::make('Konten Teks & Shape Panel')
-                        ->description('Pengaturan tampilan teks dan shape hijau diagonal di atas latar hero')
+                    Section::make(__('admin.sections.hero_text_panel'))
+                        ->description(__('admin.descriptions.hero_text_panel'))
                         ->schema([
                             Toggle::make('show_text')
-                                ->label('Tampilkan Teks & Shape Panel Hijau')
+                                ->label(__('admin.labels.show_hero_text_panel'))
                                 ->default(true)
                                 ->live()
-                                ->helperText('Jika dinonaktifkan, shape hijau diagonal beserta judul, deskripsi, dan tombol CTA tidak ditampilkan (latar video/foto tampil bersih 100% full-screen).'),
+                                ->helperText(__('admin.helpers.show_hero_text_panel')),
 
                             Tabs::make('SlideTranslations')
                                 ->visible(fn (Get $get): bool => (bool) ($get('show_text') ?? true))
@@ -90,7 +90,7 @@ class HeroSlideResource extends CmsResource
                                                 ->placeholder('e.g. Jakarta Taipei School')
                                                 ->maxLength(100),
                                             TextInput::make('title.en')
-                                                ->label('Judul / Headline Utama (EN)')
+                                                ->label(__('admin.labels.main_headline_en'))
                                                 ->placeholder('e.g. Excellence in Trilingual Education')
                                                 ->required(fn (Get $get): bool => (bool) ($get('show_text') ?? true))
                                                 ->maxLength(191),
@@ -113,17 +113,17 @@ class HeroSlideResource extends CmsResource
                                                 ->placeholder('cth. Jakarta Taipei School')
                                                 ->maxLength(100),
                                             TextInput::make('title.id')
-                                                ->label('Judul / Headline Utama (ID)')
-                                                ->placeholder('cth. Keunggulan Pendidikan Tiga Bahasa')
+                                                ->label(__('admin.labels.main_headline_id'))
+                                                ->placeholder(__('admin.placeholders.hero_headline'))
                                                 ->maxLength(191),
                                             Textarea::make('description.id')
-                                                ->label('Deskripsi Singkat (ID)')
-                                                ->placeholder('Ringkasan atau pengantar singkat...')
+                                                ->label(__('admin.labels.short_description_id'))
+                                                ->placeholder(__('admin.placeholders.short_description'))
                                                 ->rows(3)
                                                 ->maxLength(500),
                                             TextInput::make('cta_text.id')
-                                                ->label('Teks Tombol CTA (ID)')
-                                                ->placeholder('cth. Daftar Sekarang')
+                                                ->label(__('admin.labels.cta_text_id'))
+                                                ->placeholder(__('admin.placeholders.cta_text'))
                                                 ->maxLength(100),
                                         ]),
 
@@ -135,7 +135,7 @@ class HeroSlideResource extends CmsResource
                                                 ->placeholder('例：雅加達臺北學校')
                                                 ->maxLength(100),
                                             TextInput::make('title.zh-TW')
-                                                ->label('Judul / Headline Utama (中文)')
+                                                ->label(__('admin.labels.main_headline_zh'))
                                                 ->placeholder('例：深耕三語，開創卓越教育')
                                                 ->maxLength(191),
                                             Textarea::make('description.zh-TW')
@@ -153,27 +153,27 @@ class HeroSlideResource extends CmsResource
                 ])->columnSpan(['lg' => 2]),
 
                 Group::make()->schema([
-                    Section::make('Link Tombol CTA')
-                        ->description('URL tujuan saat tombol aksi diklik')
+                    Section::make(__('admin.sections.cta_link'))
+                        ->description(__('admin.descriptions.cta_link'))
                         ->visible(fn (Get $get): bool => (bool) ($get('show_text') ?? true))
                         ->schema([
-                            CmsFields::safeUrl('cta_url', 'Link URL Tujuan CTA')
-                                ->label('Link URL CTA')
-                                ->placeholder('/admissions atau https://...')
-                                ->helperText('Relative path internal (/admissions, /school-profile, /academics) atau URL eksternal.'),
+                            CmsFields::safeUrl('cta_url', __('admin.labels.cta_url_target'))
+                                ->label(__('admin.labels.cta_url'))
+                                ->placeholder(__('admin.placeholders.cta_url'))
+                                ->helperText(__('admin.helpers.cta_url')),
                         ]),
 
-                    Section::make('Status & Urutan Tampilan')
+                    Section::make(__('admin.sections.status_display_order'))
                         ->schema([
                             TextInput::make('sort_order')
-                                ->label('Urutan Tampilan')
+                                ->label(__('admin.fields.display_order'))
                                 ->integer()
                                 ->minValue(0)
                                 ->default(0)
                                 ->required()
-                                ->helperText('Nomor urut rotasi carousel (0, 1, 2, ...)'),
+                                ->helperText(__('admin.helpers.carousel_order')),
                             Toggle::make('is_active')
-                                ->label('Aktif / Tampilkan di Website')
+                                ->label(__('admin.labels.active_show_website'))
                                 ->default(true),
                         ]),
                 ])->columnSpan(['lg' => 1]),
@@ -185,18 +185,18 @@ class HeroSlideResource extends CmsResource
         return $table
             ->columns([
                 ImageColumn::make('image')
-                    ->label('Foto / Poster')
+                    ->label(__('admin.labels.photo_poster'))
                     ->state(fn (HeroSlide $record): ?string => $record->getImageOrPosterUrl())
                     ->width(80)
                     ->height(50),
                 TextColumn::make('title.en')
-                    ->label('Judul Headline (EN)')
+                    ->label(__('admin.labels.headline_en'))
                     ->searchable()
                     ->weight('medium')
-                    ->placeholder('(Tanpa Teks / Full Media)')
+                    ->placeholder(__('admin.placeholders.no_text_full_media'))
                     ->limit(40),
                 IconColumn::make('video_url')
-                    ->label('Video')
+                    ->label(__('admin.labels.video'))
                     ->boolean()
                     ->state(fn (HeroSlide $record): bool => $record->hasVideo())
                     ->trueIcon('heroicon-o-video-camera')
@@ -204,22 +204,22 @@ class HeroSlideResource extends CmsResource
                     ->trueColor('success')
                     ->falseColor('gray'),
                 IconColumn::make('show_text')
-                    ->label('Shape & Teks')
+                    ->label(__('admin.labels.shape_text'))
                     ->boolean()
                     ->trueIcon('heroicon-o-chat-bubble-bottom-center-text')
                     ->falseIcon('heroicon-o-eye-slash')
                     ->trueColor('success')
                     ->falseColor('gray'),
                 TextColumn::make('tagline.en')
-                    ->label('Tagline')
+                    ->label(__('admin.labels.tagline'))
                     ->placeholder('—')
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('sort_order')
-                    ->label('Urutan')
+                    ->label(__('admin.fields.sort_order'))
                     ->sortable(),
                 IconColumn::make('is_active')
-                    ->label('Aktif')
+                    ->label(__('admin.fields.active'))
                     ->boolean(),
             ])
             ->defaultSort('sort_order', 'asc')

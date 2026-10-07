@@ -38,42 +38,42 @@ class UniversityAcceptanceResource extends CmsResource
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
                 Group::make()->schema([
-                    Section::make('Data Siswa & Universitas')
-                        ->description('Informasi siswa, universitas tujuan, dan program studi yang diterima')
+                    Section::make(__('admin.sections.student_university_data'))
+                        ->description(__('admin.descriptions.student_university_data'))
                         ->schema([
                             TextInput::make('student_name')
-                                ->label('Nama Siswa')
+                                ->label(__('admin.labels.student_name'))
                                 ->required()
                                 ->maxLength(150),
                             TextInput::make('university_name')
-                                ->label('Nama Universitas')
+                                ->label(__('admin.labels.university_name'))
                                 ->required()
                                 ->maxLength(191),
                             TextInput::make('program_name')
-                                ->label('Program Studi / Jurusan')
+                                ->label(__('admin.labels.study_program'))
                                 ->maxLength(191),
                             TextInput::make('admission_path')
-                                ->label('Jalur Penerimaan')
-                                ->placeholder('Contoh: SNMPTN, International Admission, Beasiswa')
+                                ->label(__('admin.labels.admission_path'))
+                                ->placeholder(__('admin.placeholders.admission_path'))
                                 ->maxLength(150),
                             TextInput::make('country')
-                                ->label('Negara Universitas')
+                                ->label(__('admin.labels.university_country'))
                                 ->maxLength(100),
                             TextInput::make('image_url')
-                                ->label('Link Foto / Gambar')
-                                ->placeholder('https://drive.google.com/file/d/... atau https://...')
+                                ->label(__('admin.labels.image_url'))
+                                ->placeholder(__('admin.placeholders.image_url'))
                                 ->url()
                                 ->maxLength(2048)
-                                ->helperText('Opsional. Untuk bulk import, isi kolom image_url dengan link gambar yang bisa diakses publik.'),
+                                ->helperText(__('admin.helpers.image_url')),
                         ])
                         ->columns(2),
                 ])->columnSpan(['lg' => 2]),
 
                 Group::make()->schema([
-                    Section::make('Tahun Ajaran & Departemen')
+                    Section::make(__('admin.sections.academic_year_department'))
                         ->schema([
                             Select::make('academic_year_id')
-                                ->label('Tahun Ajaran')
+                                ->label(__('admin.fields.academic_year'))
                                 ->relationship('academicYear', 'name')
                                 ->required()
                                 ->searchable()
@@ -81,16 +81,16 @@ class UniversityAcceptanceResource extends CmsResource
                             CmsFields::department(),
                         ]),
 
-                    Section::make('Status & Urutan')
+                    Section::make(__('admin.sections.status_order'))
                         ->schema([
                             TextInput::make('sort_order')
-                                ->label('Urutan Tampilan')
+                                ->label(__('admin.fields.display_order'))
                                 ->integer()
                                 ->minValue(0)
                                 ->default(0)
                                 ->required(),
                             Toggle::make('is_active')
-                                ->label('Aktif / Tampilkan')
+                                ->label(__('admin.labels.active_show'))
                                 ->default(true),
                         ]),
                 ])->columnSpan(['lg' => 1]),
@@ -102,28 +102,28 @@ class UniversityAcceptanceResource extends CmsResource
         return $table
             ->columns([
                 ImageColumn::make('image_url')
-                    ->label('Gambar')
+                    ->label(__('admin.fields.image'))
                     ->state(fn (UniversityAcceptance $record): ?string => $record->publicImageUrl())
                     ->placeholder('-')
                     ->square()
                     ->size(56),
                 TextColumn::make('student_name')
-                    ->label('Nama Siswa')
+                    ->label(__('admin.labels.student_name'))
                     ->searchable()
                     ->weight('medium'),
                 TextColumn::make('university_name')
-                    ->label('Universitas')
+                    ->label(__('admin.labels.university'))
                     ->searchable(),
                 TextColumn::make('academicYear.name')
-                    ->label('Tahun Ajaran'),
+                    ->label(__('admin.fields.academic_year')),
                 TextColumn::make('program_name')
-                    ->label('Program Studi'),
+                    ->label(__('admin.labels.study_program')),
                 TextColumn::make('country')
-                    ->label('Negara')
+                    ->label(__('admin.labels.country'))
                     ->badge()
                     ->color('gray'),
                 IconColumn::make('is_active')
-                    ->label('Aktif')
+                    ->label(__('admin.fields.active'))
                     ->boolean(),
             ])
             ->defaultSort('id', 'desc')

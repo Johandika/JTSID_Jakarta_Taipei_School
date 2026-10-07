@@ -17,9 +17,6 @@ class DemoContentSeeder extends Seeder
 {
     public function run(): void
     {
-        if (! app()->environment(['local', 'testing'])) {
-            return;
-        }
         foreach (['campus.webp', 'library.webp', 'classroom.webp', 'highlight.webp'] as $image) {
             if (file_exists(public_path('images/'.$image)) && ! Storage::disk('public')->exists('images/'.$image)) {
                 Storage::disk('public')->put('images/'.$image, file_get_contents(public_path('images/'.$image)));

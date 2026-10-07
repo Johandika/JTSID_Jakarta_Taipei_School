@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Locale;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Facility extends CmsModel
@@ -60,10 +61,7 @@ class Facility extends CmsModel
      */
     public static function getCategoryOptions(): array
     {
-        $locale = app()->getLocale();
-        if ($locale === 'zh') {
-            $locale = 'zh-TW';
-        }
+        $locale = Locale::content();
 
         $options = [];
         foreach (self::CATEGORIES as $key => $labels) {
@@ -78,10 +76,7 @@ class Facility extends CmsModel
      */
     public static function getCategoryLabel(string $key, ?string $locale = null): string
     {
-        $locale = $locale ?? app()->getLocale();
-        if ($locale === 'zh') {
-            $locale = 'zh-TW';
-        }
+        $locale = Locale::content($locale);
 
         return self::CATEGORIES[$key][$locale]
             ?? self::CATEGORIES[$key]['id']
@@ -129,10 +124,7 @@ class Facility extends CmsModel
             return (string) ($value ?? '');
         }
 
-        $locale = app()->getLocale();
-        if ($locale === 'zh') {
-            $locale = 'zh-TW';
-        }
+        $locale = Locale::content();
 
         return (string) ($value[$locale] ?? $value['en'] ?? (reset($value) ?: ''));
     }

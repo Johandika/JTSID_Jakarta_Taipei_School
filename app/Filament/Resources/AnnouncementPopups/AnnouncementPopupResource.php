@@ -42,46 +42,46 @@ class AnnouncementPopupResource extends CmsResource
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
                 Group::make()->schema([
-                    Section::make('Konten & Pesan Pengumuman')
-                        ->description('Judul, isi pesan popup, dan poster visual')
+                    Section::make(__('admin.sections.announcement_content'))
+                        ->description(__('admin.descriptions.announcement_content'))
                         ->schema([
                             TextInput::make('title')
-                                ->label('Judul Pengumuman')
+                                ->label(__('admin.labels.announcement_title'))
                                 ->required()
                                 ->maxLength(191),
                             Textarea::make('body')
-                                ->label('Pesan Lengkap')
+                                ->label(__('admin.labels.full_message'))
                                 ->rows(4)
                                 ->maxLength(5000)
                                 ->columnSpanFull(),
-                            CmsFields::image('image', 4096, 'Poster Visual Pengumuman (Opsional)')
-                                ->helperText('Gambar poster ucapan selamat, event, atau informasi mendesak.'),
-                            CmsFields::safeUrl('link_url', 'Tautan Baca Selengkapnya'),
+                            CmsFields::image('image', 4096, __('admin.labels.announcement_poster'))
+                                ->helperText(__('admin.helpers.announcement_poster')),
+                            CmsFields::safeUrl('link_url', __('admin.labels.read_more_link')),
                         ]),
                 ])->columnSpan(['lg' => 2]),
 
                 Group::make()->schema([
-                    Section::make('Jadwal & Status Penayangan')
-                        ->description('Atur waktu aktif popup di website')
+                    Section::make(__('admin.sections.schedule_popup_status'))
+                        ->description(__('admin.descriptions.schedule_popup_status'))
                         ->schema([
                             Toggle::make('is_active')
-                                ->label('Aktifkan Popup')
+                                ->label(__('admin.labels.activate_popup'))
                                 ->default(false)
-                                ->helperText('Aktifkan saat popup sudah siap tampil kepada pengunjung.'),
+                                ->helperText(__('admin.helpers.activate_popup')),
                             DateTimePicker::make('starts_at')
                                 ->seconds(false)
-                                ->label('Waktu Mulai ('.config('app.timezone').')'),
+                                ->label(__('admin.labels.starts_at', ['timezone' => config('app.timezone')])),
                             DateTimePicker::make('ends_at')
                                 ->seconds(false)
                                 ->after(fn (Get $get): ?string => filled($get('starts_at')) ? 'starts_at' : null)
-                                ->label('Waktu Selesai ('.config('app.timezone').')'),
+                                ->label(__('admin.labels.ends_at', ['timezone' => config('app.timezone')])),
                             TextInput::make('sort_order')
-                                ->label('Prioritas Tampilan')
+                                ->label(__('admin.labels.display_priority'))
                                 ->integer()
                                 ->minValue(0)
                                 ->default(0)
                                 ->required()
-                                ->helperText('Angka lebih kecil tampil lebih dulu.'),
+                                ->helperText(__('admin.helpers.display_priority')),
                         ]),
                 ])->columnSpan(['lg' => 1]),
             ]);
@@ -93,20 +93,20 @@ class AnnouncementPopupResource extends CmsResource
             ->recordTitleAttribute('title')
             ->columns([
                 TextColumn::make('title')
-                    ->label('Judul Pengumuman')
+                    ->label(__('admin.labels.announcement_title'))
                     ->searchable()
                     ->weight('medium'),
                 IconColumn::make('is_active')
-                    ->label('Status Aktif')
+                    ->label(__('admin.fields.active_status'))
                     ->boolean(),
                 TextColumn::make('starts_at')
-                    ->label('Mulai')
+                    ->label(__('admin.labels.starts'))
                     ->dateTime('d M Y, H:i'),
                 TextColumn::make('ends_at')
-                    ->label('Selesai')
+                    ->label(__('admin.labels.ends'))
                     ->dateTime('d M Y, H:i'),
                 TextColumn::make('sort_order')
-                    ->label('Prioritas')
+                    ->label(__('admin.labels.priority'))
                     ->sortable(),
             ])
             ->defaultSort('sort_order')

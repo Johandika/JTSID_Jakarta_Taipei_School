@@ -37,10 +37,10 @@ class SubjectResourceResource extends CmsResource
         return $schema
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
-                Section::make('Jenis Materi')
+                Section::make(__('admin.sections.material_type'))
                     ->schema([
                         Select::make('type_id')
-                            ->label('Tipe / Jenis Materi')
+                            ->label(__('admin.labels.type_material'))
                             ->relationship('type', 'name')
                             ->required()
                             ->live()
@@ -49,20 +49,20 @@ class SubjectResourceResource extends CmsResource
                     ])
                     ->columnSpanFull(),
                 Group::make()->schema([
-                    Section::make('Materi & Dokumen Utama')
+                    Section::make(__('admin.sections.subject_main_document'))
                         ->schema([
                             TextInput::make('topic')
-                                ->label('Topik / Nama Materi')
+                                ->label(__('admin.labels.topic_material_name'))
                                 ->required()
                                 ->maxLength(191),
-                            CmsFields::image('image', 4096, 'Gambar Cover Weekly News')
+                            CmsFields::image('image', 4096, __('admin.labels.subject_image'))
                                 ->visible(fn (Get $get): bool => self::isWeeklyNews((int) $get('type_id'))),
-                            CmsFields::document(true, 'File Dokumen Materi (PDF, DOCX, RAR)'),
+                            CmsFields::document(true, __('admin.labels.subject_document')),
                         ]),
 
-                    Section::make('Judul & Terjemahan')
+                    Section::make(__('admin.sections.title_translations'))
                         ->schema([
-                            CmsFields::translations('Judul Materi',
+                            CmsFields::translations(__('admin.labels.subject_title'),
                                 showSummary: fn (Get $get): bool => self::isWeeklyNews((int) $get('../../type_id')),
                                 showArticle: false),
                         ]),
@@ -71,20 +71,20 @@ class SubjectResourceResource extends CmsResource
                 Group::make()->schema([
                     CmsFields::publishing(),
 
-                    Section::make('Klasifikasi Materi')
-                        ->description('Tipe berkas, departemen, dan jenjang sasaran')
+                    Section::make(__('admin.sections.material_classification'))
+                        ->description(__('admin.descriptions.material_classification'))
                         ->schema([
                             CmsFields::department(),
                             CmsFields::schoolLevels()
                                 ->visible(fn (Get $get): bool => ! self::isDetailedType((int) $get('type_id'))),
                             Select::make('class_level')
-                                ->label('Kelas')
+                                ->label(__('admin.fields.class'))
                                 ->options(SubjectResource::CLASS_LEVEL_OPTIONS)
                                 ->required(fn (Get $get): bool => self::isDetailedType((int) $get('type_id')))
                                 ->visible(fn (Get $get): bool => self::isDetailedType((int) $get('type_id')))
                                 ->searchable(),
                             Select::make('semester')
-                                ->label('Semester')
+                                ->label(__('admin.fields.semester'))
                                 ->options(SubjectResource::SEMESTER_OPTIONS)
                                 ->required(fn (Get $get): bool => self::isDetailedType((int) $get('type_id')))
                                 ->visible(fn (Get $get): bool => self::isDetailedType((int) $get('type_id'))),
@@ -99,40 +99,40 @@ class SubjectResourceResource extends CmsResource
         return $table
             ->columns([
                 TextColumn::make('topic')
-                    ->label('Topik Materi')
+                    ->label(__('admin.labels.topic_material'))
                     ->searchable()
                     ->weight('medium')
                     ->limit(40),
                 TextColumn::make('type.name')
-                    ->label('Tipe Materi')
+                    ->label(__('admin.labels.type_material'))
                     ->badge()
                     ->color('gray'),
                 TextColumn::make('school_level_label')
-                    ->label('Jenjang')
+                    ->label(__('admin.fields.school_level'))
                     ->formatStateUsing(fn (SubjectResource $record): ?string => $record->usesDetailedAcademicPeriod() ? null : $record->school_level_label)
                     ->placeholder('-'),
                 TextColumn::make('resource_level_label')
-                    ->label('Kelas / Semester')
+                    ->label(__('admin.fields.class_semester'))
                     ->placeholder('-'),
                 TextColumn::make('department.name')
-                    ->label('Departemen'),
+                    ->label(__('admin.fields.department')),
                 TextColumn::make('status')
-                    ->label('Status')
+                    ->label(__('admin.fields.status'))
                     ->badge(),
                 TextColumn::make('upload_date')
-                    ->label('Tanggal Unggah')
+                    ->label(__('admin.fields.upload_date'))
                     ->date('d M Y')
                     ->sortable(),
                 TextColumn::make('translation_status')
-                    ->label('Terjemahan')
+                    ->label(__('admin.fields.translations'))
                     ->badge(),
             ])
             ->filters([
                 SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draft',
-                        'published' => 'Published',
-                        'archived' => 'Archived',
+                        'draft' => __('admin.options.draft'),
+                        'published' => __('admin.options.published'),
+                        'archived' => __('admin.options.archived'),
                     ]),
             ])
             ->defaultSort('upload_date', 'desc')

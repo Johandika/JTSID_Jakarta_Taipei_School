@@ -33,26 +33,26 @@ class DepartmentResource extends CmsResource
         return $schema
             ->columns(1)
             ->components([
-                Section::make('Informasi Departemen')
-                    ->description('Kode dan nama departemen atau unit kerja')
+                Section::make(__('admin.sections.department_information'))
+                    ->description(__('admin.descriptions.department_information'))
                     ->schema([
                         TextInput::make('code')
-                            ->label('Kode Departemen')
+                            ->label(__('admin.labels.department_code'))
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(50),
                         TextInput::make('name')
-                            ->label('Nama Departemen')
+                            ->label(__('admin.labels.department_name'))
                             ->required()
                             ->maxLength(150),
                         TextInput::make('sort_order')
-                            ->label('Urutan Tampilan')
+                            ->label(__('admin.fields.display_order'))
                             ->integer()
                             ->minValue(0)
                             ->required()
                             ->default(0),
                         Toggle::make('is_active')
-                            ->label('Status Aktif')
+                            ->label(__('admin.fields.active_status'))
                             ->default(true),
                     ])
                     ->columns(2),
@@ -64,15 +64,15 @@ class DepartmentResource extends CmsResource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nama Departemen')
+                    ->label(__('admin.labels.department_name'))
                     ->searchable()
                     ->weight('medium'),
                 TextColumn::make('code')
-                    ->label('Kode')
+                    ->label(__('admin.fields.code'))
                     ->badge()
                     ->color('gray'),
                 IconColumn::make('is_active')
-                    ->label('Status Aktif')
+                    ->label(__('admin.fields.active_status'))
                     ->boolean(),
             ])
             ->defaultSort('id', 'desc')

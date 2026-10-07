@@ -49,8 +49,8 @@ class MandarinProgramResource extends CmsResource
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
                 Group::make()->schema([
-                    Section::make('Informasi Utama Program (Trilingual)')
-                        ->description('Judul, ringkasan, dan penjelasan lengkap program')
+                    Section::make(__('admin.sections.program_main_information'))
+                        ->description(__('admin.descriptions.program_main_information'))
                         ->schema([
                             Tabs::make('ProgramTranslations')
                                 ->tabs([
@@ -58,18 +58,18 @@ class MandarinProgramResource extends CmsResource
                                         ->label('🇮🇩 Indonesian')
                                         ->schema([
                                             TextInput::make('title.id')
-                                                ->label('Judul Program (ID)')
-                                                ->placeholder('cth. Mandarin Classes / Workshop Kaligrafi')
+                                                ->label(__('admin.labels.program_title_id'))
+                                                ->placeholder(__('admin.placeholders.program_title'))
                                                 ->required()
                                                 ->maxLength(191),
                                             Textarea::make('short_description.id')
-                                                ->label('Deskripsi Singkat (ID)')
-                                                ->placeholder('Deskripsi ringkas yang tampil pada kartu program...')
+                                                ->label(__('admin.labels.short_description_id'))
+                                                ->placeholder(__('admin.placeholders.program_short_description'))
                                                 ->rows(2)
                                                 ->maxLength(300),
                                             Textarea::make('description.id')
-                                                ->label('About the Program / Penjelasan Lengkap (ID)')
-                                                ->placeholder('Penjelasan lengkap mengenai tujuan, silabus, dan materi program...')
+                                                ->label(__('admin.labels.program_description_id'))
+                                                ->placeholder(__('admin.placeholders.program_description'))
                                                 ->rows(4),
                                         ]),
 
@@ -77,7 +77,7 @@ class MandarinProgramResource extends CmsResource
                                         ->label('🇬🇧 English')
                                         ->schema([
                                             TextInput::make('title.en')
-                                                ->label('Program Title (EN)')
+                                                ->label(__('admin.labels.program_title_en'))
                                                 ->placeholder('e.g. Mandarin Classes')
                                                 ->maxLength(191),
                                             Textarea::make('short_description.en')
@@ -86,7 +86,7 @@ class MandarinProgramResource extends CmsResource
                                                 ->rows(2)
                                                 ->maxLength(300),
                                             Textarea::make('description.en')
-                                                ->label('About the Program (EN)')
+                                                ->label(__('admin.labels.program_description_en'))
                                                 ->placeholder('Detailed information about the program...')
                                                 ->rows(4),
                                         ]),
@@ -111,72 +111,72 @@ class MandarinProgramResource extends CmsResource
                                 ]),
                         ]),
 
-                    Section::make('Jadwal & Periode Program')
-                        ->description('Tanggal pelaksanaan kegiatan atau tes')
+                    Section::make(__('admin.sections.program_schedule'))
+                        ->description(__('admin.descriptions.program_schedule'))
                         ->schema([
                             TextInput::make('program_date_label.id')
-                                ->label('Label Tanggal (ID)')
-                                ->placeholder('cth. Program Period, Test Date, Program Date')
+                                ->label(__('admin.labels.date_label_id'))
+                                ->placeholder(__('admin.placeholders.program_date_label'))
                                 ->maxLength(60),
                             TextInput::make('program_date_text.id')
-                                ->label('Teks Tanggal Custom (ID)')
-                                ->placeholder('cth. Nov 2025 – Dec 2025 atau 04 Oct 2025')
-                                ->helperText('Jika diisi, teks ini akan ditampilkan langsung.')
+                                ->label(__('admin.labels.custom_date_text_id'))
+                                ->placeholder(__('admin.placeholders.program_date_text'))
+                                ->helperText(__('admin.helpers.custom_date_text'))
                                 ->maxLength(100),
                             DatePicker::make('program_start_date')
-                                ->label('Tanggal Mulai Program')
+                                ->label(__('admin.labels.program_start_date'))
                                 ->native(false),
                             DatePicker::make('program_end_date')
-                                ->label('Tanggal Selesai Program')
+                                ->label(__('admin.labels.program_end_date'))
                                 ->native(false),
                         ])
                         ->columns(2),
 
-                    Section::make('Periode & Tautan Pendaftaran')
-                        ->description('Informasi registrasi dan link website pendaftaran')
+                    Section::make(__('admin.sections.registration_period_link'))
+                        ->description(__('admin.descriptions.registration_period_link'))
                         ->schema([
                             TextInput::make('registration_date_text.id')
-                                ->label('Teks Periode Registrasi Custom')
-                                ->placeholder('cth. 09 Sep 2025 – 30 Sep 2025')
+                                ->label(__('admin.labels.custom_registration_period'))
+                                ->placeholder(__('admin.placeholders.registration_period'))
                                 ->columnSpanFull()
                                 ->maxLength(100),
                             DatePicker::make('registration_start_date')
-                                ->label('Tanggal Buka Registrasi')
+                                ->label(__('admin.labels.registration_start_date'))
                                 ->native(false),
                             DatePicker::make('registration_end_date')
-                                ->label('Tanggal Tutup Registrasi')
+                                ->label(__('admin.labels.registration_end_date'))
                                 ->native(false),
                             TextInput::make('registration_url')
-                                ->label('URL Link Pendaftaran (Registration URL)')
-                                ->placeholder('https:// atau link formulir online')
+                                ->label(__('admin.labels.registration_url'))
+                                ->placeholder(__('admin.placeholders.registration_url'))
                                 ->url()
                                 ->columnSpanFull()
-                                ->helperText('Jika diisi dan registrasi dibuka, tombol "Registration Now" akan aktif membuka link ini di tab baru.'),
+                                ->helperText(__('admin.helpers.registration_url')),
                         ])
                         ->columns(2),
 
-                    Section::make('Informasi Tambahan / Levels / Jadwal Sesi (Fleksibel)')
-                        ->description('Contoh: Level 1 - 4 untuk kelas Mandarin, atau jadwal sesi untuk TOCFL / Workshop')
+                    Section::make(__('admin.sections.extra_information'))
+                        ->description(__('admin.descriptions.extra_information'))
                         ->schema([
                             TextInput::make('extra_info_title.id')
-                                ->label('Judul Section Informasi Tambahan')
-                                ->placeholder('cth. Available Levels / Testing Information / Workshop Highlights')
+                                ->label(__('admin.labels.extra_info_title'))
+                                ->placeholder(__('admin.placeholders.extra_info_title'))
                                 ->maxLength(100),
                             Repeater::make('extra_info_items')
-                                ->label('Item Informasi Tambahan (Cards)')
+                                ->label(__('admin.labels.extra_info_items'))
                                 ->schema([
                                     TextInput::make('label')
                                         ->label('Label')
-                                        ->placeholder('cth. Level 1 / Session 1 / Format')
+                                        ->placeholder(__('admin.placeholders.extra_info_label'))
                                         ->required()
                                         ->maxLength(60),
                                     TextInput::make('value')
-                                        ->label('Keterangan / Nilai')
-                                        ->placeholder('cth. Novice Low / Computer-Based')
+                                        ->label(__('admin.labels.description_value'))
+                                        ->placeholder(__('admin.placeholders.extra_info_value'))
                                         ->required()
                                         ->maxLength(100),
                                     Select::make('color')
-                                        ->label('Warna Card')
+                                        ->label(__('admin.labels.card_color'))
                                         ->options([
                                             'rose' => 'Rose (Pink / Merah Muda)',
                                             'amber' => 'Amber (Kuning / Jingga)',
@@ -193,10 +193,10 @@ class MandarinProgramResource extends CmsResource
                 ])->columnSpan(['lg' => 2]),
 
                 Group::make()->schema([
-                    Section::make('Klasifikasi & Status Program')
+                    Section::make(__('admin.sections.program_classification_status'))
                         ->schema([
                             Select::make('category')
-                                ->label('Kategori Program')
+                                ->label(__('admin.labels.program_category'))
                                 ->options([
                                     MandarinProgram::CATEGORY_MANDARIN_CLASS => 'Mandarin Class',
                                     MandarinProgram::CATEGORY_TOCFL => 'TOCFL',
@@ -206,54 +206,54 @@ class MandarinProgramResource extends CmsResource
                                 ->default(MandarinProgram::CATEGORY_MANDARIN_CLASS),
 
                             Select::make('status_override')
-                                ->label('Status Program')
+                                ->label(__('admin.labels.program_status'))
                                 ->options([
-                                    MandarinProgram::STATUS_AUTO => 'Otomatis (Berdasarkan Tanggal)',
+                                    MandarinProgram::STATUS_AUTO => __('admin.mandarin_status.auto'),
                                     MandarinProgram::STATUS_UPCOMING => 'Upcoming',
                                     MandarinProgram::STATUS_REGISTRATION_OPEN => 'Registration Open',
                                     MandarinProgram::STATUS_REGISTRATION_CLOSED => 'Registration Closed',
-                                    MandarinProgram::STATUS_PROGRAM_DONE => 'Program Done',
+                                    MandarinProgram::STATUS_PROGRAM_DONE => __('admin.mandarin_status.program_done'),
                                 ])
                                 ->default(MandarinProgram::STATUS_AUTO)
-                                ->helperText('Gunakan "Otomatis" agar sistem menghitung status berdasarkan tanggal, atau pilih opsi override.'),
+                                ->helperText(__('admin.helpers.status_override')),
 
                             Toggle::make('show_details')
-                                ->label('Tampilkan Tombol "View Details"')
+                                ->label(__('admin.labels.show_view_details'))
                                 ->default(true)
-                                ->helperText('Mengizinkan pengunjung membuka popup detail program.'),
+                                ->helperText(__('admin.helpers.show_view_details')),
 
                             Toggle::make('is_active')
-                                ->label('Aktif / Publikasikan')
+                                ->label(__('admin.labels.active_publish'))
                                 ->default(true),
                         ]),
 
-                    Section::make('Lokasi & Narahubung')
+                    Section::make(__('admin.sections.location_contact'))
                         ->schema([
                             TextInput::make('location.id')
-                                ->label('Lokasi')
+                                ->label(__('admin.labels.location'))
                                 ->default('Jakarta Taipei School')
                                 ->maxLength(100),
                             Textarea::make('contact_info.id')
-                                ->label('Kontak / Narahubung')
-                                ->placeholder('cth. Huayu Language Center | huayu@jts.sch.id')
+                                ->label(__('admin.labels.contact_person'))
+                                ->placeholder(__('admin.placeholders.contact_person'))
                                 ->rows(2)
                                 ->maxLength(255),
                         ]),
 
-                    Section::make('Media Visual')
+                    Section::make(__('admin.sections.visual_media'))
                         ->schema([
                             FileUpload::make('cover_image')
-                                ->label('Cover / Brosur Program')
+                                ->label(__('admin.labels.program_brochure_cover'))
                                 ->disk('public')
                                 ->directory('mandarin-programs')
                                 ->image()
                                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                                 ->maxSize(4096)
                                 ->imageEditor()
-                                ->helperText('Format: JPG/PNG/WebP, rasio poster portrait disarankan.'),
+                                ->helperText(__('admin.helpers.program_brochure_cover')),
 
                             FileUpload::make('gallery_images')
-                                ->label('Galeri Foto Tambahan (Popup)')
+                                ->label(__('admin.labels.gallery_images'))
                                 ->disk('public')
                                 ->directory('mandarin-programs')
                                 ->image()
@@ -263,7 +263,7 @@ class MandarinProgramResource extends CmsResource
                                 ->maxFiles(3)
                                 ->maxSize(4096)
                                 ->panelLayout('grid')
-                                ->helperText('Maksimal 3 foto dokumentasi tambahan yang dapat dilihat di popup modal.'),
+                                ->helperText(__('admin.helpers.gallery_images')),
                         ]),
                 ])->columnSpan(['lg' => 1]),
             ]);
@@ -274,13 +274,13 @@ class MandarinProgramResource extends CmsResource
         return $table
             ->columns([
                 ImageColumn::make('cover_image')
-                    ->label('Brosur')
+                    ->label(__('admin.labels.brochure'))
                     ->state(fn (MandarinProgram $record): ?string => $record->cover_image_url ?: null)
                     ->defaultImageUrl(asset('images/logo.webp'))
                     ->square(),
 
                 TextColumn::make('title')
-                    ->label('Judul Program')
+                    ->label(__('admin.labels.program_title'))
                     ->state(fn (MandarinProgram $record): string => $record->trans('title'))
                     ->weight('semibold')
                     ->searchable(query: function ($query, string $search) {
@@ -289,7 +289,7 @@ class MandarinProgramResource extends CmsResource
                     ->description(fn (MandarinProgram $record): string => $record->trans('short_description')),
 
                 TextColumn::make('category')
-                    ->label('Kategori')
+                    ->label(__('admin.fields.category'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         MandarinProgram::CATEGORY_MANDARIN_CLASS => 'danger',
@@ -300,7 +300,7 @@ class MandarinProgramResource extends CmsResource
                     ->formatStateUsing(fn (MandarinProgram $record): string => $record->getCategoryLabel()),
 
                 TextColumn::make('computed_status')
-                    ->label('Status')
+                    ->label(__('admin.fields.status'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         MandarinProgram::STATUS_REGISTRATION_OPEN => 'success',
@@ -312,26 +312,26 @@ class MandarinProgramResource extends CmsResource
                     ->formatStateUsing(fn (MandarinProgram $record): string => $record->getStatusLabel()),
 
                 IconColumn::make('is_active')
-                    ->label('Aktif')
+                    ->label(__('admin.fields.active'))
                     ->boolean(),
             ])
             ->defaultSort('id', 'desc')
             ->filters([
                 SelectFilter::make('category')
-                    ->label('Kategori')
+                    ->label(__('admin.fields.category'))
                     ->options([
                         MandarinProgram::CATEGORY_MANDARIN_CLASS => 'Mandarin Class',
                         MandarinProgram::CATEGORY_TOCFL => 'TOCFL',
                         MandarinProgram::CATEGORY_WORKSHOP_EVENT => 'Workshop / Event',
                     ]),
                 SelectFilter::make('status_override')
-                    ->label('Override Status')
+                    ->label(__('admin.labels.status_override'))
                     ->options([
-                        MandarinProgram::STATUS_AUTO => 'Otomatis',
+                        MandarinProgram::STATUS_AUTO => __('admin.mandarin_status.auto_short'),
                         MandarinProgram::STATUS_UPCOMING => 'Upcoming',
                         MandarinProgram::STATUS_REGISTRATION_OPEN => 'Registration Open',
                         MandarinProgram::STATUS_REGISTRATION_CLOSED => 'Registration Closed',
-                        MandarinProgram::STATUS_PROGRAM_DONE => 'Program Done',
+                        MandarinProgram::STATUS_PROGRAM_DONE => __('admin.mandarin_status.program_done'),
                     ]),
             ])
             ->recordActions([

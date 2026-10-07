@@ -19,24 +19,26 @@ class CmsFields
     public static function schoolLevels(): Select
     {
         return Select::make('school_levels')
-            ->label('Jenjang Sekolah')
+            ->label(__('admin.labels.school_levels'))
             ->multiple()
             ->options(SchoolLevel::OPTIONS)
             ->default([])
-            ->helperText('Kosongkan untuk seluruh sekolah, atau pilih: TK, SD, SMP, SMA.')
+            ->helperText(__('admin.helpers.school_levels'))
             ->rules(['array'])
             ->columnSpanFull();
     }
 
-    public static function translations(string $titleLabel = 'Judul Konten', bool|\Closure $showSummary = true, bool $showArticle = true): Repeater
+    public static function translations(?string $titleLabel = null, bool|\Closure $showSummary = true, bool $showArticle = true): Repeater
     {
+        $titleLabel ??= __('admin.labels.news_title');
+
         $schema = [
             Select::make('locale')
-                ->label('Bahasa')
+                ->label(__('admin.fields.language'))
                 ->options([
-                    'en' => 'English (Primary)',
-                    'zh-TW' => 'Traditional Chinese (繁體中文)',
-                    'id' => 'Indonesian (Bahasa Indonesia)',
+                    'en' => __('admin.options.english_primary'),
+                    'zh-TW' => __('admin.options.traditional_chinese'),
+                    'id' => __('admin.options.indonesian'),
                 ])
                 ->required()
                 ->distinct(),
@@ -45,19 +47,19 @@ class CmsFields
                 ->required()
                 ->maxLength(191),
             Textarea::make('summary')
-                ->label('Ringkasan Singkat')
+                ->label(__('admin.dashboard.summary'))
                 ->visible($showSummary)
                 ->rows(2)
                 ->maxLength(1000)
                 ->columnSpanFull(),
             MarkdownEditor::make('body')
-                ->label('Isi Konten')
+                ->label(__('admin.nav_groups.content'))
                 ->visible($showArticle)
                 ->toolbarButtons(['bold', 'italic', 'heading', 'bulletList', 'orderedList', 'link', 'blockquote', 'undo', 'redo'])
                 ->columnSpanFull(),
             Section::make('SEO & Metadata Search Engine')
                 ->visible($showArticle)
-                ->description('Pengaturan meta title dan description untuk mesin pencari (Opsional)')
+                ->description(__('admin.descriptions.seo_metadata'))
                 ->schema([
                     TextInput::make('seo_title')
                         ->label('SEO Meta Title')
@@ -72,7 +74,7 @@ class CmsFields
         ];
 
         return Repeater::make('translations')
-            ->label('Konten Multi-Bahasa')
+            ->label(__('admin.sections.content_translations'))
             ->relationship()
             ->schema($schema)
             ->columns(2)
@@ -82,14 +84,14 @@ class CmsFields
             ->reorderable(false)
             ->collapsible()
             ->itemLabel(fn (array $state): string => match ($state['locale'] ?? '') {
-                'en' => '🇬🇧 English (Required Primary)',
-                'zh-TW' => '🇹🇼 Traditional Chinese (繁體中文)',
-                'id' => '🇮🇩 Indonesian (Bahasa Indonesia)',
-                default => 'Terjemahan Baru',
+                'en' => 'English (Required Primary)',
+                'zh-TW' => __('admin.options.traditional_chinese'),
+                'id' => __('admin.options.indonesian'),
+                default => __('admin.fields.translations'),
             }.(filled($state['title'] ?? null) ? ' — '.$state['title'] : ''))
             ->rules([fn () => function (string $attribute, $value, \Closure $fail) {
                 if (! collect($value)->contains(fn ($row) => ($row['locale'] ?? '') === 'en' && filled($row['title'] ?? null))) {
-                    $fail('Terjemahan bahasa Inggris (English) wajib diisi.');
+                    $fail(__('admin.helpers.english_translation_required'));
                 }
             }])
             ->columnSpanFull();
@@ -97,29 +99,29 @@ class CmsFields
 
     public static function publishing(): Section
     {
-        return Section::make('Status & Publikasi')
-            ->description('Atur status tayang dan jadwal rilis')
+        return Section::make(__('admin.sections.publishing'))
+            ->description(__('admin.descriptions.publishing'))
             ->schema([
                 Select::make('status')
-                    ->label('Status')
+                    ->label(__('admin.fields.status'))
                     ->options([
-                        'draft' => 'Draft',
-                        'published' => 'Published',
-                        'archived' => 'Archived',
+                        'draft' => __('admin.options.draft'),
+                        'published' => __('admin.options.published'),
+                        'archived' => __('admin.options.archived'),
                     ])
                     ->default('draft')
                     ->required(),
                 DateTimePicker::make('published_at')
-                    ->label('Jadwal Publikasi')
+                    ->label(__('admin.labels.publishing_schedule'))
                     ->seconds(false)
-                    ->helperText('Kosongkan untuk langsung tayang saat Published.'),
+                    ->helperText(__('admin.helpers.published_immediately')),
             ]);
     }
 
     public static function department(): Select
     {
         return Select::make('department_id')
-            ->label('Departemen')
+            ->label(__('admin.fields.department'))
             ->relationship('department', 'name',
                 fn (Builder $query) => auth()->user()?->role?->code === 'department_admin' ? $query->whereKey(auth()->user()->department_id) : $query)
             ->default(fn () => auth()->user()?->department_id)
@@ -128,15 +130,15 @@ class CmsFields
             ->preload()
             ->rules([fn () => function (string $attribute, $value, \Closure $fail) {
                 if (auth()->user()?->role?->code === 'department_admin' && (int) $value !== (int) auth()->user()->department_id) {
-                    $fail('Pilih departemen Anda sendiri.');
+                    $fail(__('admin.helpers.own_department_only'));
                 }
             }]);
     }
 
-    public static function image(string $name = 'image', int $max = 4096, ?string $label = 'Gambar / Foto Cover'): FileUpload
+    public static function image(string $name = 'image', int $max = 4096, ?string $label = null): FileUpload
     {
         return FileUpload::make($name)
-            ->label($label)
+            ->label($label ?? __('admin.labels.image_cover'))
             ->disk('public')
             ->directory('images')
             ->visibility('public')
@@ -148,10 +150,10 @@ class CmsFields
             ->rules(['extensions:jpg,jpeg,png,webp']);
     }
 
-    public static function document(bool $required = false, ?string $label = 'File Dokumen'): FileUpload
+    public static function document(bool $required = false, ?string $label = null): FileUpload
     {
         return FileUpload::make('file_path')
-            ->label($label)
+            ->label($label ?? __('admin.fields.document_file'))
             ->disk('local')
             ->directory('documents')
             ->preventFilePathTampering()
@@ -161,22 +163,22 @@ class CmsFields
             ->maxSize(15360)
             ->required($required)
             ->rules(['extensions:pdf,doc,docx,rar'])
-            ->helperText('Format didukung: PDF, DOCX, RAR (Maks. 15MB)');
+            ->helperText(__('admin.helpers.document_format'));
     }
 
     public static function uploadDate(): DatePicker
     {
         return DatePicker::make('upload_date')
-            ->label('Tanggal Unggah')
+            ->label(__('admin.fields.upload_date'))
             ->required()
             ->default(today());
     }
 
-    public static function safeUrl(string $name, ?string $label = 'Link URL Tujuan'): TextInput
+    public static function safeUrl(string $name, ?string $label = null): TextInput
     {
         return TextInput::make($name)
-            ->label($label)
-            ->placeholder('https:// atau /path-internal')
+            ->label($label ?? __('admin.labels.read_more_link'))
+            ->placeholder(__('admin.helpers.url_format'))
             ->maxLength(255)
             ->rules(['regex:~^(?:/(?!/)[^\\s]*|https?://[^\\s]+)$~']);
     }

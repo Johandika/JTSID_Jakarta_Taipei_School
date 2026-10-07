@@ -17,16 +17,16 @@ class AdmissionFormForm
     {
         return $schema
             ->components([
-                Section::make('File Formulir Pendaftaran')
-                    ->description('Upload satu file formulir yang akan muncul sebagai tombol download di halaman Admissions.')
+                Section::make(__('admin.sections.admission_form_file'))
+                    ->description(__('admin.descriptions.admission_form_file'))
                     ->schema([
                         TextInput::make('title')
-                            ->label('Judul File')
-                            ->default('Form Pendaftaran')
+                            ->label(__('admin.labels.file_title'))
+                            ->default(__('admin.defaults.admission_form'))
                             ->required()
                             ->maxLength(191),
                         Select::make('school_level')
-                            ->label('Jenjang')
+                            ->label(__('admin.fields.school_level'))
                             ->options(SchoolLevel::OPTIONS)
                             ->default(fn (): string => collect(array_keys(SchoolLevel::OPTIONS))
                                 ->first(fn (string $level): bool => ! AdmissionForm::where('school_level', $level)->exists(), 'tk'))
@@ -34,7 +34,7 @@ class AdmissionFormForm
                             ->unique(AdmissionForm::class, 'school_level', ignoreRecord: true)
                             ->rules(['in:tk,sd,smp,sma']),
                         FileUpload::make('file_path')
-                            ->label('File Formulir Pendaftaran (PDF, DOCX, RAR)')
+                            ->label(__('admin.labels.admission_form_file'))
                             ->disk('public')
                             ->directory('admission-forms')
                             ->visibility('public')
@@ -42,9 +42,9 @@ class AdmissionFormForm
                             ->maxSize(15360)
                             ->required()
                             ->rules(['extensions:pdf,doc,docx,rar'])
-                            ->helperText('Format didukung: PDF, DOCX, RAR (Maks. 15MB)'),
+                            ->helperText(__('admin.helpers.document_format')),
                         Toggle::make('is_active')
-                            ->label('Tampilkan di halaman Admissions')
+                            ->label(__('admin.labels.show_on_admissions'))
                             ->default(true),
                     ]),
             ]);

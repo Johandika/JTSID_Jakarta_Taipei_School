@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Locale;
 use Database\Factories\ContactMessageFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -66,7 +67,7 @@ class ContactMessage extends Model
      */
     public function getStatusLabel(?string $locale = null): string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale = Locale::content($locale);
 
         $labels = [
             self::STATUS_UNREAD => [
@@ -113,7 +114,7 @@ class ContactMessage extends Model
      */
     public function getSubjectLabel(?string $locale = null): string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale = Locale::content($locale);
 
         $subjects = [
             self::SUBJECT_ADMISSIONS => [

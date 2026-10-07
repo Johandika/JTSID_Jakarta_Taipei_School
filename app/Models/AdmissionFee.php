@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\Locale;
 use Database\Factories\AdmissionFeeFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -37,7 +38,7 @@ class AdmissionFee extends CmsModel
      */
     public function trans(string $field, ?string $locale = null): string
     {
-        $locale = $locale ?? app()->getLocale();
+        $locale = Locale::content($locale);
         $value = $this->{$field};
 
         if (! is_array($value)) {

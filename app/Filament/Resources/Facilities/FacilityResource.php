@@ -46,8 +46,8 @@ class FacilityResource extends CmsResource
                 Group::make()
                     ->columnSpan(['default' => 1, 'lg' => 2])
                     ->schema([
-                        Section::make('Nama Fasilitas')
-                            ->description('Nama fasilitas dalam 3 bahasa (Indonesia, Inggris, dan Mandarin)')
+                        Section::make(__('admin.sections.facility_name'))
+                            ->description(__('admin.descriptions.facility_name'))
                             ->schema([
                                 Tabs::make('FacilityTranslations')
                                     ->tabs([
@@ -55,8 +55,8 @@ class FacilityResource extends CmsResource
                                             ->label('🇮🇩 Indonesian (Bahasa Indonesia)')
                                             ->schema([
                                                 TextInput::make('name.id')
-                                                    ->label('Nama Fasilitas (ID)')
-                                                    ->placeholder('cth. Ruang Kelas / Perpustakaan')
+                                                    ->label(__('admin.labels.facility_name_id'))
+                                                    ->placeholder(__('admin.placeholders.facility_name'))
                                                     ->required()
                                                     ->maxLength(150),
                                             ]),
@@ -85,19 +85,19 @@ class FacilityResource extends CmsResource
                 Group::make()
                     ->columnSpan(['default' => 1, 'lg' => 1])
                     ->schema([
-                        Section::make('Kategori & Foto')
-                            ->description('Pilih kategori dan unggah foto fasilitas')
+                        Section::make(__('admin.sections.category_photo'))
+                            ->description(__('admin.descriptions.category_photo'))
                             ->schema([
                                 Select::make('category')
-                                    ->label('Kategori Fasilitas')
+                                    ->label(__('admin.labels.facility_category'))
                                     ->options(Facility::getCategoryOptions())
                                     ->required()
                                     ->native(false)
-                                    ->helperText('Pilih salah satu: Fasilitas Sekolah, Asrama Guru, TK, SD, SMP, SMA.'),
+                                    ->helperText(__('admin.helpers.facility_category')),
 
-                                CmsFields::image('image', 4096, 'Foto Fasilitas')
+                                CmsFields::image('image', 4096, __('admin.labels.facility_photo'))
                                     ->required()
-                                    ->helperText('Format JPG, PNG, atau WebP. Maksimal 4MB.'),
+                                    ->helperText(__('admin.helpers.image_format_4mb')),
                             ]),
                     ]),
             ]);
@@ -108,27 +108,27 @@ class FacilityResource extends CmsResource
         return $table
             ->columns([
                 ImageColumn::make('image')
-                    ->label('Foto')
+                    ->label(__('admin.fields.image'))
                     ->square()
                     ->size(60),
                 TextColumn::make('name_display')
-                    ->label('Nama Fasilitas')
+                    ->label(__('admin.labels.facility_name'))
                     ->state(fn (Facility $record): string => $record->trans('name'))
                     ->weight('bold')
                     ->searchable(query: fn ($query, $search) => $query->where('name', 'ilike', "%{$search}%")),
                 TextColumn::make('category')
-                    ->label('Kategori')
+                    ->label(__('admin.fields.category'))
                     ->formatStateUsing(fn (string $state): string => Facility::getCategoryLabel($state))
                     ->badge()
                     ->color('primary'),
                 TextColumn::make('created_at')
                     ->dateTime('d M Y H:i')
-                    ->label('Ditambahkan')
+                    ->label(__('admin.labels.created_at'))
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('category')
-                    ->label('Kategori')
+                    ->label(__('admin.fields.category'))
                     ->options(Facility::getCategoryOptions()),
             ])
             ->actions([

@@ -46,11 +46,11 @@ class AdmissionFeeResource extends CmsResource
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
                 Group::make()->schema([
-                    Section::make('Informasi Biaya & Jenjang')
-                        ->description('Pilih jenjang sekolah dan tentukan rincian biaya')
+                    Section::make(__('admin.sections.fee_level_information'))
+                        ->description(__('admin.descriptions.fee_level_information'))
                         ->schema([
                             Select::make('grade_level_id')
-                                ->label('Jenjang Pendidikan')
+                                ->label(__('admin.labels.education_level'))
                                 ->options(fn () => GradeLevel::pluck('name', 'id'))
                                 ->default(function ($livewire) {
                                     $code = $livewire->grade_level ?? request()->query('grade_level');
@@ -61,8 +61,8 @@ class AdmissionFeeResource extends CmsResource
                                 ->native(false),
 
                             TextInput::make('amount')
-                                ->label('Nominal / Besaran Biaya')
-                                ->placeholder('cth. Rp. 1.000.000,- atau ± Rp. 5–6 juta')
+                                ->label(__('admin.labels.fee_amount'))
+                                ->placeholder(__('admin.placeholders.fee_amount'))
                                 ->required()
                                 ->maxLength(100),
 
@@ -72,18 +72,18 @@ class AdmissionFeeResource extends CmsResource
                                         ->label('🇮🇩 Indonesian (Bahasa Indonesia)')
                                         ->schema([
                                             TextInput::make('name.id')
-                                                ->label('Nama Jenis Biaya (ID)')
-                                                ->placeholder('cth. Uang Pendaftaran')
+                                                ->label(__('admin.labels.fee_name_id'))
+                                                ->placeholder(__('admin.placeholders.fee_name'))
                                                 ->required()
                                                 ->maxLength(150),
                                             TextInput::make('payment_period.id')
-                                                ->label('Periode Pembayaran (ID)')
-                                                ->placeholder('cth. satu kali pembayaran')
+                                                ->label(__('admin.labels.payment_period_id'))
+                                                ->placeholder(__('admin.placeholders.payment_period'))
                                                 ->required()
                                                 ->maxLength(150),
                                             Textarea::make('note.id')
-                                                ->label('Catatan Tambahan Opsional (ID)')
-                                                ->placeholder("cth. Untuk anak kedua Rp. 3.500.000,-\nAnak ketiga gratis")
+                                                ->label(__('admin.labels.optional_note_id'))
+                                                ->placeholder(__('admin.placeholders.fee_note'))
                                                 ->rows(3),
                                         ]),
 
@@ -125,49 +125,49 @@ class AdmissionFeeResource extends CmsResource
                 ])->columnSpan(['default' => 1, 'lg' => 2]),
 
                 Group::make()->schema([
-                    Section::make('Visual & Tampilan')
-                        ->description('Kustomisasi icon dan warna latar belakang kotak icon')
+                    Section::make(__('admin.sections.visual_display'))
+                        ->description(__('admin.descriptions.visual_display'))
                         ->schema([
                             Select::make('icon')
-                                ->label('Pilihan Icon')
+                                ->label(__('admin.labels.icon_choice'))
                                 ->options([
-                                    'file-text' => '📄 Dokumen / Formulir (file-text)',
-                                    'building' => '🏛️ Gedung / Pembangunan (building)',
-                                    'backpack' => '🎒 Tas Sekolah / SPP (backpack)',
-                                    'book-open' => '📖 Buku & Kegiatan (book-open)',
-                                    'graduation-cap' => '🎓 Akademik / Kelulusan (graduation-cap)',
-                                    'award' => '🏆 Beasiswa / Prestasi (award)',
-                                    'credit-card' => '💳 Pembayaran Umum (credit-card)',
+                                    'file-text' => __('admin.fee_icons.file_text'),
+                                    'building' => __('admin.fee_icons.building'),
+                                    'backpack' => __('admin.fee_icons.backpack'),
+                                    'book-open' => __('admin.fee_icons.book_open'),
+                                    'graduation-cap' => __('admin.fee_icons.graduation_cap'),
+                                    'award' => __('admin.fee_icons.award'),
+                                    'credit-card' => __('admin.fee_icons.credit_card'),
                                 ])
                                 ->default('file-text')
                                 ->required()
                                 ->native(false),
 
                             Select::make('icon_color')
-                                ->label('Warna Latar Kotak Icon')
+                                ->label(__('admin.labels.icon_background_color'))
                                 ->options([
-                                    'green' => '🟢 Hijau (Emerald/Green)',
-                                    'blue' => '🔵 Biru (Sky/Blue)',
-                                    'pink' => '🔴 Merah Muda (Rose/Pink)',
-                                    'amber' => '🟡 Kuning (Amber/Orange)',
+                                    'green' => __('admin.colors.green'),
+                                    'blue' => __('admin.colors.blue'),
+                                    'pink' => __('admin.colors.pink'),
+                                    'amber' => __('admin.colors.amber'),
                                 ])
                                 ->default('green')
                                 ->required()
                                 ->native(false),
                         ]),
 
-                    Section::make('Status & Urutan')
+                    Section::make(__('admin.sections.status_order'))
                         ->schema([
                             TextInput::make('sort_order')
-                                ->label('Nomor Urut')
+                                ->label(__('admin.labels.order_number'))
                                 ->numeric()
                                 ->default(0)
-                                ->helperText('Urutan tampilan dalam tabel'),
+                                ->helperText(__('admin.helpers.table_order')),
 
                             Toggle::make('is_active')
-                                ->label('Status Aktif')
+                                ->label(__('admin.fields.active_status'))
                                 ->default(true)
-                                ->helperText('Jika non-aktif, item biaya tidak akan ditampilkan di halaman publik'),
+                                ->helperText(__('admin.helpers.inactive_hidden_public')),
                         ]),
                 ])->columnSpan(['default' => 1, 'lg' => 1]),
             ]);
@@ -178,27 +178,27 @@ class AdmissionFeeResource extends CmsResource
         return $table
             ->columns([
                 TextColumn::make('gradeLevel.name')
-                    ->label('Jenjang')
+                    ->label(__('admin.fields.school_level'))
                     ->badge()
                     ->sortable(),
 
                 TextColumn::make('name')
-                    ->label('Jenis Biaya')
+                    ->label(__('admin.labels.fee_type'))
                     ->getStateUsing(fn (AdmissionFee $record): string => $record->trans('name'))
                     ->weight('bold')
                     ->searchable(query: fn ($query, $search) => $query->where('name', 'ilike', '%'.$search.'%')),
 
                 TextColumn::make('amount')
-                    ->label('Nominal')
+                    ->label(__('admin.labels.amount'))
                     ->badge()
                     ->color('gray'),
 
                 TextColumn::make('payment_period')
-                    ->label('Periode')
+                    ->label(__('admin.labels.period'))
                     ->getStateUsing(fn (AdmissionFee $record): string => $record->trans('payment_period')),
 
                 TextColumn::make('icon_color')
-                    ->label('Tema Warna')
+                    ->label(__('admin.labels.color_theme'))
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'green' => 'success',
@@ -209,16 +209,16 @@ class AdmissionFeeResource extends CmsResource
                     }),
 
                 IconColumn::make('has_note')
-                    ->label('Ada Catatan')
+                    ->label(__('admin.labels.has_note'))
                     ->boolean()
                     ->getStateUsing(fn (AdmissionFee $record): bool => ! empty(trim($record->trans('note')))),
 
                 TextColumn::make('sort_order')
-                    ->label('Urutan')
+                    ->label(__('admin.fields.sort_order'))
                     ->sortable(),
 
                 IconColumn::make('is_active')
-                    ->label('Aktif')
+                    ->label(__('admin.fields.active'))
                     ->boolean(),
             ])
             ->defaultSort('sort_order')
@@ -226,7 +226,7 @@ class AdmissionFeeResource extends CmsResource
             ->paginationPageOptions([10, 25, 50, 'all'])
             ->filters([
                 SelectFilter::make('grade_level_id')
-                    ->label('Filter Jenjang')
+                    ->label(__('admin.labels.level_filter'))
                     ->options(fn () => GradeLevel::pluck('name', 'id')),
             ])
             ->actions([

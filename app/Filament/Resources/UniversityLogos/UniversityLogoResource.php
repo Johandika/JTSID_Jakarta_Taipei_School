@@ -37,31 +37,31 @@ class UniversityLogoResource extends CmsResource
             ->columns(['default' => 1, 'lg' => 3])
             ->components([
                 Group::make()->schema([
-                    Section::make('Logo Universitas Lulusan')
-                        ->description('Unggah logo kampus tempat siswa lulusan JTS diterima/melanjutkan studi')
+                    Section::make(__('admin.sections.university_logo'))
+                        ->description(__('admin.descriptions.university_logo'))
                         ->schema([
-                            CmsFields::image('logo', 2048, 'File Logo Universitas')
-                                ->label('Logo Universitas')
-                                ->helperText('Disarankan format PNG transparan, WebP, atau SVG dengan resolusi tajam (Maks. 2MB)')
+                            CmsFields::image('logo', 2048, __('admin.labels.university_logo_file'))
+                                ->label(__('admin.labels.university_logo'))
+                                ->helperText(__('admin.helpers.university_logo'))
                                 ->required(),
                             TextInput::make('title')
-                                ->label('Nama / Label Universitas (Opsional)')
-                                ->placeholder('Contoh: Harvard University, Oxford, NTU')
+                                ->label(__('admin.labels.university_label_optional'))
+                                ->placeholder(__('admin.placeholders.university_label'))
                                 ->maxLength(191),
                         ]),
                 ])->columnSpan(['lg' => 2]),
 
                 Group::make()->schema([
-                    Section::make('Status & Urutan')
+                    Section::make(__('admin.sections.status_order'))
                         ->schema([
                             TextInput::make('sort_order')
-                                ->label('Urutan Tampilan')
+                                ->label(__('admin.fields.display_order'))
                                 ->integer()
                                 ->minValue(0)
                                 ->default(0)
                                 ->required(),
                             Toggle::make('is_active')
-                                ->label('Aktif / Tampilkan di Marquee')
+                                ->label(__('admin.labels.active_show_marquee'))
                                 ->default(true),
                         ]),
                 ])->columnSpan(['lg' => 1]),
@@ -72,18 +72,18 @@ class UniversityLogoResource extends CmsResource
     {
         return $table->columns([
             ImageColumn::make('logo')
-                ->label('Logo')
+                ->label(__('admin.labels.logo'))
                 ->disk('public'),
             TextColumn::make('title')
-                ->label('Nama / Keterangan')
+                ->label(__('admin.labels.name_description'))
                 ->searchable()
                 ->placeholder('—')
                 ->weight('medium'),
             TextColumn::make('sort_order')
-                ->label('Urutan')
+                ->label(__('admin.fields.sort_order'))
                 ->sortable(),
             IconColumn::make('is_active')
-                ->label('Aktif')
+                ->label(__('admin.fields.active'))
                 ->boolean(),
         ])
             ->defaultSort('sort_order', 'asc')

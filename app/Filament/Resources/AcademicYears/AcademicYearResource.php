@@ -31,18 +31,18 @@ class AcademicYearResource extends CmsResource
         return $schema
             ->columns(1)
             ->components([
-                Section::make('Tahun Ajaran (Academic Year)')
-                    ->description('Identifikasi tahun ajaran sekolah')
+                Section::make(__('admin.sections.academic_year'))
+                    ->description(__('admin.descriptions.academic_year'))
                     ->schema([
                         TextInput::make('code')
-                            ->label('Kode Tahun Ajaran')
-                            ->placeholder('Contoh: 2025/2026')
+                            ->label(__('admin.labels.academic_year_code'))
+                            ->placeholder(__('admin.placeholders.academic_year_code'))
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(30),
                         TextInput::make('name')
-                            ->label('Nama Tahun Ajaran')
-                            ->placeholder('Contoh: Tahun Ajaran 2025/2026')
+                            ->label(__('admin.labels.academic_year_name'))
+                            ->placeholder(__('admin.placeholders.academic_year_name'))
                             ->required()
                             ->maxLength(150),
                     ])
@@ -55,11 +55,11 @@ class AcademicYearResource extends CmsResource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Tahun Ajaran')
+                    ->label(__('admin.fields.academic_year'))
                     ->searchable()
                     ->weight('medium'),
                 TextColumn::make('code')
-                    ->label('Kode')
+                    ->label(__('admin.fields.code'))
                     ->badge()
                     ->color('gray'),
             ])

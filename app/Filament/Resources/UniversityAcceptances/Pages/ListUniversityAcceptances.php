@@ -20,31 +20,31 @@ class ListUniversityAcceptances extends ListRecords
     {
         return [
             Action::make('downloadImportTemplate')
-                ->label('Download CSV Template')
+                ->label(__('admin.actions.download_csv_template'))
                 ->icon('heroicon-o-arrow-down-tray')
                 ->color('gray')
                 ->action(fn (): StreamedResponse => response()->streamDownload(function (): void {
-                    $handle = fopen('php://output', 'w');
-                    fwrite($handle, "\xEF\xBB\xBF");
+                    $path = tempnam(sys_get_temp_dir(), 'university-acceptances-template-');
 
-                    fputcsv($handle, UniversityAcceptanceImporter::TEMPLATE_HEADERS, separator: ';');
-
-                    foreach (UniversityAcceptanceImporter::TEMPLATE_ROWS as $row) {
-                        fputcsv($handle, $row, separator: ';');
+                    try {
+                        UniversityAcceptanceImporter::writeTemplateToPath($path);
+                        readfile($path);
+                    } finally {
+                        if (is_string($path) && file_exists($path)) {
+                            unlink($path);
+                        }
                     }
-
-                    fclose($handle);
-                }, 'university-acceptances-import-template.csv', [
-                    'Content-Type' => 'text/csv; charset=UTF-8',
+                }, 'university-acceptances-import-template.xlsx', [
+                    'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 ])),
             Action::make('importCsv')
-                ->label('Import CSV')
+                ->label(__('admin.actions.import_csv'))
                 ->icon('heroicon-o-arrow-up-tray')
                 ->color('gray')
-                ->modalHeading('Import University Acceptances')
+                ->modalHeading(__('admin.labels.import_university_acceptances'))
                 ->schema([
                     FileUpload::make('file')
-                        ->label('CSV File')
+                        ->label(__('admin.labels.csv_file'))
                         ->acceptedFileTypes([
                             'text/csv',
                             'text/x-csv',
@@ -53,6 +53,7 @@ class ListUniversityAcceptances extends ListRecords
                             'text/comma-separated-values',
                             'text/plain',
                             'application/vnd.ms-excel',
+                            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                         ])
                         ->storeFiles(false)
                         ->visibility('private')
@@ -61,19 +62,14 @@ class ListUniversityAcceptances extends ListRecords
                 ->action(function (array $data): void {
                     /** @var TemporaryUploadedFile $file */
                     $file = $data['file'];
-                    $stream = $file->readStream();
-
-                    try {
-                        $result = UniversityAcceptanceImporter::importFromStream($stream);
-                    } finally {
-                        if (is_resource($stream)) {
-                            fclose($stream);
-                        }
-                    }
+                    $result = UniversityAcceptanceImporter::importFromPath(
+                        $file->getRealPath(),
+                        $file->getClientOriginalExtension(),
+                    );
 
                     Notification::make()
-                        ->title('Import CSV selesai')
-                        ->body($result['created'].' data baru dibuat, '.$result['updated'].' data diperbarui.')
+                        ->title(__('admin.messages.import_csv_finished'))
+                        ->body(__('admin.messages.import_csv_result', ['created' => $result['created'], 'updated' => $result['updated']]))
                         ->success()
                         ->send();
                 }),

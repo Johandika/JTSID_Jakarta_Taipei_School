@@ -41,8 +41,23 @@ class AuditLogResource extends CmsResource
     public static function table(Table $table): Table
     {
         return $table->columns([
-            TextColumn::make('created_at')->dateTime()->sortable(), TextColumn::make('user.name')->placeholder('System'),
-            TextColumn::make('action')->badge(), TextColumn::make('entity_type')->searchable(), TextColumn::make('entity_id'), TextColumn::make('ip_address'),
+            TextColumn::make('created_at')
+                ->label(__('admin.fields.created_at'))
+                ->dateTime()
+                ->sortable(),
+            TextColumn::make('user.name')
+                ->label(__('admin.fields.user'))
+                ->placeholder(__('admin.placeholders.system')),
+            TextColumn::make('action')
+                ->label(__('admin.fields.action'))
+                ->badge(),
+            TextColumn::make('entity_type')
+                ->label(__('admin.fields.entity_type'))
+                ->searchable(),
+            TextColumn::make('entity_id')
+                ->label(__('admin.fields.entity_id')),
+            TextColumn::make('ip_address')
+                ->label(__('admin.fields.ip_address')),
         ])->defaultSort('id', 'desc');
     }
 

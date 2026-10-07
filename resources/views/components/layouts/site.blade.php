@@ -70,15 +70,15 @@
             'bg-jts text-white': scrolled || !isTransparent,
             'bg-transparent text-white border-b border-white/15': !scrolled && isTransparent
          }" class="transition-colors duration-300">
-            <div class="shell flex min-h-9 items-center justify-between gap-3 text-xs">
-                <a class="flex items-center gap-2 py-2 transition-opacity hover:opacity-80"
+            <div class="shell flex min-h-9 items-center justify-between gap-2 text-xs">
+                <a class="flex min-w-0 items-center gap-2 py-2 transition-opacity hover:opacity-80"
                     href="{{ $contact['phones']['primary']['url'] }}">
                     <x-site-icon name="phone" class="size-3.5" />
                     <span class="hidden sm:inline">{{ __('site.admissions') }}</span>
-                    <span>{{ $contact['phones']['primary']['display'] }}</span>
+                    <span class="whitespace-nowrap">{{ $contact['phones']['primary']['display'] }}</span>
                 </a>
 
-                <div class="flex items-center gap-4">
+                <div class="flex shrink-0 items-center gap-3 sm:gap-4">
                     @foreach([
                         'WhatsApp' => $contact['whatsapp']['url'],
                         'Instagram' => $contact['social']['instagram'],
@@ -86,7 +86,7 @@
                         <a class="hidden md:inline transition-opacity hover:opacity-80"
                             href="{{ $url }}" target="_blank" rel="noopener noreferrer">{{ $label }}</a>
                     @endforeach
-                    <nav aria-label="Language" class="flex items-center gap-3">
+                    <nav aria-label="Language" class="flex items-center gap-2 sm:gap-3">
                         @foreach(['en' => 'EN', 'zh-TW' => '繁中', 'id' => 'ID'] as $code => $label)
                             <a href="{{ $site::switchLocale($code) }}" lang="{{ $code }}"
                                 class="py-1.5 px-1 rounded text-xs transition-all {{ app()->getLocale() === $code ? 'font-bold underline underline-offset-4' : 'opacity-80 hover:opacity-100' }}"
@@ -98,17 +98,17 @@
         </div>
 
         {{-- Main Navbar --}}
-        <div class="shell flex min-h-20 sm:min-h-22 items-center justify-between gap-5 transition-all duration-300">
-            <a href="{{ $site::path('/') }}" aria-label="Jakarta Taipei School" class="group flex items-center">
+        <div class="shell flex min-h-20 sm:min-h-22 items-center gap-3 transition-all duration-300">
+            <a href="{{ $site::path('/') }}" aria-label="Jakarta Taipei School" class="group flex min-w-0 shrink items-center">
                 <img src="{{ asset('images/logo-white.webp') }}" alt="Jakarta Taipei School" width="234" height="57"
                     x-show="!scrolled && isTransparent"
-                    class="h-auto w-48 sm:w-56 transition-opacity duration-300 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)]">
+                    class="h-auto w-40 max-w-[calc(100vw-6.5rem)] sm:w-56 transition-opacity duration-300 drop-shadow-[0_2px_6px_rgba(0,0,0,0.4)]">
                 <img src="{{ asset('images/logo.webp') }}" alt="Jakarta Taipei School" width="234" height="57"
                     x-show="scrolled || !isTransparent"
-                    class="h-auto w-48 sm:w-56 transition-opacity duration-300">
+                    class="h-auto w-40 max-w-[calc(100vw-6.5rem)] sm:w-56 transition-opacity duration-300">
             </a>
 
-            <nav class="hidden items-center gap-6 xl:flex" aria-label="{{ __('site.main_navigation') }}">
+            <nav class="ml-auto hidden items-center gap-6 xl:flex" aria-label="{{ __('site.main_navigation') }}">
                 @foreach($headerNavigation as $item)
                     @php($isActive = $item['url'] ? request()->getPathInfo() === $site::path($item['url']) : collect($item['children'])->contains(fn ($child) => request()->getPathInfo() === $site::path($child['url'])))
                     <div class="relative" x-data="{ open: false }" @click.outside="open = false"
@@ -156,7 +156,7 @@
             </nav>
 
             {{-- Mobile Menu Trigger --}}
-            <button class="icon-btn xl:hidden transition-all duration-300" :class="{
+            <button class="icon-btn ml-auto xl:hidden transition-all duration-300" :class="{
                     'bg-white/20 border-white/30 text-white hover:bg-white/30': !scrolled && isTransparent,
                     'bg-white border-line text-ink hover:bg-gray-50': scrolled || !isTransparent
                 }" @click="mobile = !mobile" :aria-expanded="mobile" aria-controls="mobile-menu"

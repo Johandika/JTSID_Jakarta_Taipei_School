@@ -2,6 +2,7 @@
 
 namespace App\Models\Concerns;
 
+use App\Support\Locale;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -32,8 +33,9 @@ trait HasTranslations
     public function translation(?string $locale = null): mixed
     {
         $translations = $this->translations;
+        $locale = Locale::content($locale);
 
-        return $translations->first(fn ($t) => $t->locale === ($locale ?? app()->getLocale()) && filled($t->title))
+        return $translations->first(fn ($t) => $t->locale === $locale && filled($t->title))
             ?? $translations->firstWhere('locale', 'en');
     }
 
