@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 $staticPages = [
-    'academics',
     'admissions',
     'board-of-directors',
     'school-profile',
@@ -34,6 +33,7 @@ foreach (['en' => '', 'zh' => 'zh', 'id' => 'id'] as $locale => $prefix) {
         Route::get('/resources/{type?}', [ContentController::class, 'resources'])->name('resources');
         Route::get('/staff', [ContentController::class, 'staff'])->name('staff');
         Route::get('/facilities', [ContentController::class, 'facilities'])->name('facilities');
+        Route::get('/academics', [ContentController::class, 'academics'])->name('pages.academics');
         Route::get('/university-admission', [ContentController::class, 'universities'])->name('universities');
         Route::get('/download/admission-form', [DownloadController::class, 'admissionForm'])->name('download.admission-form');
         Route::get('/download/{kind}/{id}', DownloadController::class)->whereNumber('id')->name('download');

@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Facility;
 use App\Models\AcademicYear;
+use App\Models\CurriculumPillar;
+use App\Models\Facility;
 use App\Models\Post;
+use App\Models\SiteSetting;
 use App\Models\StaffProfile;
 use App\Models\SubjectResourceType;
 use App\Models\UniversityAcceptance;
@@ -14,6 +16,18 @@ use Illuminate\View\View;
 
 class ContentController extends Controller
 {
+    public function academics(): View
+    {
+        $pillars = CurriculumPillar::where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
+
+        $headerSetting = SiteSetting::get('academic_curriculum_header');
+
+        return view('public.pages.academics', compact('pillars', 'headerSetting'));
+    }
+
     public function facilities(): View
     {
         $facilities = Facility::orderBy('id')->get();

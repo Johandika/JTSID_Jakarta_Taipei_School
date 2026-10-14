@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             AdmissionFeeSeeder::class,
             AdmissionFormSeeder::class,
             MandarinProgramSeeder::class,
+            CurriculumPillarSeeder::class,
         ]);
     }
 }

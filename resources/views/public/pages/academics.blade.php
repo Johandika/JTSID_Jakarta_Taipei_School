@@ -27,162 +27,158 @@
         <div class="prose" lang="{{ app()->getLocale() }}">
             <div class="not-prose">
 
-                {{-- Header Section: Tiga Pilar Kurikulum --}}
+                @php
+                    $locale = app()->getLocale();
+                    $contentLocale = \App\Support\Locale::content();
+
+                    $headerEyebrow = $headerSetting['eyebrow'][$contentLocale] 
+                        ?? $headerSetting['eyebrow'][$locale] 
+                        ?? $headerSetting['eyebrow']['en'] 
+                        ?? ($academics['eyebrow'] ?? 'Three Curriculum Pillars');
+
+                    $headerTitle = $headerSetting['heading'][$contentLocale] 
+                        ?? $headerSetting['heading'][$locale] 
+                        ?? $headerSetting['heading']['en'] 
+                        ?? ($academics['main_heading'] ?? 'One Education, Three Excellences');
+
+                    $headerSubtitle = $headerSetting['subheading'][$contentLocale] 
+                        ?? $headerSetting['subheading'][$locale] 
+                        ?? $headerSetting['subheading']['en'] 
+                        ?? ($academics['main_subheading'] ?? 'JTS curriculum combines the strengths of Taiwan, Indonesia, and Cambridge English education.');
+
+                    $curriculumPillars = $pillars ?? \App\Models\CurriculumPillar::where('is_active', true)->orderBy('sort_order')->orderBy('id')->get();
+                    $pillarCount = $curriculumPillars->count();
+                    $gridCols = match(true) {
+                        $pillarCount === 1 => 'grid-cols-1 max-w-md mx-auto',
+                        $pillarCount === 2 => 'grid-cols-1 md:grid-cols-2 max-w-3xl mx-auto',
+                        $pillarCount === 4 => 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4',
+                        default => 'grid-cols-1 md:grid-cols-3',
+                    };
+                @endphp
+
+                {{-- Header Section: Pilar Kurikulum --}}
                 <div class="text-center max-w-4xl mx-auto">
                     <div class="inline-flex items-center gap-2.5">
                         <span class="text-xs font-bold uppercase tracking-wider text-[#176443]">
-                            {{ $academics['eyebrow'] ?? 'TIGA PILAR KURIKULUM' }}
+                            {{ $headerEyebrow }}
                         </span>
                         <span class="w-8 h-px bg-[#176443]/40"></span>
                     </div>
 
-                    {{-- 1 baris headline, font sans sesuai school-profile (tanpa font-serif), warna solid (tanpa hijau)
-                    --}}
                     <h2
                         class="mt-3 text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-ink sm:whitespace-nowrap">
-                        {{ $academics['main_heading'] ?? 'Satu Pendidikan, Tiga Keunggulan' }}
+                        {{ $headerTitle }}
                     </h2>
 
                     <p class="mt-3 text-sm sm:text-base text-muted leading-relaxed max-w-2xl mx-auto">
-                        {{ $academics['main_subheading'] ?? 'Kurikulum JTS menggabungkan kekuatan pendidikan Taiwan, Indonesia, dan Cambridge English.' }}
+                        {{ $headerSubtitle }}
                     </p>
                 </div>
 
-                {{-- 3 Curriculum Cards Grid --}}
-                <div class="mt-10 sm:mt-14 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-
-                    {{-- Card 1: Taiwan Curriculum --}}
-                    <div
-                        class="rounded-2xl sm:rounded-3xl border border-line bg-white p-6 sm:p-7 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col hover:border-[#176443]/30">
-                        {{-- Circular Flag Container --}}
+                {{-- Curriculum Cards Grid (Dynamic from CMS) --}}
+                <div class="mt-10 sm:mt-14 grid {{ $gridCols }} gap-6 lg:gap-8">
+                    @forelse($curriculumPillars as $index => $pillar)
+                        @php
+                            $styles = $pillar->getStyles();
+                            $tags = $pillar->getTags();
+                            $iconUrl = $pillar->icon_url;
+                        @endphp
                         <div
-                            class="size-14 sm:size-16 rounded-full bg-[#fdf2f2] flex items-center justify-center p-2.5 mb-5 shadow-2xs">
-                            <svg class="size-10 sm:size-11 rounded-full shadow-xs" viewBox="0 0 64 64" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <clipPath id="tw-flag-circle">
-                                    <circle cx="32" cy="32" r="32" />
-                                </clipPath>
-                                <g clip-path="url(#tw-flag-circle)">
-                                    <rect width="64" height="64" fill="#FE0000" />
-                                    <rect width="32" height="32" fill="#000095" />
-                                    <g fill="#FFFFFF" transform="translate(16, 16)">
-                                        <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" />
-                                        <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(30)" />
-                                        <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(60)" />
-                                        <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(90)" />
-                                        <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(120)" />
-                                        <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(150)" />
-                                        <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(180)" />
-                                        <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(210)" />
-                                        <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(240)" />
-                                        <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(270)" />
-                                        <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(300)" />
-                                        <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(330)" />
-                                        <circle cx="0" cy="0" r="5.6" fill="#000095" />
-                                        <circle cx="0" cy="0" r="4.4" fill="#FFFFFF" />
-                                    </g>
-                                </g>
-                            </svg>
+                            class="rounded-2xl sm:rounded-3xl border border-line bg-white p-6 sm:p-7 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col {{ $styles['card_hover'] }}">
+                            
+                            {{-- Circular Flag / Icon Container --}}
+                            <div
+                                class="size-14 sm:size-16 rounded-full {{ $styles['icon_bg'] }} flex items-center justify-center p-2.5 mb-5 shadow-2xs">
+                                @if($iconUrl)
+                                    <img src="{{ $iconUrl }}" alt="{{ $pillar->trans('title') }}" class="size-10 sm:size-11 rounded-full object-cover shadow-xs border border-line/60" />
+                                @elseif($pillar->color_theme === 'red' || $index === 0)
+                                    {{-- Default Taiwan Flag SVG --}}
+                                    <svg class="size-10 sm:size-11 rounded-full shadow-xs" viewBox="0 0 64 64" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <clipPath id="tw-flag-circle-{{ $pillar->id }}">
+                                            <circle cx="32" cy="32" r="32" />
+                                        </clipPath>
+                                        <g clip-path="url(#tw-flag-circle-{{ $pillar->id }})">
+                                            <rect width="64" height="64" fill="#FE0000" />
+                                            <rect width="32" height="32" fill="#000095" />
+                                            <g fill="#FFFFFF" transform="translate(16, 16)">
+                                                <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" />
+                                                <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(30)" />
+                                                <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(60)" />
+                                                <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(90)" />
+                                                <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(120)" />
+                                                <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(150)" />
+                                                <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(180)" />
+                                                <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(210)" />
+                                                <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(240)" />
+                                                <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(270)" />
+                                                <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(300)" />
+                                                <path d="M0 -11 L2.2 -5 L-2.2 -5 Z" transform="rotate(330)" />
+                                                <circle cx="0" cy="0" r="5.6" fill="#000095" />
+                                                <circle cx="0" cy="0" r="4.4" fill="#FFFFFF" />
+                                            </g>
+                                        </g>
+                                    </svg>
+                                @elseif($pillar->color_theme === 'green' || $index === 1)
+                                    {{-- Default Indonesia Flag SVG --}}
+                                    <svg class="size-10 sm:size-11 rounded-full shadow-xs border border-line/60"
+                                        viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <clipPath id="id-flag-circle-{{ $pillar->id }}">
+                                            <circle cx="32" cy="32" r="32" />
+                                        </clipPath>
+                                        <g clip-path="url(#id-flag-circle-{{ $pillar->id }})">
+                                            <rect x="0" y="0" width="64" height="32" fill="#E02424" />
+                                            <rect x="0" y="32" width="64" height="32" fill="#FFFFFF" />
+                                        </g>
+                                    </svg>
+                                @elseif($pillar->color_theme === 'blue' || $index === 2)
+                                    {{-- Default UK / Cambridge Flag SVG --}}
+                                    <svg class="size-10 sm:size-11 rounded-full shadow-xs" viewBox="0 0 64 64" fill="none"
+                                        xmlns="http://www.w3.org/2000/svg">
+                                        <clipPath id="uk-flag-circle-{{ $pillar->id }}">
+                                            <circle cx="32" cy="32" r="32" />
+                                        </clipPath>
+                                        <g clip-path="url(#uk-flag-circle-{{ $pillar->id }})">
+                                            <rect width="64" height="64" fill="#012169" />
+                                            <path d="M0 0 L64 64 M64 0 L0 64" stroke="#FFFFFF" stroke-width="10" />
+                                            <path d="M0 0 L64 64 M64 0 L0 64" stroke="#C8102E" stroke-width="5" />
+                                            <rect x="25" y="0" width="14" height="64" fill="#FFFFFF" />
+                                            <rect x="0" y="25" width="64" height="14" fill="#FFFFFF" />
+                                            <rect x="28" y="0" width="8" height="64" fill="#C8102E" />
+                                            <rect x="0" y="28" width="64" height="8" fill="#C8102E" />
+                                        </g>
+                                    </svg>
+                                @else
+                                    {{-- Default Academic Torch / Graduation Icon --}}
+                                    <svg class="size-8 sm:size-9 text-jts" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+                                        <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+                                    </svg>
+                                @endif
+                            </div>
+
+                            <h3 class="text-lg sm:text-xl font-bold text-ink tracking-tight">
+                                {{ $pillar->trans('title') }}
+                            </h3>
+
+                            <p class="mt-2.5 text-xs sm:text-sm text-muted leading-relaxed">
+                                {{ $pillar->trans('description') }}
+                            </p>
+
+                            {{-- Badges in single line / flex wrap with natural compact spacing --}}
+                            @if(!empty($tags))
+                                <div class="mt-5 flex flex-wrap items-center gap-1.5 sm:gap-2">
+                                    @foreach($tags as $tag)
+                                        <span
+                                            class="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium whitespace-nowrap shrink-0 {{ $styles['badge_bg'] }} {{ $styles['badge_text'] }} border {{ $styles['badge_border'] }}">
+                                            {{ $tag }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            @endif
                         </div>
-
-                        <h3 class="text-lg sm:text-xl font-bold text-ink tracking-tight">
-                            {{ $academics['taiwan_title'] ?? 'Taiwan Curriculum' }}
-                        </h3>
-
-                        <p class="mt-2.5 text-xs sm:text-sm text-muted leading-relaxed">
-                            {{ $academics['taiwan_desc'] ?? $academics['mandarin_body'] }}
-                        </p>
-
-                        {{-- Badges in 1 single line with natural compact spacing --}}
-                        <div class="mt-5 flex items-center gap-1.5 sm:gap-2 flex-nowrap">
-                            @foreach($academics['taiwan_tags'] ?? ['Traditional Mandarin', 'Academic Foundation'] as $tag)
-                                <span
-                                    class="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium whitespace-nowrap shrink-0 bg-[#fef2f2] text-[#e02424] border border-[#fecaca]/70">
-                                    {{ $tag }}
-                                </span>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    {{-- Card 2: Indonesian Curriculum --}}
-                    <div
-                        class="rounded-2xl sm:rounded-3xl border border-line bg-white p-6 sm:p-7 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col hover:border-[#176443]/30">
-                        {{-- Circular Flag Container --}}
-                        <div
-                            class="size-14 sm:size-16 rounded-full bg-[#edfdf5] flex items-center justify-center p-2.5 mb-5 shadow-2xs">
-                            <svg class="size-10 sm:size-11 rounded-full shadow-xs border border-line/60"
-                                viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <clipPath id="id-flag-circle">
-                                    <circle cx="32" cy="32" r="32" />
-                                </clipPath>
-                                <g clip-path="url(#id-flag-circle)">
-                                    <rect x="0" y="0" width="64" height="32" fill="#E02424" />
-                                    <rect x="0" y="32" width="64" height="32" fill="#FFFFFF" />
-                                </g>
-                            </svg>
-                        </div>
-
-                        <h3 class="text-lg sm:text-xl font-bold text-ink tracking-tight">
-                            {{ $academics['indonesia_title'] ?? 'Indonesian Curriculum' }}
-                        </h3>
-
-                        <p class="mt-2.5 text-xs sm:text-sm text-muted leading-relaxed">
-                            {{ $academics['indonesia_desc'] ?? $academics['indonesian_body'] }}
-                        </p>
-
-                        {{-- Badges in 1 single line with natural compact spacing --}}
-                        <div class="mt-5 flex items-center gap-1.5 sm:gap-2 flex-nowrap">
-                            @foreach($academics['indonesia_tags'] ?? ['Kurikulum Merdeka', 'National Identity'] as $tag)
-                                <span
-                                    class="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium whitespace-nowrap shrink-0 bg-[#ecfdf5] text-[#10b981] border border-[#a7f3d0]/70">
-                                    {{ $tag }}
-                                </span>
-                            @endforeach
-                        </div>
-                    </div>
-
-                    {{-- Card 3: English Curriculum --}}
-                    <div
-                        class="rounded-2xl sm:rounded-3xl border border-line bg-white p-6 sm:p-7 shadow-xs hover:shadow-md transition-all duration-300 flex flex-col hover:border-[#176443]/30">
-                        {{-- Circular Flag Container --}}
-                        <div
-                            class="size-14 sm:size-16 rounded-full bg-[#eff6ff] flex items-center justify-center p-2.5 mb-5 shadow-2xs">
-                            <svg class="size-10 sm:size-11 rounded-full shadow-xs" viewBox="0 0 64 64" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <clipPath id="uk-flag-circle">
-                                    <circle cx="32" cy="32" r="32" />
-                                </clipPath>
-                                <g clip-path="url(#uk-flag-circle)">
-                                    <rect width="64" height="64" fill="#012169" />
-                                    <path d="M0 0 L64 64 M64 0 L0 64" stroke="#FFFFFF" stroke-width="10" />
-                                    <path d="M0 0 L64 64 M64 0 L0 64" stroke="#C8102E" stroke-width="5" />
-                                    <rect x="25" y="0" width="14" height="64" fill="#FFFFFF" />
-                                    <rect x="0" y="25" width="64" height="14" fill="#FFFFFF" />
-                                    <rect x="28" y="0" width="8" height="64" fill="#C8102E" />
-                                    <rect x="0" y="28" width="64" height="8" fill="#C8102E" />
-                                </g>
-                            </svg>
-                        </div>
-
-                        <h3 class="text-lg sm:text-xl font-bold text-ink tracking-tight">
-                            {{ $academics['english_title'] ?? 'English Curriculum' }}
-                        </h3>
-
-                        <p class="mt-2.5 text-xs sm:text-sm text-muted leading-relaxed">
-                            {{ $academics['english_desc'] ?? $academics['english_body'] }}
-                        </p>
-
-                        {{-- Badges in 1 single line with natural compact spacing --}}
-                        <div class="mt-5 flex items-center gap-1.5 sm:gap-2 flex-nowrap">
-                            @foreach($academics['english_tags'] ?? ['Cambridge', 'Global Opportunities'] as $tag)
-                                <span
-                                    class="inline-flex items-center px-2.5 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-medium whitespace-nowrap shrink-0 bg-[#eff6ff] text-[#3b82f6] border border-[#bfdbfe]/70">
-                                    {{ $tag }}
-                                </span>
-                            @endforeach
-                        </div>
-                    </div>
-
+                    @empty
+                    @endforelse
                 </div>
 
                 {{-- Section: Learning Journey (Curriculum by Level) --}}
