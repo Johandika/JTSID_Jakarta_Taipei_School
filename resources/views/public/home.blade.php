@@ -29,40 +29,80 @@
         })->values()->all();
 
 
-        $curriculumPrograms = [
-            [
-                'col' => 'lg:col-span-5',
-                'image' => asset('images/programs/kindergarten.webp'),
-                'title' => __('site.prog_kindergarten_title'),
-                'label' => __('site.prog_kindergarten_label'),
-                'description' => __('site.prog_kindergarten_desc'),
-                'url' => $site::path('/academics'),
-            ],
-            [
-                'col' => 'lg:col-span-7',
-                'image' => asset('images/programs/primary.webp'),
-                'title' => __('site.prog_primary_title'),
-                'label' => __('site.prog_primary_label'),
-                'description' => __('site.prog_primary_desc'),
-                'url' => $site::path('/academics'),
-            ],
-            [
-                'col' => 'lg:col-span-7',
-                'image' => asset('images/programs/secondary.webp'),
-                'title' => __('site.prog_secondary_title'),
-                'label' => __('site.prog_secondary_label'),
-                'description' => __('site.prog_secondary_desc'),
-                'url' => $site::path('/academics'),
-            ],
-            [
-                'col' => 'lg:col-span-5',
-                'image' => asset('images/programs/english.webp'),
-                'title' => __('site.prog_english_title'),
-                'label' => __('site.prog_english_label'),
-                'description' => __('site.prog_english_desc'),
-                'url' => $site::path('/academics'),
-            ],
-        ];
+        $rawPrograms = collect($academicPrograms ?? []);
+        if ($rawPrograms->isEmpty()) {
+            $rawPrograms = collect([
+                [
+                    'image' => 'images/programs/kindergarten.webp',
+                    'title' => __('site.prog_kindergarten_title'),
+                    'label' => __('site.prog_kindergarten_label'),
+                    'description' => __('site.prog_kindergarten_desc'),
+                    'url' => '/academics',
+                ],
+                [
+                    'image' => 'images/programs/primary.webp',
+                    'title' => __('site.prog_primary_title'),
+                    'label' => __('site.prog_primary_label'),
+                    'description' => __('site.prog_primary_desc'),
+                    'url' => '/academics',
+                ],
+                [
+                    'image' => 'images/programs/secondary.webp',
+                    'title' => __('site.prog_secondary_title'),
+                    'label' => __('site.prog_secondary_label'),
+                    'description' => __('site.prog_secondary_desc'),
+                    'url' => '/academics',
+                ],
+                [
+                    'image' => 'images/programs/english.webp',
+                    'title' => __('site.prog_english_title'),
+                    'label' => __('site.prog_english_label'),
+                    'description' => __('site.prog_english_desc'),
+                    'url' => '/academics',
+                ],
+            ]);
+        }
+
+        $programCount = $rawPrograms->count();
+        $curriculumPrograms = $rawPrograms->values()->map(function ($program, $index) use ($site, $programCount) {
+            $isModel = $program instanceof \App\Models\AcademicProgram;
+            $image = $isModel ? $program->image_url : (is_array($program) ? ($program['image'] ?? null) : null);
+            if (! $image) {
+                $image = asset('images/logo.webp');
+            } elseif (! str_starts_with($image, 'http')) {
+                $clean = ltrim($image, '/');
+                $image = file_exists(public_path($clean)) ? asset($clean) : asset('storage/' . $clean);
+            }
+
+            $rawUrl = $isModel ? $program->url : (is_array($program) ? ($program['url'] ?? '/academics') : '/academics');
+            $url = $rawUrl;
+            if ($url && ! str_starts_with($url, 'http') && ! str_starts_with($url, '#')) {
+                $url = $site::path($url);
+            }
+
+            if ($programCount % 2 !== 0 && $index === $programCount - 1) {
+                $col = 'lg:col-span-12';
+            } elseif ($index % 4 === 0 || $index % 4 === 3) {
+                $col = 'lg:col-span-5';
+            } else {
+                $col = 'lg:col-span-7';
+            }
+
+            return [
+                'col' => $col,
+                'image' => $image,
+                'title' => $isModel ? $program->trans('title') : ($program['title'] ?? ''),
+                'label' => $isModel ? $program->trans('label') : ($program['label'] ?? ''),
+                'description' => $isModel ? $program->trans('description') : ($program['description'] ?? ''),
+                'url' => $url ?: $site::path('/academics'),
+            ];
+        })->all();
+
+        $curriculumLocale = app()->getLocale();
+        $curriculumEyebrow = $academicsHeader['eyebrow'][$curriculumLocale] ?? $academicsHeader['eyebrow']['en'] ?? __('site.academics');
+        $curriculumHeadline = $academicsHeader['heading'][$curriculumLocale] ?? $academicsHeader['heading']['en'] ?? __('site.curriculum_headline');
+        $curriculumDesc = $academicsHeader['subheading'][$curriculumLocale] ?? $academicsHeader['subheading']['en'] ?? __('site.curriculum_desc');
+        $curriculumCtaLabel = $academicsHeader['cta_label'][$curriculumLocale] ?? $academicsHeader['cta_label']['en'] ?? __('site.curriculum_learn_more');
     @endphp
 
     {{-- Hero Section: 70svh on Mobile (with next section peeking), Full Screen on Desktop --}}
@@ -332,10 +372,10 @@
     <section class="shell py-16 sm:py-24 bg-white">
         {{-- Section Heading --}}
         <div class="mx-auto mb-10 sm:mb-14 max-w-3xl text-center">
-            <p class="eyebrow justify-center">{{ __('site.academics') }}</p>
-            <h2 class="section-title mx-auto">{{ __('site.curriculum_headline') }}</h2>
+            <p class="eyebrow justify-center">{{ $curriculumEyebrow }}</p>
+            <h2 class="section-title mx-auto">{{ $curriculumHeadline }}</h2>
             <p class="mt-4 text-base leading-7 text-muted mx-auto max-w-2xl">
-                {{ __('site.curriculum_desc') }}
+                {{ $curriculumDesc }}
             </p>
         </div>
 
@@ -379,7 +419,7 @@
                                 <a href="{{ $program['url'] }}"
                                    @click.stop
                                    class="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-white hover:text-accent transition-colors group/cta">
-                                    <span>{{ __('site.curriculum_learn_more') }}</span>
+                                    <span>{{ $curriculumCtaLabel }}</span>
                                     <x-site-icon name="arrow-right" class="size-4 text-white group-hover/cta:text-accent transition-transform group-hover/cta:translate-x-1" />
                                 </a>
                             </div>
