@@ -5,10 +5,20 @@ namespace Tests\Feature;
 use App\Filament\Resources\CurriculumPillars\CurriculumPillarResource;
 use App\Models\CurriculumPillar;
 use App\Models\SiteSetting;
+use Database\Seeders\CurriculumPillarSeeder;
 use Tests\TestCase;
 
 class CurriculumPillarsTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        if (CurriculumPillar::count() === 0) {
+            $this->seed(CurriculumPillarSeeder::class);
+        }
+    }
+
     public function test_academics_page_renders_successfully_with_curriculum_pillars(): void
     {
         $responseEn = $this->get('/academics');
