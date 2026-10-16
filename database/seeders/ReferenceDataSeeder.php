@@ -33,11 +33,13 @@ class ReferenceDataSeeder extends Seeder
         foreach (['2025-2026', '2026-2027'] as $year) {
             AcademicYear::firstOrCreate(['code' => $year], ['name' => str_replace('-', ' / ', $year)]);
         }
-        if (app()->environment(['local', 'testing'])) {
-            foreach (['admin' => 'super_admin', 'editor' => 'content_admin', 'academic' => 'department_admin', 'viewer' => 'viewer'] as $username => $code) {
+        $this->call(InitialAdminSeeder::class);
+
+        if (app()->environment('testing')) {
+            foreach (['editor' => 'content_admin', 'academic' => 'department_admin', 'viewer' => 'viewer'] as $username => $code) {
                 User::firstOrCreate(['email' => $username.'@jts.local'], [
                     'name' => Role::where('code', $code)->value('name'),
-                    'password' => env('LOCAL_ADMIN_PASSWORD', 'JtsLocal2026!'),
+                    'password' => 'JtsTest2026!',
                     'role_id' => Role::where('code', $code)->value('id'),
                     'department_id' => $code === 'department_admin' ? Department::where('code', 'academic')->value('id') : null,
                     'is_active' => true,

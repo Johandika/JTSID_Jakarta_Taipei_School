@@ -5,6 +5,26 @@ return [
     'language' => 'Bahasa',
     'view_website' => 'Lihat website',
     'logout' => 'Keluar',
+    'users' => [
+        'edit_account' => 'Ubah akun saya',
+        'password_confirmation' => 'Konfirmasi kata sandi',
+        'super_admin_access' => 'Semua akun yang dikelola di sini memiliki akses penuh sebagai Super Admin.',
+        'validation' => [
+            'required' => ':attribute wajib diisi.',
+            'email' => 'Masukkan alamat email yang valid.',
+            'unique_email' => 'Alamat email ini sudah digunakan.',
+            'min' => ':attribute harus berisi minimal :min karakter.',
+            'max' => ':attribute tidak boleh melebihi :max karakter.',
+            'password_mismatch' => 'Kata sandi dan konfirmasi tidak cocok.',
+            'confirmation_required' => 'Silakan konfirmasi kata sandi.',
+        ],
+        'roles' => [
+            'super_admin' => 'Super Admin',
+            'content_admin' => 'Admin Konten',
+            'department_admin' => 'Admin Departemen',
+            'viewer' => 'Pembaca',
+        ],
+    ],
     'nav_groups' => [
         'content' => 'Konten',
         'website' => 'Website',

@@ -5,6 +5,26 @@ return [
     'language' => 'Language',
     'view_website' => 'View website',
     'logout' => 'Log out',
+    'users' => [
+        'edit_account' => 'Edit my account',
+        'password_confirmation' => 'Confirm password',
+        'super_admin_access' => 'All accounts managed here have full Super Admin access.',
+        'validation' => [
+            'required' => 'The :attribute field is required.',
+            'email' => 'Enter a valid email address.',
+            'unique_email' => 'This email address is already in use.',
+            'min' => 'The :attribute must be at least :min characters.',
+            'max' => 'The :attribute must not exceed :max characters.',
+            'password_mismatch' => 'The passwords do not match.',
+            'confirmation_required' => 'Please confirm the password.',
+        ],
+        'roles' => [
+            'super_admin' => 'Super Admin',
+            'content_admin' => 'Content Admin',
+            'department_admin' => 'Department Admin',
+            'viewer' => 'Viewer',
+        ],
+    ],
     'nav_groups' => [
         'content' => 'Content',
         'website' => 'Website',

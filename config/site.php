@@ -3,6 +3,12 @@
 return [
     'admin_path' => trim((string) (env('ADMIN_PANEL_PATH') ?: 'jts-secure-portal'), '/'),
 
+    'initial_admin' => [
+        'name' => env('LOCAL_ADMIN_NAME', 'Super Admin'),
+        'email' => env('LOCAL_ADMIN_EMAIL', 'admin@jts.local'),
+        'password' => env('LOCAL_ADMIN_PASSWORD'),
+    ],
+
     'contact' => [
         'address' => [
             'street' => 'Jl. Raya Kelapa Hybrida Blok QA3, Kelapa Gading',

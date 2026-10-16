@@ -25,6 +25,16 @@
             </x-filament::dropdown.header>
 
             <x-filament::dropdown.list>
+                @can('update', $user)
+                    <x-filament::dropdown.list.item
+                        tag="a"
+                        href="{{ \App\Filament\Resources\Users\UserResource::getUrl('edit', ['record' => $user]) }}"
+                        icon="heroicon-o-user-circle"
+                    >
+                        {{ __('admin.users.edit_account') }}
+                    </x-filament::dropdown.list.item>
+                @endcan
+
                 <x-filament::dropdown.list.item
                     icon="heroicon-o-language"
                 >

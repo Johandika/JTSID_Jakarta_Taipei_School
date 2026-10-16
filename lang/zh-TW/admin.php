@@ -5,6 +5,26 @@ return [
     'language' => '語言',
     'view_website' => '查看網站',
     'logout' => '登出',
+    'users' => [
+        'edit_account' => '編輯我的帳戶',
+        'password_confirmation' => '確認密碼',
+        'super_admin_access' => '此處管理的所有帳戶皆具有超級管理員的完整權限。',
+        'validation' => [
+            'required' => '請填寫:attribute。',
+            'email' => '請輸入有效的電子郵件地址。',
+            'unique_email' => '此電子郵件地址已被使用。',
+            'min' => ':attribute至少需要 :min 個字元。',
+            'max' => ':attribute不得超過 :max 個字元。',
+            'password_mismatch' => '密碼與確認密碼不一致。',
+            'confirmation_required' => '請再次輸入密碼以確認。',
+        ],
+        'roles' => [
+            'super_admin' => '超級管理員',
+            'content_admin' => '內容管理員',
+            'department_admin' => '部門管理員',
+            'viewer' => '檢視者',
+        ],
+    ],
     'nav_groups' => [
         'content' => '內容管理',
         'website' => '網站管理',

@@ -3,16 +3,13 @@
 namespace App\Filament\Resources\Users;
 
 use App\Filament\Resources\CmsResource;
-use App\Models\Role;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -45,40 +42,64 @@ class UserResource extends CmsResource
                             TextInput::make('name')
                                 ->label(__('admin.labels.full_name'))
                                 ->required()
+                                ->validationMessages([
+                                    'required' => __('admin.users.validation.required'),
+                                    'max' => __('admin.users.validation.max'),
+                                ])
                                 ->maxLength(150),
                             TextInput::make('email')
                                 ->label(__('admin.labels.email_address'))
                                 ->email()
                                 ->required()
                                 ->unique(ignoreRecord: true)
+                                ->validationMessages([
+                                    'required' => __('admin.users.validation.required'),
+                                    'email' => __('admin.users.validation.email'),
+                                    'unique' => __('admin.users.validation.unique_email'),
+                                    'max' => __('admin.users.validation.max'),
+                                ])
                                 ->maxLength(191),
                             TextInput::make('password')
                                 ->label(__('admin.labels.password'))
                                 ->password()
                                 ->revealable()
+                                ->autocomplete('new-password')
+                                ->afterStateHydrated(fn (TextInput $component) => $component->state(null))
                                 ->minLength(12)
+                                ->maxLength(72)
                                 ->required(fn (string $operation) => $operation === 'create')
-                                ->dehydrated(fn ($state) => filled($state))
-                                ->helperText(__('admin.helpers.password_edit'))
-                                ->columnSpanFull(),
+                                ->same('password_confirmation')
+                                ->validationMessages([
+                                    'required' => __('admin.users.validation.required'),
+                                    'min' => __('admin.users.validation.min'),
+                                    'max' => __('admin.users.validation.max'),
+                                    'same' => __('admin.users.validation.password_mismatch'),
+                                ])
+                                ->dehydrated(fn (?string $state): bool => filled($state))
+                                ->helperText(__('admin.helpers.password_edit')),
+                            TextInput::make('password_confirmation')
+                                ->label(__('admin.users.password_confirmation'))
+                                ->password()
+                                ->revealable()
+                                ->autocomplete('new-password')
+                                ->requiredWith('password')
+                                ->validationMessages([
+                                    'required_with' => __('admin.users.validation.confirmation_required'),
+                                ])
+                                ->dehydrated(false),
                         ])
                         ->columns(2),
                 ])->columnSpan(['lg' => 2]),
 
                 Group::make()->schema([
                     Section::make(__('admin.sections.role_permissions'))
-                        ->description(__('admin.descriptions.role_permissions'))
+                        ->description(__('admin.users.super_admin_access'))
                         ->schema([
-                            Select::make('role_id')
+                            TextInput::make('account_role')
                                 ->label(__('admin.labels.role'))
-                                ->relationship('role', 'name')
-                                ->required()
-                                ->live()
-                                ->disabled(fn (?Model $record) => $record?->id === auth()->id()),
-                            Select::make('department_id')
-                                ->label(__('admin.labels.managed_department'))
-                                ->relationship('department', 'name')
-                                ->required(fn (Get $get) => Role::find($get('role_id'))?->code === 'department_admin'),
+                                ->default(__('admin.users.roles.super_admin'))
+                                ->disabled()
+                                ->dehydrated(false),
                             Toggle::make('is_active')
                                 ->label(__('admin.fields.active_status'))
                                 ->default(true)
@@ -99,13 +120,11 @@ class UserResource extends CmsResource
                 TextColumn::make('email')
                     ->label(__('admin.fields.email'))
                     ->searchable(),
-                TextColumn::make('role.name')
+                TextColumn::make('role.code')
                     ->label(__('admin.labels.role'))
+                    ->formatStateUsing(fn (string $state): string => __('admin.users.roles.'.$state))
                     ->badge()
                     ->color('primary'),
-                TextColumn::make('department.name')
-                    ->label(__('admin.fields.department'))
-                    ->placeholder('—'),
                 IconColumn::make('is_active')
                     ->label(__('admin.fields.active_status'))
                     ->boolean(),
