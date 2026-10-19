@@ -29,6 +29,11 @@
                 'sub' => $admissions['levels']['sma']['sub'] ?? '(SMA)',
                 'icon' => 'graduation-cap',
             ],
+            'international' => [
+                'name' => $admissions['levels']['international']['name'] ?? 'Siswa Internasional',
+                'sub' => $admissions['levels']['international']['sub'] ?? '(Semua Jenjang)',
+                'icon' => 'globe',
+            ],
         ];
         $admissionFormsByLevel = \App\Models\AdmissionForm::downloadableByLevel();
         $downloadForms = collect($levelTabs)
@@ -36,7 +41,7 @@
                 $code => ($form = $admissionFormsByLevel->get($code)) ? [
                     'url' => $form->download_url,
                     'name' => $form->download_name,
-                    'label' => __('site.download_admission_form').' '.$form->school_level_label,
+                    'label' => __('site.download_admission_form').' '.($admissions['levels'][$code]['button'] ?? $form->school_level_label),
                 ] : null,
             ])
             ->all();
@@ -61,7 +66,7 @@
     <div class="shell py-12 sm:py-16">
         <div class="space-y-16">
 
-            {{-- 1. Rincian Biaya (Fee Structure) with 4 Interactive Tabs --}}
+            {{-- 1. Rincian Biaya (Fee Structure) with 5 Interactive Tabs --}}
             <div x-data="{ activeTab: 'tk', downloadForms: {{ \Illuminate\Support\Js::from($downloadForms) }} }" class="w-full">
                 <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
                     <div>
@@ -85,13 +90,13 @@
                     </a>
                 </div>
 
-                {{-- 4 Level Selection Tabs --}}
-                <div class="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {{-- 5 Level Selection Tabs --}}
+                <div class="mt-8 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4">
                     @foreach($levelTabs as $code => $tab)
                         <button
                             type="button"
                             @click="activeTab = '{{ $code }}'"
-                            class="flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl text-left transition-all duration-300 border focus:outline-none focus:ring-2 focus:ring-[#176443] focus:ring-offset-2"
+                            class="flex items-center gap-3 sm:gap-4 p-3.5 sm:p-4 rounded-2xl text-left transition-all duration-300 border focus:outline-none focus:ring-2 focus:ring-[#176443] focus:ring-offset-2 last:col-span-2 sm:last:col-span-1"
                             :class="activeTab === '{{ $code }}'
                                 ? 'bg-[#0a4a30] border-[#0a4a30] text-white shadow-lg -translate-y-0.5'
                                 : 'bg-white border-line text-ink hover:border-[#176443]/40 hover:bg-[#fbfcfb] shadow-xs'"
@@ -122,6 +127,12 @@
                                         <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"/>
                                         <path d="M22 10v6"/>
                                         <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/>
+                                    </svg>
+                                @elseif($tab['icon'] === 'globe')
+                                    <svg class="size-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <line x1="2" y1="12" x2="22" y2="12"/>
+                                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
                                     </svg>
                                 @endif
                             </div>

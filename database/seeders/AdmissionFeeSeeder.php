@@ -316,6 +316,80 @@ class AdmissionFeeSeeder extends Seeder
                     'sort_order' => 4,
                 ],
             ],
+            'international' => [
+                [
+                    'name' => [
+                        'id' => 'Uang Pendaftaran',
+                        'en' => 'Registration Fee',
+                        'zh-TW' => '報名費',
+                    ],
+                    'amount' => 'Rp. 1.000.000,-',
+                    'payment_period' => [
+                        'id' => 'satu kali pembayaran',
+                        'en' => 'one-time payment',
+                        'zh-TW' => '一次性繳納',
+                    ],
+                    'note' => null,
+                    'icon' => 'file-text',
+                    'icon_color' => 'green',
+                    'sort_order' => 1,
+                ],
+                [
+                    'name' => [
+                        'id' => 'Uang Pembangunan',
+                        'en' => 'Development Fee',
+                        'zh-TW' => '建設發展費',
+                    ],
+                    'amount' => 'Rp. 8.500.000,-',
+                    'payment_period' => [
+                        'id' => 'pembayaran per semester (6 bulan)',
+                        'en' => 'payment per semester (6 months)',
+                        'zh-TW' => '每學期繳納（6個月）',
+                    ],
+                    'note' => [
+                        'id' => 'Tersedia program beasiswa jalur prestasi akademik dan minat bakat',
+                        'en' => 'Scholarships available for academic and special talent tracks',
+                        'zh-TW' => '提供學術與多元專長卓越獎學金方案',
+                    ],
+                    'icon' => 'building',
+                    'icon_color' => 'blue',
+                    'sort_order' => 2,
+                ],
+                [
+                    'name' => [
+                        'id' => 'Uang Sekolah',
+                        'en' => 'Tuition Fee',
+                        'zh-TW' => '學雜費',
+                    ],
+                    'amount' => 'Rp. 38.900.000,-',
+                    'payment_period' => [
+                        'id' => 'pembayaran per semester (6 bulan)',
+                        'en' => 'payment per semester (6 months)',
+                        'zh-TW' => '每學期繳納（6個月）',
+                    ],
+                    'note' => null,
+                    'icon' => 'backpack',
+                    'icon_color' => 'pink',
+                    'sort_order' => 3,
+                ],
+                [
+                    'name' => [
+                        'id' => 'Uang Buku dan Kegiatan',
+                        'en' => 'Books & Activity Fee',
+                        'zh-TW' => '書籍與活動費',
+                    ],
+                    'amount' => '± Rp. 8–9 juta',
+                    'payment_period' => [
+                        'id' => 'pembayaran per semester (6 bulan)',
+                        'en' => 'payment per semester (6 months)',
+                        'zh-TW' => '每學期繳納（6個月）',
+                    ],
+                    'note' => null,
+                    'icon' => 'book-open',
+                    'icon_color' => 'amber',
+                    'sort_order' => 4,
+                ],
+            ],
         ];
 
         foreach ($feesByLevel as $code => $fees) {

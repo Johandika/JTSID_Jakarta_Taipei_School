@@ -21,10 +21,11 @@ class ListAdmissionFees extends ListRecords
                     'sd' => __('admin.actions.add_sd_fee'),
                     'smp' => __('admin.actions.add_smp_fee'),
                     'sma' => __('admin.actions.add_sma_fee'),
+                    'international' => __('admin.actions.add_international_fee'),
                     default => __('admin.actions.add_tk_fee'),
                 })
                 ->url(fn (): string => static::getResource()::getUrl('create', [
-                    'grade_level' => in_array($this->activeTab, ['tk', 'sd', 'smp', 'sma'], true) ? $this->activeTab : 'tk',
+                    'grade_level' => in_array($this->activeTab, ['tk', 'sd', 'smp', 'sma', 'international'], true) ? $this->activeTab : 'tk',
                 ])),
         ];
     }
@@ -51,6 +52,11 @@ class ListAdmissionFees extends ListRecords
                 ->icon('heroicon-o-check-badge')
                 ->badge(AdmissionFee::whereHas('gradeLevel', fn ($q) => $q->where('code', 'sma'))->count())
                 ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('gradeLevel', fn ($q) => $q->where('code', 'sma'))),
+
+            'international' => Tab::make(__('admin.school_levels.international'))
+                ->icon('heroicon-o-globe-alt')
+                ->badge(AdmissionFee::whereHas('gradeLevel', fn ($q) => $q->where('code', 'international'))->count())
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereHas('gradeLevel', fn ($q) => $q->where('code', 'international'))),
         ];
     }
 }

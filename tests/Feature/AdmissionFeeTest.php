@@ -49,6 +49,7 @@ class AdmissionFeeTest extends TestCase
             ->assertOk()
             ->assertSeeText('Rincian Biaya Sekolah')
             ->assertSeeText('Taman Kanak-Kanak')
+            ->assertSeeText('Siswa Internasional')
             ->assertSeeText('Uang Pendaftaran')
             ->assertSeeText('Rp. 1.000.000,-')
             ->assertSeeText('satu kali pembayaran')
@@ -61,6 +62,7 @@ class AdmissionFeeTest extends TestCase
             ->assertOk()
             ->assertSeeText('Tuition & Fee Structure')
             ->assertSeeText('Kindergarten')
+            ->assertSeeText('International Student')
             ->assertSeeText('Registration Fee')
             ->assertSeeText('Rp. 1.000.000,-')
             ->assertSeeText('one-time payment')
@@ -72,6 +74,7 @@ class AdmissionFeeTest extends TestCase
             ->assertOk()
             ->assertSeeText('各年級收費標準')
             ->assertSeeText('幼兒園')
+            ->assertSeeText('國際學生')
             ->assertSeeText('報名費')
             ->assertSeeText('建設發展費')
             ->assertSeeText('第二位子女 Rp. 3,500,000,-');
@@ -98,11 +101,13 @@ class AdmissionFeeTest extends TestCase
         $sd = GradeLevel::where('code', 'sd')->firstOrFail();
         $smp = GradeLevel::where('code', 'smp')->firstOrFail();
         $sma = GradeLevel::where('code', 'sma')->firstOrFail();
+        $intl = GradeLevel::where('code', 'international')->firstOrFail();
 
         AdmissionFee::factory()->create(['grade_level_id' => $tk->id]);
         AdmissionFee::factory()->create(['grade_level_id' => $sd->id]);
         AdmissionFee::factory()->create(['grade_level_id' => $smp->id]);
         AdmissionFee::factory()->create(['grade_level_id' => $sma->id]);
+        AdmissionFee::factory()->create(['grade_level_id' => $intl->id]);
         $admin = User::where('email', 'admin@jts.local')->firstOrFail();
         $this->actingAs($admin)->withSession(['admin_locale' => 'id']);
 
@@ -112,12 +117,16 @@ class AdmissionFeeTest extends TestCase
             ->assertSeeText('Taman Kanak-Kanak (TK)')
             ->assertSeeText('Sekolah Dasar (SD)')
             ->assertSeeText('Sekolah Menengah Pertama (SMP)')
-            ->assertSeeText('Sekolah Menengah Atas (SMA)');
+            ->assertSeeText('Sekolah Menengah Atas (SMA)')
+            ->assertSeeText('Siswa Internasional');
 
         $this->get(AdmissionFeeResource::getUrl('index', ['tab' => 'smp']))
             ->assertOk();
 
-        $this->get(AdmissionFeeResource::getUrl('create', ['grade_level' => 'smp']))
+        $this->get(AdmissionFeeResource::getUrl('index', ['tab' => 'international']))
+            ->assertOk();
+
+        $this->get(AdmissionFeeResource::getUrl('create', ['grade_level' => 'international']))
             ->assertOk();
     }
 }

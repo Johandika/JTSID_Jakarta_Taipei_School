@@ -267,6 +267,7 @@ return [
             'sd' => ['name' => '小學部', 'sub' => '(國小)'],
             'smp' => ['name' => '國中部', 'sub' => '(初中)'],
             'sma' => ['name' => '高中部', 'sub' => '(高中)'],
+            'international' => ['name' => '國際學生', 'sub' => '(各年級)'],
         ],
         'faq_heading' => '常見問題',
         'fees_question' => '如何查詢費用與時間？',

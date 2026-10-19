@@ -403,6 +403,7 @@ return [
         'add_sd_fee' => 'Tambah Biaya SD',
         'add_smp_fee' => 'Tambah Biaya SMP',
         'add_sma_fee' => 'Tambah Biaya SMA',
+        'add_international_fee' => 'Tambah Biaya Siswa Internasional',
         'download_csv_template' => 'Download Template Excel',
         'import_csv' => 'Import Excel / CSV',
     ],
@@ -429,6 +430,7 @@ return [
         'sd' => 'Sekolah Dasar (SD)',
         'smp' => 'Sekolah Menengah Pertama (SMP)',
         'sma' => 'Sekolah Menengah Atas (SMA)',
+        'international' => 'Siswa Internasional',
     ],
     'messages' => [
         'email_copied' => 'Alamat email disalin',

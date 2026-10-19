@@ -403,6 +403,7 @@ return [
         'add_sd_fee' => 'Add SD Fee',
         'add_smp_fee' => 'Add SMP Fee',
         'add_sma_fee' => 'Add SMA Fee',
+        'add_international_fee' => 'Add International Student Fee',
         'download_csv_template' => 'Download Excel Template',
         'import_csv' => 'Import Excel / CSV',
     ],
@@ -429,6 +430,7 @@ return [
         'sd' => 'Elementary School (SD)',
         'smp' => 'Junior High School (SMP)',
         'sma' => 'Senior High School (SMA)',
+        'international' => 'International Student',
     ],
     'messages' => [
         'email_copied' => 'Email address copied',

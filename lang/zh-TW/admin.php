@@ -403,6 +403,7 @@ return [
         'add_sd_fee' => '新增 SD 費用',
         'add_smp_fee' => '新增 SMP 費用',
         'add_sma_fee' => '新增 SMA 費用',
+        'add_international_fee' => '新增國際學生費用',
         'download_csv_template' => '下載 Excel 範本',
         'import_csv' => '匯入 Excel / CSV',
     ],
@@ -429,6 +430,7 @@ return [
         'sd' => '小學部 (SD)',
         'smp' => '國中部 (SMP)',
         'sma' => '高中部 (SMA)',
+        'international' => '國際學生',
     ],
     'messages' => [
         'email_copied' => '電子郵件已複製',

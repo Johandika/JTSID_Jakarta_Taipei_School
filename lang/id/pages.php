@@ -267,6 +267,7 @@ return [
             'sd' => ['name' => 'Sekolah Dasar', 'sub' => '(SD)'],
             'smp' => ['name' => 'Sekolah Menengah Pertama', 'sub' => '(SMP)'],
             'sma' => ['name' => 'Sekolah Menengah Atas', 'sub' => '(SMA)'],
+            'international' => ['name' => 'Siswa Internasional', 'sub' => '(Semua Jenjang)'],
         ],
         'faq_heading' => 'Pertanyaan umum',
         'fees_question' => 'Bagaimana cara mengetahui biaya dan jadwal?',

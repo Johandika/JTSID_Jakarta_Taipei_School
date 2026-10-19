@@ -32,7 +32,7 @@ class AdmissionFormForm
                                 ->first(fn (string $level): bool => ! AdmissionForm::where('school_level', $level)->exists(), 'tk'))
                             ->required()
                             ->unique(AdmissionForm::class, 'school_level', ignoreRecord: true)
-                            ->rules(['in:tk,sd,smp,sma']),
+                            ->rules(['in:'.implode(',', array_keys(SchoolLevel::OPTIONS))]),
                         FileUpload::make('file_path')
                             ->label(__('admin.labels.admission_form_file'))
                             ->disk('public')

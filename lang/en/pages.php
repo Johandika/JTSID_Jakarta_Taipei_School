@@ -267,6 +267,7 @@ return [
             'sd' => ['name' => 'Elementary School', 'sub' => '(Primary)'],
             'smp' => ['name' => 'Junior High School', 'sub' => '(Middle School)'],
             'sma' => ['name' => 'Senior High School', 'sub' => '(High School)'],
+            'international' => ['name' => 'International Student', 'sub' => '(All Grades)'],
         ],
         'faq_heading' => 'Frequently asked questions',
         'fees_question' => 'How can I find current fees and dates?',
