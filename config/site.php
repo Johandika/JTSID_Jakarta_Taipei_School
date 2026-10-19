@@ -27,8 +27,8 @@ return [
             ],
         ],
         'email' => [
-            'display' => 'jts@jtsid.org',
-            'url' => 'mailto:jts@jtsid.org',
+            'display' => 'jtis.org@gmail.com',
+            'url' => 'mailto:jtis.org@gmail.com',
         ],
         'whatsapp' => [
             'display' => '+62 813-8543-5909',

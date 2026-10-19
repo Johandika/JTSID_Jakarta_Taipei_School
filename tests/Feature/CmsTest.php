@@ -295,7 +295,7 @@ class CmsTest extends TestCase
                 ->assertOk()
                 ->assertSee('href="tel:+62214523273"', false)
                 ->assertSee('href="tel:+62214530535"', false)
-                ->assertSee('href="mailto:jts@jtsid.org"', false)
+                ->assertSee('href="mailto:jtis.org@gmail.com"', false)
                 ->assertSee('href="https://wa.me/6281385435909"', false)
                 ->assertSee('href="https://www.facebook.com/profile.php?id=100057615161035"', false)
                 ->assertSee('href="https://www.instagram.com/jakartataipeischoolofficial/"', false)
@@ -307,7 +307,7 @@ class CmsTest extends TestCase
                 ->assertSeeText('Jl. Raya Kelapa Hybrida Blok QA3, Kelapa Gading, Jakarta Utara 14250, Indonesia')
                 ->assertSeeText('+62 (21) 452 3273')
                 ->assertSeeText('+62 (21) 453 0535')
-                ->assertSeeText('jts@jtsid.org');
+                ->assertSeeText('jtis.org@gmail.com');
         }
 
         $this->actingAs(User::where('email', 'admin@jts.local')->firstOrFail());
