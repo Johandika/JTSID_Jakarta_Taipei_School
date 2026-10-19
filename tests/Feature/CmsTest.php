@@ -475,7 +475,10 @@ class CmsTest extends TestCase
         $ownPost->update(['status' => 'draft']);
         $otherPost->update(['status' => 'draft']);
 
-        $ownResource = SubjectResource::where('department_id', $departmentAdmin->department_id)->firstOrFail();
+        $lessonProgressTypeId = SubjectResourceType::where('code', 'lesson_progress')->value('id');
+        $ownResource = SubjectResource::where('department_id', $departmentAdmin->department_id)
+            ->where('type_id', $lessonProgressTypeId)
+            ->firstOrFail();
         $otherResource = SubjectResource::whereKeyNot($ownResource->id)->firstOrFail();
         $otherResource->update([
             'department_id' => Department::whereKeyNot($departmentAdmin->department_id)->value('id'),
@@ -499,7 +502,7 @@ class CmsTest extends TestCase
         Livewire::test(NeedsAttentionWidget::class)
             ->assertSeeText('1 draft berita menunggu rilis')
             ->assertSeeText('1 materi berstatus draft')
-            ->assertDontSeeText('popup pengumuman sedang tampil');
+            ->assertSeeText('0 popup pengumuman sedang tampil');
 
         AnnouncementPopup::query()->delete();
         AnnouncementPopup::factory()->create(['starts_at' => now()->addDay()]);

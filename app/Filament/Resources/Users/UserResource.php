@@ -3,9 +3,11 @@
 namespace App\Filament\Resources\Users;
 
 use App\Filament\Resources\CmsResource;
+use App\Models\Role;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Group;
@@ -14,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class UserResource extends CmsResource
@@ -93,13 +96,25 @@ class UserResource extends CmsResource
 
                 Group::make()->schema([
                     Section::make(__('admin.sections.role_permissions'))
-                        ->description(__('admin.users.super_admin_access'))
+                        ->description(__('admin.descriptions.role_permissions'))
                         ->schema([
-                            TextInput::make('account_role')
+                            Select::make('role_id')
                                 ->label(__('admin.labels.role'))
-                                ->default(__('admin.users.roles.super_admin'))
-                                ->disabled()
-                                ->dehydrated(false),
+                                ->relationship('role', 'name', modifyQueryUsing: fn (Builder $query) => $query->whereIn('code', [
+                                    'super_admin',
+                                    'admissions',
+                                    'academic',
+                                    'student_affairs',
+                                    'clc',
+                                    'kindergarten',
+                                    'secretary',
+                                    'languages',
+                                    'library',
+                                ]))
+                                ->getOptionLabelFromRecordUsing(fn (Role $record) => __('admin.users.roles.'.$record->code) ?? $record->name)
+                                ->default(fn () => Role::where('code', 'super_admin')->value('id'))
+                                ->required()
+                                ->native(true),
                             Toggle::make('is_active')
                                 ->label(__('admin.fields.active_status'))
                                 ->default(true)
@@ -122,7 +137,7 @@ class UserResource extends CmsResource
                     ->searchable(),
                 TextColumn::make('role.code')
                     ->label(__('admin.labels.role'))
-                    ->formatStateUsing(fn (string $state): string => __('admin.users.roles.'.$state))
+                    ->formatStateUsing(fn (?string $state): string => $state ? (__('admin.users.roles.'.$state) ?? $state) : '-')
                     ->badge()
                     ->color('primary'),
                 IconColumn::make('is_active')

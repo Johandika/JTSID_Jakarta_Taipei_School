@@ -6,6 +6,7 @@ use App\Filament\Resources\CmsResource;
 use App\Filament\Support\CmsFields;
 use App\Models\SubjectResource;
 use App\Models\SubjectResourceType;
+use App\Support\DepartmentPermission;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -17,6 +18,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class SubjectResourceResource extends CmsResource
 {
@@ -41,7 +43,22 @@ class SubjectResourceResource extends CmsResource
                     ->schema([
                         Select::make('type_id')
                             ->label(__('admin.labels.type_material'))
-                            ->relationship('type', 'name')
+                            ->relationship('type', 'name', modifyQueryUsing: function (Builder $query) {
+                                $allowed = DepartmentPermission::getAllowedSubjectResourceTypes(auth()->user());
+                                if ($allowed !== null) {
+                                    $query->whereIn('code', $allowed);
+                                }
+
+                                return $query;
+                            })
+                            ->default(function () {
+                                $allowed = DepartmentPermission::getAllowedSubjectResourceTypes(auth()->user());
+                                if ($allowed !== null && count($allowed) === 1) {
+                                    return SubjectResourceType::where('code', $allowed[0])->value('id');
+                                }
+
+                                return null;
+                            })
                             ->required()
                             ->live()
                             ->searchable()
@@ -141,6 +158,21 @@ class SubjectResourceResource extends CmsResource
                 DeleteAction::make(),
             ])
             ->paginated([10, 25, 50]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+        $user = auth()->user();
+
+        if ($user?->role?->code === 'department_admin') {
+            $allowedTypes = DepartmentPermission::getAllowedSubjectResourceTypes($user);
+            if ($allowedTypes !== null) {
+                $query->whereHas('type', fn (Builder $q) => $q->whereIn('code', $allowedTypes));
+            }
+        }
+
+        return $query;
     }
 
     public static function getPages(): array

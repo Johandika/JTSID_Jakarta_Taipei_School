@@ -33,7 +33,7 @@ class AdmissionFormResource extends CmsResource
 
     public static function canCreate(): bool
     {
-        return AdmissionForm::query()
+        return static::can('create') && AdmissionForm::query()
             ->whereIn('school_level', array_keys(SchoolLevel::OPTIONS))
             ->distinct()
             ->count('school_level') < count(SchoolLevel::OPTIONS);

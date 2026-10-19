@@ -6,6 +6,7 @@ use App\Filament\Pages\Auth\Login;
 use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Filament\Resources\Users\Pages\EditUser;
 use App\Filament\Resources\Users\UserResource;
+use App\Models\Department;
 use App\Models\Role;
 use App\Models\User;
 use Database\Seeders\InitialAdminSeeder;
@@ -94,11 +95,11 @@ class UserManagementTest extends TestCase
     public function test_admin_creates_a_super_admin_who_can_login_using_database_credentials(): void
     {
         $this->actingAs($this->createAdministrator());
-        $viewerRole = Role::create(['code' => 'viewer', 'name' => 'Viewer']);
+        $superAdminRole = Role::firstOrCreate(['code' => 'super_admin'], ['name' => 'Super Admin']);
 
         Livewire::test(CreateUser::class)
             ->fillForm($this->validAccountData())
-            ->set('data.role_id', $viewerRole->id)
+            ->set('data.role_id', $superAdminRole->id)
             ->call('create')
             ->assertHasNoFormErrors()
             ->assertRedirect(UserResource::getUrl('index'));
@@ -117,6 +118,24 @@ class UserManagementTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertAuthenticatedAs($user);
+    }
+
+    public function test_admin_can_create_user_with_division_role_and_department_is_auto_assigned(): void
+    {
+        $this->actingAs($this->createAdministrator());
+        $admissionsRole = Role::firstOrCreate(['code' => 'admissions'], ['name' => 'Pendaftaran']);
+        $department = Department::firstOrCreate(['code' => 'admissions'], ['name' => 'Admissions']);
+
+        Livewire::test(CreateUser::class)
+            ->fillForm($this->validAccountData())
+            ->set('data.role_id', $admissionsRole->id)
+            ->call('create')
+            ->assertHasNoFormErrors()
+            ->assertRedirect(UserResource::getUrl('index'));
+
+        $user = User::where('email', 'new@example.com')->sole();
+        $this->assertSame('admissions', $user->role->code);
+        $this->assertSame($department->id, $user->department_id);
     }
 
     #[DataProvider('invalidAccounts')]

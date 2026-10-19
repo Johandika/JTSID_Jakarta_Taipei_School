@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Support\DepartmentPermission;
 use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Lang;
@@ -16,6 +17,26 @@ abstract class CmsResource extends Resource
     public static function getModelLabel(): string
     {
         return static::resourceTranslation('model') ?? parent::getModelLabel();
+    }
+
+    public static function canViewAny(): bool
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return false;
+        }
+
+        if (in_array($user->role?->code, ['super_admin', 'content_admin'], true)) {
+            return true;
+        }
+
+        if ($user->role?->code === 'department_admin') {
+            $model = static::getModel();
+
+            return $model ? DepartmentPermission::canAccessModel($user, $model) : false;
+        }
+
+        return parent::canViewAny();
     }
 
     public static function getPluralModelLabel(): string

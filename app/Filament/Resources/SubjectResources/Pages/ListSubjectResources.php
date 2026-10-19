@@ -5,6 +5,7 @@ namespace App\Filament\Resources\SubjectResources\Pages;
 use App\Filament\Resources\SubjectResources\SubjectResourceResource;
 use App\Models\SubjectResource;
 use App\Models\SubjectResourceType;
+use App\Support\DepartmentPermission;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use Filament\Schemas\Components\Tabs\Tab;
@@ -21,15 +22,26 @@ class ListSubjectResources extends ListRecords
 
     public function getTabs(): array
     {
+        $allowedTypes = DepartmentPermission::getAllowedSubjectResourceTypes(auth()->user());
+        $user = auth()->user();
+
         return SubjectResourceType::query()
+            ->when($allowedTypes !== null, fn (Builder $query) => $query->whereIn('code', $allowedTypes))
             ->orderBy('id')
             ->get()
-            ->mapWithKeys(fn (SubjectResourceType $type): array => [
-                (string) $type->getKey() => Tab::make($type->name)
-                    ->icon($this->iconForType($type->code))
-                    ->badge(SubjectResource::where('type_id', $type->getKey())->count())
-                    ->modifyQueryUsing(fn (Builder $query) => $query->where('type_id', $type->getKey())),
-            ])
+            ->mapWithKeys(function (SubjectResourceType $type) use ($user): array {
+                $countQuery = SubjectResource::where('type_id', $type->getKey());
+                if ($user?->role?->code === 'department_admin' && $user->department_id) {
+                    $countQuery->where('department_id', $user->department_id);
+                }
+
+                return [
+                    (string) $type->getKey() => Tab::make($type->name)
+                        ->icon($this->iconForType($type->code))
+                        ->badge($countQuery->count())
+                        ->modifyQueryUsing(fn (Builder $query) => $query->where('type_id', $type->getKey())),
+                ];
+            })
             ->all();
     }
 
