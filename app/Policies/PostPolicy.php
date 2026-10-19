@@ -20,7 +20,10 @@ class PostPolicy
 
     public function create(User $user): bool
     {
-        return $this->viewAny($user) && in_array($user->role?->code, ['super_admin', 'content_admin', 'department_admin'], true);
+        return $this->viewAny($user) && (
+            in_array($user->role?->code, ['super_admin', 'content_admin'], true)
+            || DepartmentPermission::isDepartmentRole($user->role?->code)
+        );
     }
 
     public function update(User $user, Post $post): bool
@@ -40,7 +43,18 @@ class PostPolicy
 
     private function owns(User $user, Post $post): bool
     {
-        return $this->viewAny($user) && ($user->role?->code !== 'department_admin'
-            || ($user->department_id !== null && (int) $post->department_id === (int) $user->department_id));
+        if (! $this->viewAny($user)) {
+            return false;
+        }
+
+        if (in_array($user->role?->code, ['super_admin', 'content_admin'], true)) {
+            return true;
+        }
+
+        if (DepartmentPermission::isDepartmentRole($user->role?->code)) {
+            return $user->department_id !== null && (int) $post->department_id === (int) $user->department_id;
+        }
+
+        return false;
     }
 }

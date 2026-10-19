@@ -2,6 +2,7 @@
 
 namespace App\Filament\Support;
 
+use App\Support\DepartmentPermission;
 use App\Support\SchoolLevel;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
@@ -123,13 +124,13 @@ class CmsFields
         return Select::make('department_id')
             ->label(__('admin.fields.department'))
             ->relationship('department', 'name',
-                fn (Builder $query) => auth()->user()?->role?->code === 'department_admin' ? $query->whereKey(auth()->user()->department_id) : $query)
+                fn (Builder $query) => (auth()->user() && DepartmentPermission::isDepartmentRole(auth()->user()->role?->code)) ? $query->whereKey(auth()->user()->department_id) : $query)
             ->default(fn () => auth()->user()?->department_id)
             ->required()
             ->searchable()
             ->preload()
             ->rules([fn () => function (string $attribute, $value, \Closure $fail) {
-                if (auth()->user()?->role?->code === 'department_admin' && (int) $value !== (int) auth()->user()->department_id) {
+                if (auth()->user() && DepartmentPermission::isDepartmentRole(auth()->user()->role?->code) && (int) $value !== (int) auth()->user()->department_id) {
                     $fail(__('admin.helpers.own_department_only'));
                 }
             }]);

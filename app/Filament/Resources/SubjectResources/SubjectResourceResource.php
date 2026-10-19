@@ -165,7 +165,7 @@ class SubjectResourceResource extends CmsResource
         $query = parent::getEloquentQuery();
         $user = auth()->user();
 
-        if ($user?->role?->code === 'department_admin') {
+        if ($user && DepartmentPermission::isDepartmentRole($user->role?->code)) {
             $allowedTypes = DepartmentPermission::getAllowedSubjectResourceTypes($user);
             if ($allowedTypes !== null) {
                 $query->whereHas('type', fn (Builder $q) => $q->whereIn('code', $allowedTypes));

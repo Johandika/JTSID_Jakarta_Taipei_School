@@ -367,7 +367,7 @@ class CmsTest extends TestCase
         $catalog->call('setPage', 2)->assertSet('paginators.page', 2);
         $catalog->set('department', (string) Department::where('code', 'academic')->value('id'))->assertSet('paginators.page', 1)->assertSee('7 results');
         app()->setLocale('id');
-        Livewire::test(ContentCatalog::class, ['kind' => 'resources', 'type' => 'calendar'])
+        Livewire::test(ContentCatalog::class, ['kind' => 'resources', 'type' => 'lesson_progress'])
             ->assertSee('4 hasil')->set('schoolLevel', GradeLevel::first()->code)->assertSee('1 hasil')->assertSee('Tanggal unggah');
     }
 

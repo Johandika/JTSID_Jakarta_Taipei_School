@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\RecordsActivity;
+use App\Support\DepartmentPermission;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
@@ -22,7 +23,7 @@ abstract class CmsModel extends Model
     {
         static::saving(function (Model $model) {
             $user = Auth::user();
-            if ($user && array_key_exists('department_id', $model->getAttributes()) && $user->role?->code === 'department_admin') {
+            if ($user && array_key_exists('department_id', $model->getAttributes()) && DepartmentPermission::isDepartmentRole($user->role?->code)) {
                 if ((int) $model->department_id !== (int) $user->department_id
                     || ($model->exists && (int) $model->getOriginal('department_id') !== (int) $user->department_id)) {
                     throw ValidationException::withMessages(['department_id' => 'You can only manage your own department.']);

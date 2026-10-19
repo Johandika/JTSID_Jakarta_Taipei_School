@@ -124,7 +124,7 @@ class DepartmentPermission
 
         $roleCode = $user->role->code;
 
-        if (in_array($roleCode, ['super_admin', 'content_admin'], true)) {
+        if (in_array($roleCode, ['super_admin', 'content_admin', 'viewer'], true)) {
             return true;
         }
 

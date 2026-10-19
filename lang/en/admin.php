@@ -20,7 +20,7 @@ return [
         ],
         'roles' => [
             'super_admin' => 'Super Admin',
-            'admissions' => 'Pendaftaran (Admissions)',
+            'admissions' => 'Admissions',
             'academic' => 'Academic',
             'student_affairs' => 'Student Affair',
             'clc' => 'Chinese Learning Center',

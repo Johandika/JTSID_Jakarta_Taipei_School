@@ -31,7 +31,7 @@ class ListSubjectResources extends ListRecords
             ->get()
             ->mapWithKeys(function (SubjectResourceType $type) use ($user): array {
                 $countQuery = SubjectResource::where('type_id', $type->getKey());
-                if ($user?->role?->code === 'department_admin' && $user->department_id) {
+                if ($user && DepartmentPermission::isDepartmentRole($user->role?->code) && $user->department_id) {
                     $countQuery->where('department_id', $user->department_id);
                 }
 

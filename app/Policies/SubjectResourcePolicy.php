@@ -23,7 +23,10 @@ class SubjectResourcePolicy
 
     public function create(User $user): bool
     {
-        return $this->viewAny($user) && in_array($user->role?->code, ['super_admin', 'content_admin', 'department_admin'], true);
+        return $this->viewAny($user) && (
+            in_array($user->role?->code, ['super_admin', 'content_admin'], true)
+            || DepartmentPermission::isDepartmentRole($user->role?->code)
+        );
     }
 
     public function update(User $user, SubjectResource $record): bool
@@ -47,16 +50,20 @@ class SubjectResourcePolicy
             return false;
         }
 
-        if ($user->role?->code !== 'department_admin') {
+        if (in_array($user->role?->code, ['super_admin', 'content_admin'], true)) {
             return true;
         }
 
-        if ($user->department_id === null || (int) $record->department_id !== (int) $user->department_id) {
-            return false;
+        if (DepartmentPermission::isDepartmentRole($user->role?->code)) {
+            if ($user->department_id === null || (int) $record->department_id !== (int) $user->department_id) {
+                return false;
+            }
+
+            $typeCode = $record->relationLoaded('type') ? $record->type?->code : $record->type()->value('code');
+
+            return DepartmentPermission::canAccessSubjectResourceType($user, $typeCode);
         }
 
-        $typeCode = $record->relationLoaded('type') ? $record->type?->code : $record->type()->value('code');
-
-        return DepartmentPermission::canAccessSubjectResourceType($user, $typeCode);
+        return false;
     }
 }

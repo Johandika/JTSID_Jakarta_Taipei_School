@@ -20,7 +20,10 @@ class MandarinProgramPolicy
 
     public function create(User $user): bool
     {
-        return $this->viewAny($user) && in_array($user->role?->code, ['super_admin', 'content_admin', 'department_admin'], true);
+        return $this->viewAny($user) && (
+            in_array($user->role?->code, ['super_admin', 'content_admin'], true)
+            || DepartmentPermission::isDepartmentRole($user->role?->code)
+        );
     }
 
     public function update(User $user, MandarinProgram $record): bool

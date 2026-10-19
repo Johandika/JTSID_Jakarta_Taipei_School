@@ -19,26 +19,6 @@ abstract class CmsResource extends Resource
         return static::resourceTranslation('model') ?? parent::getModelLabel();
     }
 
-    public static function canViewAny(): bool
-    {
-        $user = auth()->user();
-        if (! $user) {
-            return false;
-        }
-
-        if (in_array($user->role?->code, ['super_admin', 'content_admin'], true)) {
-            return true;
-        }
-
-        if ($user->role?->code === 'department_admin') {
-            $model = static::getModel();
-
-            return $model ? DepartmentPermission::canAccessModel($user, $model) : false;
-        }
-
-        return parent::canViewAny();
-    }
-
     public static function getPluralModelLabel(): string
     {
         return static::resourceTranslation('plural') ?? parent::getPluralModelLabel();
@@ -50,8 +30,10 @@ abstract class CmsResource extends Resource
         if (method_exists($query->getModel(), 'translations')) {
             $query->with('translations');
         }
-        if (auth()->user()?->role?->code === 'department_admin' && method_exists($query->getModel(), 'department')) {
-            $query->where('department_id', auth()->user()->department_id);
+
+        $user = auth()->user();
+        if ($user && DepartmentPermission::isDepartmentRole($user->role?->code) && method_exists($query->getModel(), 'department') && $user->department_id) {
+            $query->where('department_id', $user->department_id);
         }
 
         return $query;
