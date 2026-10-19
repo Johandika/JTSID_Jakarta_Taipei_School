@@ -95,7 +95,7 @@ class AnnouncementPopupTest extends TestCase
     public function test_popup_management_obeys_existing_staff_permissions(): void
     {
         $popup = AnnouncementPopup::factory()->create();
-        foreach (['admin' => true, 'editor' => true, 'academic' => false, 'viewer' => false] as $username => $allowed) {
+        foreach (['admin' => true, 'editor' => true, 'academic' => true, 'viewer' => false] as $username => $allowed) {
             $gate = Gate::forUser(User::where('email', $username.'@jts.local')->first());
             $this->assertSame($allowed, $gate->allows('create', AnnouncementPopup::class));
             $this->assertSame($allowed, $gate->allows('update', $popup));

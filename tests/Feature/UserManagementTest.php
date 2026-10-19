@@ -33,23 +33,28 @@ class UserManagementTest extends TestCase
     #[DataProvider('seedEnvironments')]
     public function test_seeding_creates_only_the_initial_super_admin_outside_testing(string $environment): void
     {
-        app()->instance('env', $environment);
-        config()->set('site.initial_admin', [
-            'name' => 'Initial Administrator',
-            'email' => 'initial@example.com',
-            'password' => 'InitialPassword2026!',
-        ]);
+        try {
+            app()->instance('env', $environment);
+            config()->set('site.initial_admin', [
+                'name' => 'Initial Administrator',
+                'email' => 'initial@example.com',
+                'password' => 'InitialPassword2026!',
+            ]);
 
-        $this->artisan('db:seed', ['--class' => ReferenceDataSeeder::class, '--force' => true])
-            ->assertExitCode(0);
+            $this->artisan('db:seed', ['--class' => ReferenceDataSeeder::class, '--force' => true])
+                ->assertExitCode(0);
 
-        $this->assertDatabaseCount('users', 1);
-        $admin = User::sole();
-        $this->assertSame('Initial Administrator', $admin->name);
-        $this->assertSame('initial@example.com', $admin->email);
-        $this->assertSame('super_admin', $admin->role->code);
-        $this->assertTrue($admin->is_active);
-        $this->assertTrue(Hash::check('InitialPassword2026!', $admin->password));
+            $this->assertDatabaseCount('users', 1);
+            $admin = User::sole();
+            $this->assertSame('Initial Administrator', $admin->name);
+            $this->assertSame('initial@example.com', $admin->email);
+            $this->assertSame('super_admin', $admin->role->code);
+            $this->assertTrue($admin->is_active);
+            $this->assertTrue(Hash::check('InitialPassword2026!', $admin->password));
+        } finally {
+            app()->instance('env', 'testing');
+            $this->artisan('migrate:fresh');
+        }
     }
 
     public static function seedEnvironments(): array

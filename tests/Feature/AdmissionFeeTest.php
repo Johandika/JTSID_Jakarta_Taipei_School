@@ -104,7 +104,7 @@ class AdmissionFeeTest extends TestCase
         AdmissionFee::factory()->create(['grade_level_id' => $smp->id]);
         AdmissionFee::factory()->create(['grade_level_id' => $sma->id]);
         $admin = User::where('email', 'admin@jts.local')->firstOrFail();
-        $this->actingAs($admin);
+        $this->actingAs($admin)->withSession(['admin_locale' => 'id']);
 
         $this->get(AdmissionFeeResource::getUrl('index'))
             ->assertOk()

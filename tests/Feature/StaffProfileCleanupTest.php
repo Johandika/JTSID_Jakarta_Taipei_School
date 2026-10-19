@@ -22,6 +22,7 @@ class StaffProfileCleanupTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        StaffProfile::query()->delete();
         $this->seed(ReferenceDataSeeder::class);
         Filament::setCurrentPanel(Filament::getPanel('admin'));
     }
@@ -120,5 +121,7 @@ class StaffProfileCleanupTest extends TestCase
         $this->assertNull(DB::table('staff_profiles')->where('id', $staff->id)->value('extension'));
         $this->assertNull(DB::table('staff_profiles')->where('id', $staff->id)->value('responsibilities'));
         $migration->up();
+
+        $this->artisan('migrate:fresh');
     }
 }
