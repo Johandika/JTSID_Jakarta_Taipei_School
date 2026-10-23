@@ -10,7 +10,40 @@ use Illuminate\Support\Facades\Storage;
 
 class AdmissionForm extends Model
 {
+    public const NATIONALITIES = ['wni', 'wna'];
+
     protected $guarded = ['id'];
+
+    protected $attributes = ['nationality' => 'wni'];
+
+    /**
+     * @return array<string, string>
+     */
+    public static function nationalityOptions(): array
+    {
+        return collect(self::NATIONALITIES)
+            ->mapWithKeys(fn (string $nationality): array => [$nationality => __('admin.nationalities.'.$nationality)])
+            ->all();
+    }
+
+    /**
+     * @return array{school_level: string, nationality: string}|null
+     */
+    public static function nextAvailableSlot(): ?array
+    {
+        $existingForms = self::query()->get(['school_level', 'nationality'])
+            ->mapWithKeys(fn (self $form): array => [$form->school_level.':'.$form->nationality => true]);
+
+        foreach (self::NATIONALITIES as $nationality) {
+            foreach (array_keys(SchoolLevel::OPTIONS) as $schoolLevel) {
+                if (! $existingForms->has($schoolLevel.':'.$nationality)) {
+                    return ['school_level' => $schoolLevel, 'nationality' => $nationality];
+                }
+            }
+        }
+
+        return null;
+    }
 
     /**
      * @return array<string, string>
@@ -32,10 +65,11 @@ class AdmissionForm extends Model
         return $query->where('school_level', $schoolLevel);
     }
 
-    public static function current(string $schoolLevel = 'tk'): ?self
+    public static function current(string $schoolLevel = 'tk', string $nationality = 'wni'): ?self
     {
         return self::active()
             ->forLevel($schoolLevel)
+            ->where('nationality', $nationality)
             ->latest('updated_at')
             ->get()
             ->first(fn (self $form): bool => $form->isDownloadable());
@@ -44,9 +78,10 @@ class AdmissionForm extends Model
     /**
      * @return Collection<string, self>
      */
-    public static function downloadableByLevel(): Collection
+    public static function downloadableByLevel(string $nationality = 'wni'): Collection
     {
         return self::active()
+            ->where('nationality', $nationality)
             ->whereIn('school_level', array_keys(SchoolLevel::OPTIONS))
             ->latest('updated_at')
             ->get()

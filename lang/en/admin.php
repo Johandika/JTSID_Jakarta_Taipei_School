@@ -92,6 +92,7 @@ return [
         'language' => 'Language',
         'name' => 'Name',
         'school_level' => 'Level',
+        'nationality' => 'Citizenship',
         'semester' => 'Semester',
         'slug_url' => 'Slug URL',
         'sort_order' => 'Order',
@@ -101,6 +102,10 @@ return [
         'translations' => 'Translations',
         'upload_date' => 'Upload date',
         'user' => 'User',
+    ],
+    'nationalities' => [
+        'wni' => 'Indonesian Citizen (WNI)',
+        'wna' => 'Foreign Citizen (WNA)',
     ],
     'sections' => [
         'academic_year' => 'Academic Year',
@@ -158,7 +163,7 @@ return [
         'category_photo' => 'Choose a category and upload a facility photo',
         'student_university_data' => 'Student information, destination university, and accepted study program',
         'university_logo' => 'Upload logos of universities where JTS graduates were accepted or continued their studies',
-        'admission_form_file' => 'Upload one form file that will appear as a download button on the Admissions page.',
+        'admission_form_file' => 'Upload a registration form for the selected school level and citizenship (WNI or WNA).',
         'fee_level_information' => 'Choose a school level and define the fee details',
         'visual_display' => 'Customize the icon and icon box background color',
         'hero_media' => 'Required: either a high-resolution photo or a YouTube video link',

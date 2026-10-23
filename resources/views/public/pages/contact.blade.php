@@ -49,7 +49,7 @@
                                     {{ $page['address_label'] ?? 'Address' }}
                                 </h3>
                                 <p class="mt-1 text-sm text-slate-600 leading-relaxed">
-                                    {{ $contact['address']['full'] ?? 'Jl. Raya Kelapa Hybrida Blok QA3, Kelapa Gading, Jakarta Utara 14250, Indonesia' }}
+                                    {{ $contact['address']['full'] }}
                                 </p>
                             </div>
                         </div>
@@ -113,21 +113,26 @@
                     </div>
                 </div>
 
-                {{-- WhatsApp Prompt Pill --}}
-                <div class="mt-8 pt-6 border-t border-emerald-900/10 flex items-center justify-between gap-3 text-xs text-slate-600">
+                {{-- WhatsApp Contacts --}}
+                <div class="mt-8 pt-6 border-t border-emerald-900/10 space-y-3 text-xs text-slate-600">
                     <span class="flex items-center gap-1.5 font-medium">
                         <x-site-icon name="message-circle" class="size-4 text-[#0d6b46]" />
                         <span>{{ __('pages.contact.contact_link') }}</span>
                     </span>
-                    <a
-                        href="{{ $contact['whatsapp']['url'] }}"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        class="inline-flex items-center gap-1 font-semibold text-[#0d6b46] hover:underline"
-                    >
-                        <span>{{ $contact['whatsapp']['display'] }}</span>
-                        <x-site-icon name="external-link" class="size-3" />
-                    </a>
+                    @foreach($contact['whatsapp'] as $channel => $whatsapp)
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <span class="font-semibold">{{ __('site.footer_whatsapp_'.$channel) }}</span>
+                            <a
+                                href="{{ $whatsapp['url'] }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                class="inline-flex items-center gap-1 font-semibold text-[#0d6b46] hover:underline"
+                            >
+                                <span>{{ $whatsapp['display'] }}</span>
+                                <x-site-icon name="external-link" class="size-3" />
+                            </a>
+                        </div>
+                    @endforeach
                 </div>
             </div>
 

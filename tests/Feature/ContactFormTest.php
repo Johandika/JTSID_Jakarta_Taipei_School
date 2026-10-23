@@ -6,10 +6,12 @@ use App\Filament\Resources\ContactMessages\ContactMessageResource;
 use App\Livewire\ContactForm;
 use App\Models\ContactMessage;
 use App\Models\User;
+use chillerlan\QRCode\QRCode;
 use Database\Seeders\ReferenceDataSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class ContactFormTest extends TestCase
@@ -49,6 +51,75 @@ class ContactFormTest extends TestCase
             ->assertSeeText('Contact Information')
             ->assertSeeText('辦公時間')
             ->assertSee('google.com/maps/embed', false);
+    }
+
+    #[DataProvider('whatsappContactLocales')]
+    public function test_contact_page_and_footer_separate_admissions_and_mandarin_whatsapp_in_each_language(
+        string $prefix,
+        string $admissionsLabel,
+        string $mandarinLabel,
+        string $selectionLabel,
+    ): void {
+        $this->get($prefix.'/contact')->assertOk()
+            ->assertSeeText($admissionsLabel)
+            ->assertSeeText($mandarinLabel)
+            ->assertSeeText($selectionLabel)
+            ->assertSeeText('+62 813-8543-5909')
+            ->assertSeeText('+62 811-1180-5213')
+            ->assertSee('href="https://wa.me/6281385435909"', false)
+            ->assertSee('href="https://wa.me/6281111805213"', false)
+            ->assertSee('id="jts-whatsapp-contact"', false)
+            ->assertSee('data-whatsapp-channel="admissions"', false)
+            ->assertSee('data-whatsapp-channel="mandarin"', false)
+            ->assertSee('src="'.asset('images/qr-whatsapp.webp').'"', false)
+            ->assertSee('src="'.asset('images/qr-whatsapp-mandarin.webp').'"', false)
+            ->assertDontSee('site.footer_whatsapp_', false);
+    }
+
+    /**
+     * @return array<string, array{string, string, string, string}>
+     */
+    public static function whatsappContactLocales(): array
+    {
+        return [
+            'English' => ['', 'School Admissions WhatsApp', 'Mandarin Center WhatsApp', 'Choose a WhatsApp contact'],
+            'Indonesian' => ['/id', 'WhatsApp Pendaftaran Sekolah', 'WhatsApp Mandarin Center', 'Pilih kontak WhatsApp'],
+            'Traditional Chinese' => ['/zh', '招生 WhatsApp', '華語中心 WhatsApp', '選擇 WhatsApp 聯絡單位'],
+        ];
+    }
+
+    public function test_whatsapp_qr_codes_open_the_correct_contact_numbers(): void
+    {
+        foreach ([
+            'admissions' => 'https://wa.me/6281385435909',
+            'mandarin' => 'https://wa.me/6281111805213',
+        ] as $channel => $expectedUrl) {
+            $qrPath = public_path(config('site.contact.whatsapp.'.$channel.'.qr_image'));
+
+            $this->assertSame($expectedUrl, (string) (new QRCode)->readFromFile($qrPath));
+        }
+    }
+
+    public function test_footer_replaces_facebook_with_the_configured_tiktok_link(): void
+    {
+        config()->set('site.contact.social.tiktok', 'https://www.tiktok.com/@jts-test-account');
+
+        $this->get('/contact')->assertOk()
+            ->assertSee('href="https://www.tiktok.com/@jts-test-account"', false)
+            ->assertSee('aria-label="TikTok"', false)
+            ->assertDontSee('aria-label="Facebook"', false)
+            ->assertDontSee('facebook.com', false);
+    }
+
+    public function test_footer_does_not_link_to_an_unconfigured_tiktok_account(): void
+    {
+        config()->set('site.contact.social.tiktok', null);
+
+        $this->get('/contact')->assertOk()
+            ->assertSee('aria-label="TikTok"', false)
+            ->assertSee('aria-disabled="true"', false)
+            ->assertDontSee('href="https://www.tiktok.com', false)
+            ->assertDontSee('facebook.com', false);
     }
 
     public function test_contact_form_submits_successfully_and_stores_in_database(): void

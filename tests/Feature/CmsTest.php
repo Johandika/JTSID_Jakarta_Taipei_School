@@ -297,14 +297,18 @@ class CmsTest extends TestCase
                 ->assertSee('href="tel:+62214530535"', false)
                 ->assertSee('href="mailto:jtis.org@gmail.com"', false)
                 ->assertSee('href="https://wa.me/6281385435909"', false)
-                ->assertSee('href="https://www.facebook.com/profile.php?id=100057615161035"', false)
+                ->assertSee('href="https://wa.me/6281111805213"', false)
+                ->assertSee('aria-label="TikTok"', false)
+                ->assertSee('href="https://www.tiktok.com/@jts.jakartataipeischool?_r=1&amp;_t=ZS-9AmzNRYa4TS"', false)
+                ->assertDontSee('facebook.com', false)
                 ->assertSee('href="https://www.instagram.com/jakartataipeischoolofficial/"', false)
                 ->assertSee('href="https://youtube.com/@jakartataipeischool?si=5LP55sxC05ZOteLH"', false)
-                ->assertSee('src="'.asset('images/qr-whatsapp.webp').'"', false);
+                ->assertSee('src="'.asset('images/qr-whatsapp.webp').'"', false)
+                ->assertSee('src="'.asset('images/qr-whatsapp-mandarin.webp').'"', false);
 
             $this->get($prefix.'/contact')
                 ->assertOk()
-                ->assertSeeText('Jl. Raya Kelapa Hybrida Blok QA3, Kelapa Gading, Jakarta Utara 14250, Indonesia')
+                ->assertSeeText('JL. Raya Kelapa Hibrida Blok QH, Kelapa Gading Permai, Jakarta 14240, Indonesia')
                 ->assertSeeText('+62 (21) 452 3273')
                 ->assertSeeText('+62 (21) 453 0535')
                 ->assertSeeText('jtis.org@gmail.com');

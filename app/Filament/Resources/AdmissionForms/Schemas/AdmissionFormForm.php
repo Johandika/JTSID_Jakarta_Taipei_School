@@ -9,7 +9,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
+use Illuminate\Validation\Rules\Unique;
 
 class AdmissionFormForm
 {
@@ -28,11 +30,17 @@ class AdmissionFormForm
                         Select::make('school_level')
                             ->label(__('admin.fields.school_level'))
                             ->options(SchoolLevel::OPTIONS)
-                            ->default(fn (): string => collect(array_keys(SchoolLevel::OPTIONS))
-                                ->first(fn (string $level): bool => ! AdmissionForm::where('school_level', $level)->exists(), 'tk'))
+                            ->default(fn (): string => AdmissionForm::nextAvailableSlot()['school_level'] ?? 'tk')
                             ->required()
-                            ->unique(AdmissionForm::class, 'school_level', ignoreRecord: true)
+                            ->unique(AdmissionForm::class, 'school_level', ignoreRecord: true,
+                                modifyRuleUsing: fn (Unique $rule, Get $get): Unique => $rule->where('nationality', $get('nationality')))
                             ->rules(['in:'.implode(',', array_keys(SchoolLevel::OPTIONS))]),
+                        Select::make('nationality')
+                            ->label(__('admin.fields.nationality'))
+                            ->options(AdmissionForm::nationalityOptions())
+                            ->default(fn (): string => AdmissionForm::nextAvailableSlot()['nationality'] ?? 'wni')
+                            ->required()
+                            ->rules(['in:'.implode(',', AdmissionForm::NATIONALITIES)]),
                         FileUpload::make('file_path')
                             ->label(__('admin.labels.admission_form_file'))
                             ->disk('public')

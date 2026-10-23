@@ -35,16 +35,18 @@
                 'icon' => 'globe',
             ],
         ];
-        $admissionFormsByLevel = \App\Models\AdmissionForm::downloadableByLevel();
-        $downloadForms = collect($levelTabs)
-            ->mapWithKeys(fn ($tab, $code) => [
-                $code => ($form = $admissionFormsByLevel->get($code)) ? [
+        $downloadForms = [];
+        foreach (\App\Models\AdmissionForm::NATIONALITIES as $nationality) {
+            $admissionFormsByLevel = \App\Models\AdmissionForm::downloadableByLevel($nationality);
+            foreach ($levelTabs as $code => $tab) {
+                $form = $admissionFormsByLevel->get($code);
+                $downloadForms[$code][$nationality] = $form ? [
                     'url' => $form->download_url,
                     'name' => $form->download_name,
-                    'label' => __('site.download_admission_form').' '.($admissions['levels'][$code]['button'] ?? $form->school_level_label),
-                ] : null,
-            ])
-            ->all();
+                    'label' => __('site.download_admission_form_'.$nationality).' '.($admissions['levels'][$code]['button'] ?? $form->school_level_label),
+                ] : null;
+            }
+        }
     @endphp
 
     {{-- Headline Section with Supporting Background Image (JTS Green Overlay) --}}
@@ -78,16 +80,21 @@
                         </p>
                     </div>
 
-                    <a
-                        :href="downloadForms[activeTab]?.url || '#'"
-                        :download="downloadForms[activeTab]?.name || null"
-                        :aria-disabled="downloadForms[activeTab] ? 'false' : 'true'"
-                        class="btn btn-primary inline-flex w-fit items-center gap-2 shadow-xs transition-all hover:shadow-md"
-                        :class="downloadForms[activeTab] ? '' : 'pointer-events-none opacity-60'"
-                    >
-                        <x-site-icon name="download" class="size-4" />
-                        <span x-text="downloadForms[activeTab]?.label || '{{ __('site.download_admission_form') }}'">{{ __('site.download_admission_form') }}</span>
-                    </a>
+                    <div class="flex flex-wrap gap-3">
+                        @foreach(\App\Models\AdmissionForm::NATIONALITIES as $nationality)
+                            <a
+                                data-admission-nationality="{{ $nationality }}"
+                                :href="downloadForms[activeTab]?.{{ $nationality }}?.url || '#'"
+                                :download="downloadForms[activeTab]?.{{ $nationality }}?.name || null"
+                                :aria-disabled="downloadForms[activeTab]?.{{ $nationality }} ? 'false' : 'true'"
+                                class="btn btn-primary inline-flex w-fit items-center gap-2 shadow-xs transition-all hover:shadow-md"
+                                :class="downloadForms[activeTab]?.{{ $nationality }} ? '' : 'pointer-events-none opacity-60'"
+                            >
+                                <x-site-icon name="download" class="size-4" />
+                                <span x-text="downloadForms[activeTab]?.{{ $nationality }}?.label || @js(__('site.download_admission_form_'.$nationality))">{{ __('site.download_admission_form_'.$nationality) }}</span>
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
 
                 {{-- 5 Level Selection Tabs --}}

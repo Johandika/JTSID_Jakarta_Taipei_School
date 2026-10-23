@@ -11,10 +11,10 @@ return [
 
     'contact' => [
         'address' => [
-            'street' => 'Jl. Raya Kelapa Hybrida Blok QA3, Kelapa Gading',
-            'city' => 'Jakarta Utara 14250',
+            'street' => 'JL. Raya Kelapa Hibrida Blok QH, Kelapa Gading Permai',
+            'city' => 'Jakarta 14240',
             'country' => 'Indonesia',
-            'full' => 'Jl. Raya Kelapa Hybrida Blok QA3, Kelapa Gading, Jakarta Utara 14250, Indonesia',
+            'full' => 'JL. Raya Kelapa Hibrida Blok QH, Kelapa Gading Permai, Jakarta 14240, Indonesia',
         ],
         'phones' => [
             'primary' => [
@@ -31,12 +31,19 @@ return [
             'url' => 'mailto:jtis.org@gmail.com',
         ],
         'whatsapp' => [
-            'display' => '+62 813-8543-5909',
-            'url' => 'https://wa.me/6281385435909',
-            'qr_image' => 'images/qr-whatsapp.webp',
+            'admissions' => [
+                'display' => '+62 813-8543-5909',
+                'url' => 'https://wa.me/6281385435909',
+                'qr_image' => 'images/qr-whatsapp.webp',
+            ],
+            'mandarin' => [
+                'display' => '+62 811-1180-5213',
+                'url' => 'https://wa.me/6281111805213',
+                'qr_image' => 'images/qr-whatsapp-mandarin.webp',
+            ],
         ],
         'social' => [
-            'facebook' => 'https://www.facebook.com/profile.php?id=100057615161035',
+            'tiktok' => 'https://www.tiktok.com/@jts.jakartataipeischool?_r=1&_t=ZS-9AmzNRYa4TS',
             'instagram' => 'https://www.instagram.com/jakartataipeischoolofficial/',
             'youtube' => 'https://youtube.com/@jakartataipeischool?si=5LP55sxC05ZOteLH',
         ],

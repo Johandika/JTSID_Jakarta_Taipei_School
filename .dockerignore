@@ -1,7 +1,7 @@
 vendor
 node_modules
 .git
-.env
+.env*
 tmp
 web.pdf
 public/storage

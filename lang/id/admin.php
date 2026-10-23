@@ -92,6 +92,7 @@ return [
         'language' => 'Bahasa',
         'name' => 'Nama',
         'school_level' => 'Jenjang',
+        'nationality' => 'Kewarganegaraan',
         'semester' => 'Semester',
         'slug_url' => 'Slug URL',
         'sort_order' => 'Urutan',
@@ -101,6 +102,10 @@ return [
         'translations' => 'Terjemahan',
         'upload_date' => 'Tanggal Unggah',
         'user' => 'Pengguna',
+    ],
+    'nationalities' => [
+        'wni' => 'Warga Negara Indonesia (WNI)',
+        'wna' => 'Warga Negara Asing (WNA)',
     ],
     'sections' => [
         'academic_year' => 'Tahun Ajaran (Academic Year)',
@@ -158,7 +163,7 @@ return [
         'category_photo' => 'Pilih kategori dan unggah foto fasilitas',
         'student_university_data' => 'Informasi siswa, universitas tujuan, dan program studi yang diterima',
         'university_logo' => 'Unggah logo kampus tempat siswa lulusan JTS diterima/melanjutkan studi',
-        'admission_form_file' => 'Upload satu file formulir yang akan muncul sebagai tombol download di halaman Admissions.',
+        'admission_form_file' => 'Unggah formulir pendaftaran sesuai jenjang dan kewarganegaraan (WNI atau WNA).',
         'fee_level_information' => 'Pilih jenjang sekolah dan tentukan rincian biaya',
         'visual_display' => 'Kustomisasi icon dan warna latar belakang kotak icon',
         'hero_media' => 'Wajib diisi salah satu: Foto resolusi tinggi ATAU Link Video YouTube',

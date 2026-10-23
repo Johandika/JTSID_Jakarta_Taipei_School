@@ -10,13 +10,18 @@ COPY public ./public
 COPY vite.config.js ./
 RUN npm run build
 
-FROM php:8.4-cli-bookworm
+FROM php:8.4.27-cli-bookworm AS php-base
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git unzip libpq-dev libicu-dev libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev libonig-dev \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    git unzip libpq-dev libicu-dev libzip-dev libpng-dev libjpeg62-turbo-dev libfreetype6-dev libwebp-dev libonig-dev \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) pdo_pgsql intl zip gd mbstring bcmath pcntl \
     && rm -rf /var/lib/apt/lists/*
+
+FROM php-base AS runtime
+
+ARG APP_VERSION
+LABEL org.opencontainers.image.version="${APP_VERSION}"
 
 COPY --from=composer:2 /usr/bin/composer /usr/local/bin/composer
 COPY docker/php.ini /usr/local/etc/php/conf.d/jts.ini
@@ -45,6 +50,7 @@ RUN mkdir -p \
     storage/logs \
     && composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader \
     && php artisan filament:assets \
+    && php artisan storage:link --no-interaction \
     && chown -R www-data:www-data bootstrap/cache storage public \
     && chmod -R ug+rwX bootstrap/cache storage
 

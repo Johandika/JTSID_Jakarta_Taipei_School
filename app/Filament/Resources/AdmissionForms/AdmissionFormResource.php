@@ -9,7 +9,6 @@ use App\Filament\Resources\AdmissionForms\Schemas\AdmissionFormForm;
 use App\Filament\Resources\AdmissionForms\Tables\AdmissionFormsTable;
 use App\Filament\Resources\CmsResource;
 use App\Models\AdmissionForm;
-use App\Support\SchoolLevel;
 use BackedEnum;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -33,10 +32,7 @@ class AdmissionFormResource extends CmsResource
 
     public static function canCreate(): bool
     {
-        return static::can('create') && AdmissionForm::query()
-            ->whereIn('school_level', array_keys(SchoolLevel::OPTIONS))
-            ->distinct()
-            ->count('school_level') < count(SchoolLevel::OPTIONS);
+        return static::can('create') && AdmissionForm::nextAvailableSlot() !== null;
     }
 
     public static function form(Schema $schema): Schema

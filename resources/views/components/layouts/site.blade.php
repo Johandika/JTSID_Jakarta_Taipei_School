@@ -81,7 +81,7 @@
 
                 <div class="flex shrink-0 items-center gap-3 sm:gap-4">
                     @foreach([
-                        'WhatsApp' => $contact['whatsapp']['url'],
+                        'WhatsApp' => $contact['whatsapp']['admissions']['url'],
                         'Instagram' => $contact['social']['instagram'],
                     ] as $label => $url)
                         <a class="hidden md:inline transition-opacity hover:opacity-80"
@@ -226,6 +226,12 @@
                             <span class="text-emerald-400 font-semibold text-xs tracking-wider">E:</span>
                             <a href="{{ $contact['email']['url'] }}" class="hover:text-emerald-300 transition-colors">{{ $contact['email']['display'] }}</a>
                         </p>
+                        @foreach($contact['whatsapp'] as $channel => $whatsapp)
+                            <p class="pt-1">
+                                <span class="block text-xs font-semibold text-emerald-300">{{ __('site.footer_whatsapp_'.$channel) }}</span>
+                                <a href="{{ $whatsapp['url'] }}" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-300 transition-colors">{{ $whatsapp['display'] }}</a>
+                            </p>
+                        @endforeach
                     </div>
                 </div>
 
@@ -254,13 +260,17 @@
                             </svg>
                         </a>
 
-                        {{-- Facebook --}}
-                        <a href="{{ $contact['social']['facebook'] }}"
-                            target="_blank" rel="noopener noreferrer"
+                        {{-- TikTok --}}
+                        <a
+                            @if(filled($contact['social']['tiktok']))
+                                href="{{ $contact['social']['tiktok'] }}" target="_blank" rel="noopener noreferrer"
+                            @else
+                                aria-disabled="true"
+                            @endif
                             class="size-11 rounded-lg border border-white/20 bg-white/10 hover:bg-white/25 hover:border-emerald-400 text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-105 backdrop-blur-sm"
-                            title="Facebook Jakarta Taipei School" aria-label="Facebook">
+                            title="TikTok Jakarta Taipei School" aria-label="TikTok">
                             <svg class="size-5 fill-current" viewBox="0 0 24 24">
-                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                                <path d="M12.53 2h3.53c.27 2.23 1.5 3.65 3.64 4.04v3.59a7.85 7.85 0 0 1-3.62-1.04v6.93a6.15 6.15 0 1 1-5.3-6.1v3.66a2.67 2.67 0 1 0 1.75 2.52V2Z"/>
                             </svg>
                         </a>
 
@@ -416,6 +426,8 @@
 
         {{-- QR Code Barcode Modal Popup --}}
         <dialog id="jts-qr-modal"
+            x-data="{ whatsappContact: 'admissions' }"
+            aria-labelledby="jts-qr-title"
             class="backdrop:bg-black/75 backdrop:backdrop-blur-sm rounded-2xl p-0 shadow-2xl border border-white/20 bg-[#0d2a1d] text-white max-w-sm w-full mx-auto my-auto overflow-hidden">
             <div class="relative p-6 text-center">
                 <button type="button"
@@ -436,19 +448,31 @@
                     </svg>
                 </div>
 
-                <h4 class="text-base font-bold text-white mb-1">{{ __('site.footer_qr_title') }}</h4>
+                <h4 id="jts-qr-title" class="text-base font-bold text-white mb-1">{{ __('site.footer_qr_title') }}</h4>
                 <p class="text-xs text-emerald-200/80 mb-4">{{ __('site.footer_qr_description') }}</p>
 
-                <div class="bg-white p-3.5 rounded-xl inline-block shadow-lg mb-4">
-                    <img src="{{ asset($contact['whatsapp']['qr_image']) }}"
-                        alt="{{ __('site.footer_whatsapp_qr_alt') }}"
-                        class="size-48 object-contain mx-auto" />
-                </div>
+                <label for="jts-whatsapp-contact" class="mb-2 block text-left text-xs font-semibold text-emerald-200">{{ __('site.whatsapp_select_contact') }}</label>
+                <select id="jts-whatsapp-contact" x-model="whatsappContact" class="mb-5 w-full rounded-lg border border-white/30 bg-[#0d2a1d] px-3 py-2.5 text-sm text-white focus:border-emerald-300 focus:outline-none">
+                    @foreach($contact['whatsapp'] as $channel => $whatsapp)
+                        <option value="{{ $channel }}">{{ __('site.footer_whatsapp_'.$channel) }}</option>
+                    @endforeach
+                </select>
 
-                <div class="space-y-1">
-                    <p class="text-xs font-semibold text-emerald-300">{{ __('site.footer_whatsapp_admissions') }}: {{ $contact['whatsapp']['display'] }}</p>
-                    <p class="text-[11px] text-gray-300">{{ $contact['address']['street'] }}</p>
-                </div>
+                @foreach($contact['whatsapp'] as $channel => $whatsapp)
+                    <div x-show="whatsappContact === '{{ $channel }}'" data-whatsapp-channel="{{ $channel }}" @if($channel !== 'admissions') x-cloak @endif>
+                        <div class="bg-white p-3.5 rounded-xl inline-block shadow-lg mb-4">
+                            <img src="{{ asset($whatsapp['qr_image']) }}"
+                                alt="{{ __('site.footer_whatsapp_qr_alt', ['contact' => __('site.footer_whatsapp_'.$channel)]) }}"
+                                width="192" height="192"
+                                class="size-48 object-contain mx-auto" />
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-xs font-semibold text-emerald-300">{{ __('site.footer_whatsapp_'.$channel) }}</p>
+                            <a href="{{ $whatsapp['url'] }}" target="_blank" rel="noopener noreferrer" class="inline-block text-sm font-semibold text-white underline underline-offset-4 hover:text-emerald-300">{{ $whatsapp['display'] }}</a>
+                            <p class="text-[11px] text-gray-300">{{ $contact['address']['street'] }}</p>
+                        </div>
+                    </div>
+                @endforeach
             </div>
         </dialog>
     </footer>

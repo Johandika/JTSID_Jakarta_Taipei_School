@@ -24,24 +24,29 @@ class NeedsAttentionWidget extends Widget
      */
     public function getViewData(): array
     {
-        $items = [
-            [
+        $items = [];
+
+        if (PostResource::canViewAny()) {
+            $items[] = [
                 'count' => PostResource::getEloquentQuery()->where('status', 'draft')->count(),
                 'title' => __('admin.widgets.draft_news_title'),
                 'description' => __('admin.widgets.draft_news_desc'),
                 'url' => PostResource::getUrl('index'),
                 'icon' => 'heroicon-m-pencil-square',
                 'tone' => 'primary',
-            ],
-            [
+            ];
+        }
+
+        if (SubjectResourceResource::canViewAny()) {
+            $items[] = [
                 'count' => SubjectResourceResource::getEloquentQuery()->where('status', 'draft')->count(),
                 'title' => __('admin.widgets.draft_resources_title'),
                 'description' => __('admin.widgets.draft_resources_desc'),
                 'url' => SubjectResourceResource::getUrl('index'),
                 'icon' => 'heroicon-m-folder-open',
                 'tone' => 'primary',
-            ],
-        ];
+            ];
+        }
 
         if (AnnouncementPopupResource::canViewAny()) {
             $items[] = [

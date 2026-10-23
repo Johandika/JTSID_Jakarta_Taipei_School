@@ -21,7 +21,7 @@ class AdmissionFormSeeder extends Seeder
                 Storage::disk('public')->put($path, $this->sampleAdmissionFormPdf($label));
             }
 
-            $form = AdmissionForm::firstOrNew(['school_level' => $code]);
+            $form = AdmissionForm::firstOrNew(['school_level' => $code, 'nationality' => 'wni']);
 
             if (! $form->exists) {
                 $form->fill([

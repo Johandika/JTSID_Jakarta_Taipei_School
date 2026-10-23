@@ -92,6 +92,7 @@ return [
         'language' => '語言',
         'name' => '名稱',
         'school_level' => '學段',
+        'nationality' => '國籍',
         'semester' => '學期',
         'slug_url' => '網址代稱',
         'sort_order' => '排序',
@@ -101,6 +102,10 @@ return [
         'translations' => '翻譯',
         'upload_date' => '上傳日期',
         'user' => '使用者',
+    ],
+    'nationalities' => [
+        'wni' => '印尼籍（WNI）',
+        'wna' => '外籍（WNA）',
     ],
     'sections' => [
         'academic_year' => '學年度',
@@ -158,7 +163,7 @@ return [
         'category_photo' => '選擇分類並上傳設施照片',
         'student_university_data' => '學生資料、錄取大學與錄取科系資訊',
         'university_logo' => '上傳 JTS 畢業生錄取或升學大學標誌',
-        'admission_form_file' => '上傳一個表單檔案，將顯示為 Admissions 頁面的下載按鈕。',
+        'admission_form_file' => '依學段及國籍（印尼籍 WNI 或外籍 WNA）上傳報名表。',
         'fee_level_information' => '選擇學段並設定費用明細',
         'visual_display' => '自訂圖示與圖示框背景色',
         'hero_media' => '必填其中一項：高解析照片或 YouTube 影片連結',
