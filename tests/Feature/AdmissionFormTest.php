@@ -179,6 +179,8 @@ class AdmissionFormTest extends TestCase
         string $prefix,
         string $wniLabel,
         string $wnaLabel,
+        string $internationalLabel,
+        string $allGradesLabel,
     ): void {
         Storage::fake('public');
         foreach (['tk', 'sd', 'smp', 'sma', 'international'] as $schoolLevel) {
@@ -189,23 +191,27 @@ class AdmissionFormTest extends TestCase
         $response = $this->get($prefix.'/admissions')->assertOk()
             ->assertSeeText($wniLabel)
             ->assertSeeText($wnaLabel)
+            ->assertDontSeeText($internationalLabel)
+            ->assertDontSeeText($allGradesLabel)
+            ->assertDontSee('international-wni.pdf', false)
+            ->assertDontSee('international-wna.pdf', false)
             ->assertDontSee('site.download_admission_form_', false);
 
-        foreach (['tk', 'sd', 'smp', 'sma', 'international'] as $schoolLevel) {
+        foreach (['tk', 'sd', 'smp', 'sma'] as $schoolLevel) {
             $response->assertSee("{$schoolLevel}-wni.pdf", false)
                 ->assertSee("{$schoolLevel}-wna.pdf", false);
         }
     }
 
     /**
-     * @return array<string, array{string, string, string}>
+     * @return array<string, array{string, string, string, string, string}>
      */
     public static function publicLocales(): array
     {
         return [
-            'English' => ['', 'Download registration form WNI', 'Download registration form WNA'],
-            'Indonesian' => ['/id', 'Unduh form pendaftaran WNI', 'Unduh form pendaftaran WNA'],
-            'Traditional Chinese' => ['/zh', '下載印尼籍（WNI）報名表', '下載外籍（WNA）報名表'],
+            'English' => ['', 'Download registration form WNI', 'Download registration form WNA', 'International Student', '(All Grades)'],
+            'Indonesian' => ['/id', 'Unduh form pendaftaran WNI', 'Unduh form pendaftaran WNA', 'Siswa Internasional', '(Semua Jenjang)'],
+            'Traditional Chinese' => ['/zh', '下載印尼籍（WNI）報名表', '下載外籍（WNA）報名表', '國際學生', '(各年級)'],
         ];
     }
 

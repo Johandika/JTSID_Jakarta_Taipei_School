@@ -80,13 +80,34 @@
                 </a>
 
                 <div class="flex shrink-0 items-center gap-3 sm:gap-4">
-                    @foreach([
-                        'WhatsApp' => $contact['whatsapp']['admissions']['url'],
-                        'Instagram' => $contact['social']['instagram'],
-                    ] as $label => $url)
-                        <a class="hidden md:inline transition-opacity hover:opacity-80"
-                            href="{{ $url }}" target="_blank" rel="noopener noreferrer">{{ $label }}</a>
-                    @endforeach
+                    <div class="relative hidden md:block" x-data="{ open: false }"
+                        @click.outside="open = false"
+                        @keydown.escape.stop.prevent="open = false; $refs.trigger.focus()"
+                        @focusout="if (!$el.contains($event.relatedTarget)) { open = false; }">
+                        <button type="button" x-ref="trigger" @click="open = !open"
+                            aria-expanded="false" :aria-expanded="open" aria-controls="header-whatsapp-options"
+                            aria-label="{{ __('site.whatsapp_select_contact') }}"
+                            class="inline-flex items-center gap-1 py-2 transition-opacity hover:opacity-80">
+                            <span>WhatsApp</span>
+                            <x-site-icon name="chevron-down" class="size-3" />
+                        </button>
+                        <div id="header-whatsapp-options" x-show="open" x-cloak
+                            x-transition:enter="transition ease-out duration-150"
+                            x-transition:enter-start="opacity-0 translate-y-1"
+                            x-transition:enter-end="opacity-100 translate-y-0"
+                            class="absolute right-0 top-full z-50 w-72 rounded-lg border border-line bg-white p-2 text-ink shadow-xl">
+                            @foreach($contact['whatsapp'] as $channel => $whatsapp)
+                                <a href="{{ $whatsapp['url'] }}" target="_blank" rel="noopener noreferrer"
+                                    @click="open = false"
+                                    class="block rounded-md px-3 py-2.5 transition-colors hover:bg-gray-50 hover:text-jts focus-visible:bg-gray-50 focus-visible:text-jts">
+                                    <span class="block text-sm font-semibold">{{ __('site.footer_whatsapp_' . $channel) }}</span>
+                                    <span class="mt-1 block text-xs">{{ $whatsapp['display'] }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                    <a class="hidden md:inline transition-opacity hover:opacity-80"
+                        href="{{ $contact['social']['instagram'] }}" target="_blank" rel="noopener noreferrer">Instagram</a>
                     <nav aria-label="Language" class="flex items-center gap-2 sm:gap-3">
                         @foreach(['en' => 'EN', 'zh-TW' => '繁中', 'id' => 'ID'] as $code => $label)
                             <a href="{{ $site::switchLocale($code) }}" lang="{{ $code }}"

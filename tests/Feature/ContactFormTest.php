@@ -76,6 +76,27 @@ class ContactFormTest extends TestCase
             ->assertDontSee('site.footer_whatsapp_', false);
     }
 
+    #[DataProvider('whatsappContactLocales')]
+    public function test_header_offers_both_whatsapp_contacts_in_each_language(
+        string $prefix,
+        string $admissionsLabel,
+        string $mandarinLabel,
+        string $selectionLabel,
+    ): void {
+        $response = $this->get($prefix.'/contact')->assertOk();
+
+        $header = strstr($response->getContent(), '</header>', true);
+        $this->assertIsString($header);
+        $this->assertStringContainsString('aria-controls="header-whatsapp-options"', $header);
+        $this->assertStringContainsString('aria-label="'.$selectionLabel.'"', $header);
+        $this->assertStringContainsString($admissionsLabel, $header);
+        $this->assertStringContainsString('+62 813-8543-5909', $header);
+        $this->assertStringContainsString('href="https://wa.me/6281385435909"', $header);
+        $this->assertStringContainsString($mandarinLabel, $header);
+        $this->assertStringContainsString('+62 811-1180-5213', $header);
+        $this->assertStringContainsString('href="https://wa.me/6281111805213"', $header);
+    }
+
     /**
      * @return array<string, array{string, string, string, string}>
      */
