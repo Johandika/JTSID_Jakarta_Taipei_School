@@ -14,7 +14,7 @@
         <div class="mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800 text-sm flex items-start gap-3">
             <x-site-icon name="alert-circle" class="size-5 text-amber-600 shrink-0 mt-0.5" />
             <div>
-                <p class="font-semibold">{{ __('Perhatian') }}</p>
+                <p class="font-semibold">{{ $page['rate_limit_title'] }}</p>
                 <p class="mt-0.5">{{ $rateLimitError }}</p>
             </div>
         </div>
@@ -47,7 +47,13 @@
     @endif
 
     {{-- Form --}}
-    <form wire:submit.prevent="submit" class="space-y-5">
+    <form wire:submit="submit" class="space-y-5">
+        {{-- Honeypot: hidden from people, filled in by spam bots --}}
+        <div class="absolute -left-[9999px] size-px overflow-hidden" aria-hidden="true">
+            <label for="contact-website">Website</label>
+            <input id="contact-website" wire:model="website" type="text" name="website" tabindex="-1" autocomplete="off" />
+        </div>
+
         {{-- Nama Lengkap --}}
         <div>
             <label for="contact-name" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
@@ -55,7 +61,7 @@
             </label>
             <input
                 id="contact-name"
-                wire:model.defer="name"
+                wire:model="name"
                 type="text"
                 placeholder="{{ $page['name_placeholder'] ?? 'Masukkan nama lengkap Anda' }}"
                 class="w-full px-4 py-3 rounded-xl border text-sm text-slate-900 placeholder:text-slate-400 bg-white focus:outline-none focus:ring-2 focus:ring-[#0d6b46]/20 focus:border-[#0d6b46] transition-all {{ $errors->has('name') ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200' }}"
@@ -69,11 +75,11 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             <div>
                 <label for="contact-email" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
-                    {{ $page['email_label'] ?? 'Email' }} <span class="text-rose-500">*</span>
+                    {{ $page['email_input_label'] }} <span class="text-rose-500">*</span>
                 </label>
                 <input
                     id="contact-email"
-                    wire:model.defer="email"
+                    wire:model="email"
                     type="email"
                     placeholder="{{ $page['email_placeholder'] ?? 'Masukkan alamat email Anda' }}"
                     class="w-full px-4 py-3 rounded-xl border text-sm text-slate-900 placeholder:text-slate-400 bg-white focus:outline-none focus:ring-2 focus:ring-[#0d6b46]/20 focus:border-[#0d6b46] transition-all {{ $errors->has('email') ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200' }}"
@@ -89,7 +95,7 @@
                 </label>
                 <input
                     id="contact-phone"
-                    wire:model.defer="phone"
+                    wire:model="phone"
                     type="tel"
                     placeholder="{{ $page['phone_placeholder'] ?? 'Masukkan nomor telepon Anda' }}"
                     class="w-full px-4 py-3 rounded-xl border text-sm text-slate-900 placeholder:text-slate-400 bg-white focus:outline-none focus:ring-2 focus:ring-[#0d6b46]/20 focus:border-[#0d6b46] transition-all {{ $errors->has('phone') ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200' }}"
@@ -108,15 +114,13 @@
             <div class="relative">
                 <select
                     id="contact-subject"
-                    wire:model.defer="subject"
+                    wire:model="subject"
                     class="w-full px-4 py-3 rounded-xl border text-sm text-slate-900 bg-white appearance-none focus:outline-none focus:ring-2 focus:ring-[#0d6b46]/20 focus:border-[#0d6b46] transition-all cursor-pointer {{ $errors->has('subject') ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200' }}"
                 >
                     <option value="">{{ $page['subject_placeholder'] ?? 'Pilih subjek' }}</option>
-                    <option value="admissions">{{ $page['subject_admissions'] ?? 'Penerimaan Siswa Baru (Admissions)' }}</option>
-                    <option value="mandarin_program">{{ $page['subject_mandarin'] ?? 'Program Mandarin / TOCFL' }}</option>
-                    <option value="general">{{ $page['subject_general'] ?? 'Pertanyaan Umum' }}</option>
-                    <option value="academics">{{ $page['subject_academics'] ?? 'Akademik & Kurikulum' }}</option>
-                    <option value="other">{{ $page['subject_other'] ?? 'Lainnya' }}</option>
+                    @foreach($subjects as $subject)
+                        <option value="{{ $subject }}">{{ $page['subjects'][$subject] }}</option>
+                    @endforeach
                 </select>
                 <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
                     <x-site-icon name="chevron-down" class="size-4" />
@@ -133,13 +137,13 @@
                 <label for="contact-message" class="block text-xs sm:text-sm font-semibold text-slate-700">
                     {{ $page['message_label'] ?? 'Pesan' }} <span class="text-rose-500">*</span>
                 </label>
-                <span class="text-xs text-slate-400" id="message-counter">
-                    {{ strlen($this->message) }}/500
+                <span class="text-xs text-slate-400" id="message-counter" x-data>
+                    <span x-text="Array.from($wire.message ?? '').length">{{ mb_strlen($this->message) }}</span>/500
                 </span>
             </div>
             <textarea
                 id="contact-message"
-                wire:model.live.debounce.150ms="message"
+                wire:model="message"
                 rows="4"
                 maxlength="500"
                 placeholder="{{ $page['message_placeholder'] ?? 'Tulis pesan Anda di sini...' }}"

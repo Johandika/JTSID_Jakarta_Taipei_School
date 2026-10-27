@@ -243,10 +243,6 @@
                             <span class="text-white/40">/</span>
                             <a href="{{ $contact['phones']['secondary']['url'] }}" class="hover:text-emerald-300 transition-colors">{{ $contact['phones']['secondary']['display'] }}</a>
                         </p>
-                        <p class="flex items-center gap-2">
-                            <span class="text-emerald-400 font-semibold text-xs tracking-wider">E:</span>
-                            <a href="{{ $contact['email']['url'] }}" class="hover:text-emerald-300 transition-colors">{{ $contact['email']['display'] }}</a>
-                        </p>
                         @foreach($contact['whatsapp'] as $channel => $whatsapp)
                             <p class="pt-1">
                                 <span class="block text-xs font-semibold text-emerald-300">{{ __('site.footer_whatsapp_'.$channel) }}</span>

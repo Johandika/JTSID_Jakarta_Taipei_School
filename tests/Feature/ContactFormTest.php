@@ -10,6 +10,7 @@ use chillerlan\QRCode\QRCode;
 use Database\Seeders\ReferenceDataSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
@@ -200,6 +201,108 @@ class ContactFormTest extends TestCase
             ->set('message', str_repeat('a', 501))
             ->call('submit')
             ->assertHasErrors(['message']);
+    }
+
+    public function test_contact_form_rejects_unknown_subject(): void
+    {
+        Livewire::test(ContactForm::class)
+            ->set('name', 'Ani')
+            ->set('email', 'ani@example.com')
+            ->set('phone', '08123456789')
+            ->set('subject', 'not-a-subject')
+            ->set('message', 'Halo, saya ingin bertanya tentang sekolah.')
+            ->call('submit')
+            ->assertHasErrors(['subject']);
+
+        $this->assertDatabaseCount('contact_messages', 0);
+    }
+
+    #[DataProvider('validationMessageLocales')]
+    public function test_contact_form_validation_messages_follow_the_page_language(string $locale, string $expectedNameError): void
+    {
+        app()->setLocale($locale);
+
+        $errors = Livewire::test(ContactForm::class)
+            ->call('submit')
+            ->errors();
+
+        $this->assertSame($expectedNameError, $errors->first('name'));
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function validationMessageLocales(): array
+    {
+        return [
+            'English' => ['en', 'The Full Name field is required.'],
+            'Indonesian' => ['id', 'Nama Lengkap wajib diisi.'],
+            'Traditional Chinese' => ['zh-TW', '中文或英文姓名為必填欄位。'],
+        ];
+    }
+
+    public function test_rate_limited_visitor_sees_a_translated_message_and_nothing_is_stored(): void
+    {
+        foreach (range(1, 5) as $attempt) {
+            RateLimiter::hit('contact-form:127.0.0.1', 600);
+        }
+
+        $component = Livewire::test(ContactForm::class)
+            ->set('name', 'Budi Santoso')
+            ->set('email', 'budi@example.com')
+            ->set('phone', '08123456789')
+            ->set('subject', 'general')
+            ->set('message', 'Halo, saya ingin bertanya tentang sekolah.')
+            ->call('submit')
+            ->assertSet('isSuccess', false);
+
+        $this->assertStringStartsWith('Too many messages were sent.', $component->get('rateLimitError'));
+        $this->assertDatabaseCount('contact_messages', 0);
+    }
+
+    public function test_honeypot_submission_looks_successful_but_is_not_stored(): void
+    {
+        Livewire::test(ContactForm::class)
+            ->set('name', 'Spam Bot')
+            ->set('email', 'bot@example.com')
+            ->set('phone', '08123456789')
+            ->set('subject', 'general')
+            ->set('message', 'Buy cheap followers now at our website.')
+            ->set('website', 'https://spam.example.com')
+            ->call('submit')
+            ->assertSet('isSuccess', true)
+            ->assertSet('website', '');
+
+        $this->assertDatabaseCount('contact_messages', 0);
+    }
+
+    public function test_contact_page_uses_subject_options_from_the_model(): void
+    {
+        $response = $this->get('/contact')->assertOk();
+
+        foreach (ContactMessage::SUBJECTS as $subject) {
+            $response->assertSee('value="'.$subject.'"', false);
+        }
+
+        $response->assertSeeText('Short-Term Mandarin Program / TOCFL')
+            ->assertDontSee('pages.contact.', false);
+    }
+
+    public function test_submitted_and_updated_contact_messages_are_audited(): void
+    {
+        Livewire::test(ContactForm::class)
+            ->set('name', 'Budi Santoso')
+            ->set('email', 'budi@example.com')
+            ->set('phone', '08123456789')
+            ->set('subject', 'general')
+            ->set('message', 'Halo, saya ingin bertanya tentang sekolah.')
+            ->call('submit');
+
+        $message = ContactMessage::sole();
+        $message->update(['status' => ContactMessage::STATUS_REPLIED]);
+
+        $this->assertDatabaseHas('audit_logs', ['entity_type' => 'ContactMessage', 'entity_id' => $message->id, 'action' => 'created']);
+        $this->assertDatabaseHas('audit_logs', ['entity_type' => 'ContactMessage', 'entity_id' => $message->id, 'action' => 'updated']);
     }
 
     public function test_admin_can_access_contact_messages_in_filament(): void

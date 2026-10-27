@@ -74,13 +74,7 @@ class ContactMessageResource extends CmsResource
 
                             Select::make('subject')
                                 ->label(__('admin.labels.subject_category'))
-                                ->options([
-                                    ContactMessage::SUBJECT_ADMISSIONS => __('admin.contact.subjects.admissions'),
-                                    ContactMessage::SUBJECT_MANDARIN_PROGRAM => __('admin.contact.subjects.mandarin_program'),
-                                    ContactMessage::SUBJECT_GENERAL => __('admin.contact.subjects.general'),
-                                    ContactMessage::SUBJECT_ACADEMICS => __('admin.contact.subjects.academics'),
-                                    ContactMessage::SUBJECT_OTHER => __('admin.contact.subjects.other'),
-                                ])
+                                ->options(ContactMessage::subjectOptions())
                                 ->disabled(),
                         ])
                         ->columns(2),
@@ -100,12 +94,7 @@ class ContactMessageResource extends CmsResource
                         ->schema([
                             Select::make('status')
                                 ->label(__('admin.labels.message_status'))
-                                ->options([
-                                    ContactMessage::STATUS_UNREAD => __('admin.contact.statuses.unread'),
-                                    ContactMessage::STATUS_READ => __('admin.contact.statuses.read'),
-                                    ContactMessage::STATUS_REPLIED => __('admin.contact.statuses.replied'),
-                                    ContactMessage::STATUS_ARCHIVED => __('admin.contact.statuses.archived'),
-                                ])
+                                ->options(ContactMessage::statusOptions())
                                 ->required(),
 
                             Textarea::make('admin_notes')
@@ -132,13 +121,7 @@ class ContactMessageResource extends CmsResource
                 TextColumn::make('status')
                     ->label(__('admin.fields.status'))
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        ContactMessage::STATUS_UNREAD => 'warning',
-                        ContactMessage::STATUS_READ => 'info',
-                        ContactMessage::STATUS_REPLIED => 'success',
-                        ContactMessage::STATUS_ARCHIVED => 'gray',
-                        default => 'gray',
-                    })
+                    ->color(fn (ContactMessage $record): string => $record->getStatusBadgeColor())
                     ->formatStateUsing(fn (ContactMessage $record): string => $record->getStatusLabel()),
 
                 TextColumn::make('name')
@@ -173,21 +156,10 @@ class ContactMessageResource extends CmsResource
             ->filters([
                 SelectFilter::make('status')
                     ->label(__('admin.labels.message_status'))
-                    ->options([
-                        ContactMessage::STATUS_UNREAD => __('admin.contact.statuses.unread'),
-                        ContactMessage::STATUS_READ => __('admin.contact.statuses.read'),
-                        ContactMessage::STATUS_REPLIED => __('admin.contact.statuses.replied'),
-                        ContactMessage::STATUS_ARCHIVED => __('admin.contact.statuses.archived'),
-                    ]),
+                    ->options(ContactMessage::statusOptions()),
                 SelectFilter::make('subject')
                     ->label(__('admin.labels.subject_category_filter'))
-                    ->options([
-                        ContactMessage::SUBJECT_ADMISSIONS => __('admin.contact.subjects.admissions_short'),
-                        ContactMessage::SUBJECT_MANDARIN_PROGRAM => __('admin.contact.subjects.mandarin_program'),
-                        ContactMessage::SUBJECT_GENERAL => __('admin.contact.subjects.general'),
-                        ContactMessage::SUBJECT_ACADEMICS => __('admin.contact.subjects.academics'),
-                        ContactMessage::SUBJECT_OTHER => __('admin.contact.subjects.other'),
-                    ]),
+                    ->options(ContactMessage::subjectOptions()),
             ])
             ->recordActions([
                 EditAction::make()

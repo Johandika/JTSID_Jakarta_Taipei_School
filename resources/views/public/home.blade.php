@@ -503,7 +503,7 @@
                         {{-- Left Half of Bento: 1 Tall Card (Ruang Kelas Modern) --}}
                         <div class="sm:col-span-6 flex">
                             <div class="group relative w-full h-[320px] sm:h-[460px] lg:h-[490px] rounded-2xl overflow-hidden border border-line/70 bg-gray-900 shadow-sm hover:shadow-xl transition-all duration-300">
-                                <img src="{{ asset('images/programs/primary.webp') }}"
+                                <img src="{{ asset('images/classroom-blue.webp') }}"
                                      alt="{{ __('site.facility_classroom') }}"
                                      class="size-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-105"
                                      loading="lazy">
@@ -532,10 +532,10 @@
 
                         {{-- Right Half of Bento: 1 Top Horizontal Card + 2 Bottom Cards --}}
                         <div class="sm:col-span-6 flex flex-col gap-3.5 sm:gap-4 lg:gap-5 h-full">
-                            {{-- Top Horizontal Card (Laboratorium Sains) --}}
+                            {{-- Top Horizontal Card (Ruang Musik) --}}
                             <div class="group relative w-full h-[180px] sm:h-[220px] lg:h-[235px] rounded-2xl overflow-hidden border border-line/70 bg-gray-900 shadow-sm hover:shadow-xl transition-all duration-300">
-                                <img src="{{ asset('images/programs/secondary.webp') }}"
-                                     alt="{{ __('site.facility_lab') }}"
+                                <img src="{{ asset('images/music-room.webp') }}"
+                                     alt="{{ __('site.facility_music') }}"
                                      class="size-full object-cover transform transition-transform duration-700 ease-out group-hover:scale-105"
                                      loading="lazy">
 
@@ -547,14 +547,14 @@
 
                                 <div class="absolute inset-x-0 bottom-0 p-5 z-10 pointer-events-none">
                                     <span class="inline-block text-[11px] sm:text-xs font-bold uppercase tracking-wider text-accent mb-1 drop-shadow-xs">
-                                        {{ __('site.facility_tag_exploration') }}
+                                        {{ __('site.facility_tag_creativity') }}
                                     </span>
                                     <h3 class="text-base sm:text-lg lg:text-xl font-bold text-white leading-snug drop-shadow-sm group-hover:text-amber-200 transition-colors">
-                                        {{ __('site.facility_lab') }}
+                                        {{ __('site.facility_music') }}
                                     </h3>
                                 </div>
 
-                                <a href="{{ $site::path('/facilities') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_lab') }}"></a>
+                                <a href="{{ $site::path('/facilities') }}" class="absolute inset-0 z-20" aria-label="{{ __('site.facility_music') }}"></a>
                             </div>
 
                             {{-- Bottom Row: 2 Cards Side-by-Side --}}

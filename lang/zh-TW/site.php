@@ -165,10 +165,12 @@ return [
     'alumni_headline' => '錄取全球頂尖學府',
     'facility_classroom' => '現代化智慧教室',
     'facility_lab' => '科學實驗室',
+    'facility_music' => '音樂專科教室',
     'facility_library' => '校園圖書館',
     'facility_sports' => '體育運動設施',
     'facility_tag_learning' => '教學空間',
     'facility_tag_exploration' => '科學探索',
+    'facility_tag_creativity' => '藝術創意',
     'facility_tag_literacy' => '圖書閱讀',
     'facility_tag_activity' => '體育運動',
 ];

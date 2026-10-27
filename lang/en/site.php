@@ -165,10 +165,12 @@ return [
     'alumni_headline' => 'Accepted at World-Leading Universities',
     'facility_classroom' => 'Modern Classrooms',
     'facility_lab' => 'Science Laboratories',
+    'facility_music' => 'Music Room',
     'facility_library' => 'Library',
     'facility_sports' => 'Sports Facilities',
     'facility_tag_learning' => 'Learning',
     'facility_tag_exploration' => 'Exploration',
+    'facility_tag_creativity' => 'Creativity',
     'facility_tag_literacy' => 'Literacy',
     'facility_tag_activity' => 'Activity',
 ];

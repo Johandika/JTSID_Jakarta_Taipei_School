@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use App\Support\Locale;
+use App\Models\Concerns\RecordsActivity;
 use Database\Factories\ContactMessageFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Lang;
 
 class ContactMessage extends Model
 {
     /** @use HasFactory<ContactMessageFactory> */
-    use HasFactory;
+    use HasFactory, RecordsActivity;
 
     protected $table = 'contact_messages';
 
@@ -25,6 +26,16 @@ class ContactMessage extends Model
 
     public const STATUS_ARCHIVED = 'archived';
 
+    /**
+     * @var list<string>
+     */
+    public const STATUSES = [
+        self::STATUS_UNREAD,
+        self::STATUS_READ,
+        self::STATUS_REPLIED,
+        self::STATUS_ARCHIVED,
+    ];
+
     public const SUBJECT_ADMISSIONS = 'admissions';
 
     public const SUBJECT_MANDARIN_PROGRAM = 'mandarin_program';
@@ -34,6 +45,19 @@ class ContactMessage extends Model
     public const SUBJECT_ACADEMICS = 'academics';
 
     public const SUBJECT_OTHER = 'other';
+
+    /**
+     * Subjects offered on the public contact form, in display order.
+     *
+     * @var list<string>
+     */
+    public const SUBJECTS = [
+        self::SUBJECT_ADMISSIONS,
+        self::SUBJECT_MANDARIN_PROGRAM,
+        self::SUBJECT_GENERAL,
+        self::SUBJECT_ACADEMICS,
+        self::SUBJECT_OTHER,
+    ];
 
     /**
      * @return array<string, string>
@@ -63,36 +87,35 @@ class ContactMessage extends Model
     }
 
     /**
+     * Admin status options in the current locale.
+     *
+     * @return array<string, string>
+     */
+    public static function statusOptions(): array
+    {
+        return collect(self::STATUSES)
+            ->mapWithKeys(fn (string $status): array => [$status => self::translatedLabel('statuses', $status)])
+            ->all();
+    }
+
+    /**
+     * Admin subject options in the current locale.
+     *
+     * @return array<string, string>
+     */
+    public static function subjectOptions(): array
+    {
+        return collect(self::SUBJECTS)
+            ->mapWithKeys(fn (string $subject): array => [$subject => self::translatedLabel('subjects', $subject)])
+            ->all();
+    }
+
+    /**
      * Localized status label.
      */
-    public function getStatusLabel(?string $locale = null): string
+    public function getStatusLabel(): string
     {
-        $locale = Locale::content($locale);
-
-        $labels = [
-            self::STATUS_UNREAD => [
-                'en' => 'Unread',
-                'id' => 'Belum Dibaca',
-                'zh-TW' => '未讀',
-            ],
-            self::STATUS_READ => [
-                'en' => 'Read',
-                'id' => 'Sudah Dibaca',
-                'zh-TW' => '已讀',
-            ],
-            self::STATUS_REPLIED => [
-                'en' => 'Replied',
-                'id' => 'Sudah Dibalas',
-                'zh-TW' => '已回覆',
-            ],
-            self::STATUS_ARCHIVED => [
-                'en' => 'Archived',
-                'id' => 'Diarsipkan',
-                'zh-TW' => '已封存',
-            ],
-        ];
-
-        return $labels[$this->status][$locale] ?? $labels[$this->status]['en'] ?? ucfirst($this->status);
+        return self::translatedLabel('statuses', $this->status);
     }
 
     /**
@@ -104,7 +127,6 @@ class ContactMessage extends Model
             self::STATUS_UNREAD => 'warning',
             self::STATUS_READ => 'info',
             self::STATUS_REPLIED => 'success',
-            self::STATUS_ARCHIVED => 'gray',
             default => 'gray',
         };
     }
@@ -112,38 +134,15 @@ class ContactMessage extends Model
     /**
      * Localized subject label.
      */
-    public function getSubjectLabel(?string $locale = null): string
+    public function getSubjectLabel(): string
     {
-        $locale = Locale::content($locale);
+        return self::translatedLabel('subjects', $this->subject);
+    }
 
-        $subjects = [
-            self::SUBJECT_ADMISSIONS => [
-                'en' => 'Admissions & Enrollment',
-                'id' => 'Penerimaan Siswa Baru (Admissions)',
-                'zh-TW' => '入學與註冊諮詢',
-            ],
-            self::SUBJECT_MANDARIN_PROGRAM => [
-                'en' => 'Short-Term Mandarin Program / TOCFL',
-                'id' => 'Program Mandarin / TOCFL',
-                'zh-TW' => '短期華語班 / TOCFL檢定',
-            ],
-            self::SUBJECT_GENERAL => [
-                'en' => 'General Inquiry',
-                'id' => 'Pertanyaan Umum',
-                'zh-TW' => '一般校務諮詢',
-            ],
-            self::SUBJECT_ACADEMICS => [
-                'en' => 'Academics & Curriculum',
-                'id' => 'Akademik & Kurikulum',
-                'zh-TW' => '教學與課程規劃',
-            ],
-            self::SUBJECT_OTHER => [
-                'en' => 'Other',
-                'id' => 'Lainnya',
-                'zh-TW' => '其他事項',
-            ],
-        ];
+    private static function translatedLabel(string $group, string $value): string
+    {
+        $key = 'admin.contact.'.$group.'.'.$value;
 
-        return $subjects[$this->subject][$locale] ?? $subjects[$this->subject]['en'] ?? ucwords(str_replace('_', ' ', $this->subject));
+        return Lang::has($key) ? __($key) : ucwords(str_replace('_', ' ', $value));
     }
 }

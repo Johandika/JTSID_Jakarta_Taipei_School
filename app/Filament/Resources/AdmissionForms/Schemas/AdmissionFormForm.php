@@ -49,7 +49,7 @@ class AdmissionFormForm
                             ->preventFilePathTampering()
                             ->maxSize(15360)
                             ->required()
-                            ->rules(['extensions:pdf,doc,docx,rar'])
+                            ->rules(['extensions:pdf,doc,docx,rar,zip'])
                             ->helperText(__('admin.helpers.document_format')),
                         Toggle::make('is_active')
                             ->label(__('admin.labels.show_on_admissions'))

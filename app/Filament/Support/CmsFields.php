@@ -159,11 +159,24 @@ class CmsFields
             ->directory('documents')
             ->preventFilePathTampering()
             ->visibility('private')
-            ->acceptedFileTypes(['application/pdf', 'application/msword',
-                'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.rar', 'application/x-rar', 'application/x-rar-compressed'])
+            ->acceptedFileTypes([
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.rar',
+                'application/x-rar',
+                'application/x-rar-compressed',
+                'application/x-compressed',
+                'application/rar',
+                'application/zip',
+                'application/x-zip',
+                'application/x-zip-compressed',
+                'multipart/x-zip',
+                'application/octet-stream',
+            ])
             ->maxSize(15360)
             ->required($required)
-            ->rules(['extensions:pdf,doc,docx,rar'])
+            ->rules(['extensions:pdf,doc,docx,rar,zip'])
             ->helperText(__('admin.helpers.document_format'));
     }
 

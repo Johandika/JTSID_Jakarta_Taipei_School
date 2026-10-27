@@ -295,7 +295,7 @@ class CmsTest extends TestCase
                 ->assertOk()
                 ->assertSee('href="tel:+62214523273"', false)
                 ->assertSee('href="tel:+62214530535"', false)
-                ->assertSee('href="mailto:jtis.org@gmail.com"', false)
+                ->assertDontSee('href="mailto:jtis.org@gmail.com"', false)
                 ->assertSee('href="https://wa.me/6281385435909"', false)
                 ->assertSee('href="https://wa.me/6281111805213"', false)
                 ->assertSee('aria-label="TikTok"', false)
@@ -576,6 +576,18 @@ class CmsTest extends TestCase
         $resource = SubjectResource::where('topic', 'Test file')->firstOrFail();
         Storage::disk('local')->assertExists($resource->file_path);
         Storage::disk('public')->assertExists($resource->image);
+        Livewire::test(CreateSubjectResource::class)->fillForm($data + [
+            'topic' => 'Test RAR file',
+            'image' => UploadedFile::fake()->image('weekly-news-rar.jpg'),
+            'file_path' => UploadedFile::fake()->create('archive.rar', 100, 'application/x-compressed'),
+        ])
+            ->call('create')->assertHasNoFormErrors();
+        Livewire::test(CreateSubjectResource::class)->fillForm($data + [
+            'topic' => 'Test ZIP file',
+            'image' => UploadedFile::fake()->image('weekly-news-zip.jpg'),
+            'file_path' => UploadedFile::fake()->create('archive.zip', 100, 'application/zip'),
+        ])
+            ->call('create')->assertHasNoFormErrors();
         Livewire::test(CreateSubjectResource::class)->fillForm($data + ['file_path' => UploadedFile::fake()->create('shell.php', 10, 'application/x-php')])
             ->call('create')->assertHasFormErrors();
         Livewire::test(CreateSubjectResource::class)->fillForm($data + ['file_path' => UploadedFile::fake()->create('large.pdf', 16000, 'application/pdf')])

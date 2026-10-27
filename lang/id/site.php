@@ -165,10 +165,12 @@ return [
     'alumni_headline' => 'Diterima di Berbagai Universitas Terkemuka Dunia',
     'facility_classroom' => 'Ruang Kelas Modern',
     'facility_lab' => 'Laboratorium Sains',
+    'facility_music' => 'Ruang Musik',
     'facility_library' => 'Perpustakaan',
     'facility_sports' => 'Fasilitas Olahraga',
     'facility_tag_learning' => 'Pembelajaran',
     'facility_tag_exploration' => 'Eksplorasi',
+    'facility_tag_creativity' => 'Kreativitas',
     'facility_tag_literacy' => 'Literasi',
     'facility_tag_activity' => 'Aktivitas',
 ];
