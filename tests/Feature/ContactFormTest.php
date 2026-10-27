@@ -4,15 +4,19 @@ namespace Tests\Feature;
 
 use App\Filament\Resources\ContactMessages\ContactMessageResource;
 use App\Livewire\ContactForm;
+use App\Mail\ContactMessageReceived;
 use App\Models\ContactMessage;
 use App\Models\User;
 use chillerlan\QRCode\QRCode;
 use Database\Seeders\ReferenceDataSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Exceptions;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Tests\TestCase;
 
 class ContactFormTest extends TestCase
@@ -303,6 +307,82 @@ class ContactFormTest extends TestCase
 
         $this->assertDatabaseHas('audit_logs', ['entity_type' => 'ContactMessage', 'entity_id' => $message->id, 'action' => 'created']);
         $this->assertDatabaseHas('audit_logs', ['entity_type' => 'ContactMessage', 'entity_id' => $message->id, 'action' => 'updated']);
+    }
+
+    public function test_submitted_message_is_emailed_to_the_school_with_reply_to_the_sender(): void
+    {
+        Mail::fake();
+
+        Livewire::test(ContactForm::class)
+            ->set('name', 'Budi Santoso')
+            ->set('email', 'budi@example.com')
+            ->set('phone', '08123456789')
+            ->set('subject', 'admissions')
+            ->set('message', 'Halo, saya ingin bertanya tentang pendaftaran.')
+            ->call('submit')
+            ->assertSet('isSuccess', true);
+
+        $message = ContactMessage::sole();
+
+        Mail::assertSent(ContactMessageReceived::class, function (ContactMessageReceived $mail) use ($message): bool {
+            return $mail->contactMessage->is($message)
+                && $mail->hasTo('jtis.org@gmail.com')
+                && $mail->hasReplyTo('budi@example.com', 'Budi Santoso');
+        });
+    }
+
+    public function test_honeypot_submission_does_not_send_an_email(): void
+    {
+        Mail::fake();
+
+        Livewire::test(ContactForm::class)
+            ->set('name', 'Spam Bot')
+            ->set('email', 'bot@example.com')
+            ->set('phone', '08123456789')
+            ->set('subject', 'general')
+            ->set('message', 'Buy cheap followers now at our website.')
+            ->set('website', 'https://spam.example.com')
+            ->call('submit');
+
+        Mail::assertNothingSent();
+    }
+
+    public function test_message_is_kept_and_visitor_sees_success_when_email_delivery_fails(): void
+    {
+        Exceptions::fake();
+        Mail::shouldReceive('to')->andThrow(new TransportException('Resend is unavailable'));
+
+        Livewire::test(ContactForm::class)
+            ->set('name', 'Budi Santoso')
+            ->set('email', 'budi@example.com')
+            ->set('phone', '08123456789')
+            ->set('subject', 'general')
+            ->set('message', 'Halo, saya ingin bertanya tentang sekolah.')
+            ->call('submit')
+            ->assertHasNoErrors()
+            ->assertSet('isSuccess', true);
+
+        $this->assertDatabaseHas('contact_messages', ['email' => 'budi@example.com']);
+        Exceptions::assertReported(TransportException::class);
+    }
+
+    public function test_contact_email_shows_the_message_details_and_escapes_visitor_input(): void
+    {
+        $message = ContactMessage::factory()->create([
+            'name' => '<b>Budi</b> Santoso',
+            'email' => 'budi@example.com',
+            'phone' => '08123456789',
+            'subject' => ContactMessage::SUBJECT_ADMISSIONS,
+            'message' => "Baris pertama\n<script>alert(1)</script>",
+        ]);
+
+        $mailable = new ContactMessageReceived($message);
+
+        $mailable->assertHasSubject('[JTS Website] New message: New Student Admissions - <b>Budi</b> Santoso');
+        $mailable->assertSeeInHtml('&lt;b&gt;Budi&lt;/b&gt; Santoso', false);
+        $mailable->assertDontSeeInHtml('<script>alert(1)</script>', false);
+        $mailable->assertSeeInHtml('08123456789');
+        $mailable->assertSeeInHtml(ContactMessageResource::getUrl('edit', ['record' => $message], panel: 'admin'), false);
     }
 
     public function test_admin_can_access_contact_messages_in_filament(): void

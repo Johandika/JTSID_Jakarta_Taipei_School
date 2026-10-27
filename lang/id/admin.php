@@ -447,6 +447,19 @@ return [
         'department_not_found' => 'Departemen tidak ditemukan. Gunakan nama/kode departemen yang sudah ada.',
     ],
     'contact' => [
+        'email' => [
+            'subject' => '[Website JTS] Pesan baru: :subject - :name',
+            'heading' => 'Pesan baru dari form kontak',
+            'intro' => 'Seorang pengunjung mengirim pesan berikut melalui form kontak website.',
+            'name' => 'Nama',
+            'email' => 'Email',
+            'phone' => 'Telepon',
+            'subject_label' => 'Subjek',
+            'sent_at' => 'Dikirim',
+            'message' => 'Pesan',
+            'open_in_admin' => 'Buka di admin panel',
+            'reply_hint' => 'Balas email ini untuk langsung menjawab pengirim.',
+        ],
         'statuses' => [
             'unread' => 'Belum Dibaca',
             'read' => 'Sudah Dibaca',

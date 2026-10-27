@@ -9,6 +9,10 @@ return [
         'password' => env('LOCAL_ADMIN_PASSWORD'),
     ],
 
+    'contact_form' => [
+        'recipient' => env('CONTACT_FORM_RECIPIENT', 'jtis.org@gmail.com'),
+    ],
+
     'contact' => [
         'address' => [
             'street' => 'JL. Raya Kelapa Hibrida Blok QH, Kelapa Gading Permai',

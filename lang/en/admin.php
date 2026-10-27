@@ -447,6 +447,19 @@ return [
         'department_not_found' => 'Department was not found. Use an existing department name or code.',
     ],
     'contact' => [
+        'email' => [
+            'subject' => '[JTS Website] New message: :subject - :name',
+            'heading' => 'New contact form message',
+            'intro' => 'A visitor sent the following message through the website contact form.',
+            'name' => 'Name',
+            'email' => 'Email',
+            'phone' => 'Phone',
+            'subject_label' => 'Subject',
+            'sent_at' => 'Sent at',
+            'message' => 'Message',
+            'open_in_admin' => 'Open in admin panel',
+            'reply_hint' => 'Reply to this email to answer the sender directly.',
+        ],
         'statuses' => [
             'unread' => 'Unread',
             'read' => 'Read',

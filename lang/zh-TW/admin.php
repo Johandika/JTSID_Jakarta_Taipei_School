@@ -447,6 +447,19 @@ return [
         'department_not_found' => '找不到部門。請使用既有的部門名稱或代碼。',
     ],
     'contact' => [
+        'email' => [
+            'subject' => '[JTS 網站] 新訊息：:subject - :name',
+            'heading' => '聯絡表單新訊息',
+            'intro' => '有訪客透過網站聯絡表單送出以下訊息。',
+            'name' => '姓名',
+            'email' => '電子郵件',
+            'phone' => '電話',
+            'subject_label' => '主旨',
+            'sent_at' => '送出時間',
+            'message' => '留言內容',
+            'open_in_admin' => '在管理後台開啟',
+            'reply_hint' => '直接回覆此郵件即可回覆寄件人。',
+        ],
         'statuses' => [
             'unread' => '未讀',
             'read' => '已讀',

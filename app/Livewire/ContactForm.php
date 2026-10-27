@@ -2,11 +2,14 @@
 
 namespace App\Livewire;
 
+use App\Mail\ContactMessageReceived;
 use App\Models\ContactMessage;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Throwable;
 
 class ContactForm extends Component
 {
@@ -86,13 +89,14 @@ class ContactForm extends Component
             return;
         }
 
-        ContactMessage::create([
+        $contactMessage = ContactMessage::create([
             ...$validated,
             'status' => ContactMessage::STATUS_UNREAD,
             'ip_address' => $ip,
             'user_agent' => substr((string) request()->userAgent(), 0, 255),
         ]);
 
+        $this->notifySchool($contactMessage);
         $this->completeSubmission();
     }
 
@@ -108,6 +112,18 @@ class ContactForm extends Component
             'page' => __('pages.contact'),
             'subjects' => ContactMessage::SUBJECTS,
         ]);
+    }
+
+    /**
+     * Email the school inbox. The message is already stored, so a delivery failure is reported but never shown to the visitor.
+     */
+    private function notifySchool(ContactMessage $contactMessage): void
+    {
+        try {
+            Mail::to(config('site.contact_form.recipient'))->send(new ContactMessageReceived($contactMessage));
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 
     private function completeSubmission(): void
