@@ -81,7 +81,7 @@ return [
     'footer_qr_description' => 'Pilih kontak lalu pindai kode QR untuk membuka WhatsApp.',
     'footer_whatsapp_qr_alt' => 'Kode QR :contact',
     'footer_whatsapp_admissions' => 'WhatsApp Pendaftaran Sekolah',
-    'footer_whatsapp_mandarin' => 'WhatsApp Mandarin Center',
+    'footer_whatsapp_mandarin' => 'WhatsApp Mandarin Center atau TOCFL',
     'whatsapp_select_contact' => 'Pilih kontak WhatsApp',
     'rights' => 'Hak cipta dilindungi.',
     'admin' => 'Login staf',

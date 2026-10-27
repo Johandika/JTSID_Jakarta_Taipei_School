@@ -81,7 +81,7 @@ return [
     'footer_qr_description' => 'Choose a contact and scan the QR code to open WhatsApp.',
     'footer_whatsapp_qr_alt' => 'QR code for :contact',
     'footer_whatsapp_admissions' => 'School Admissions WhatsApp',
-    'footer_whatsapp_mandarin' => 'Mandarin Center WhatsApp',
+    'footer_whatsapp_mandarin' => 'Mandarin Center Or TOCFL WhatsApp',
     'whatsapp_select_contact' => 'Choose a WhatsApp contact',
     'rights' => 'All rights reserved.',
     'admin' => 'Staff login',

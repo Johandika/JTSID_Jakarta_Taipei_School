@@ -24,6 +24,7 @@ use App\Models\User;
 use App\Policies\AdmissionFeePolicy;
 use App\Policies\AdmissionFormPolicy;
 use App\Policies\AnnouncementPopupPolicy;
+use App\Policies\ContactMessagePolicy;
 use App\Policies\GlobalContentPolicy;
 use App\Policies\HeroSlidePolicy;
 use App\Policies\MandarinProgramPolicy;
@@ -63,6 +64,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(AnnouncementPopup::class, AnnouncementPopupPolicy::class);
         Gate::policy(HeroSlide::class, HeroSlidePolicy::class);
         Gate::policy(MandarinProgram::class, MandarinProgramPolicy::class);
+        Gate::policy(ContactMessage::class, ContactMessagePolicy::class);
 
         foreach ([
             StaffProfile::class,
@@ -73,7 +75,6 @@ class AppServiceProvider extends ServiceProvider
             AcademicProgram::class,
             Director::class,
             Facility::class,
-            ContactMessage::class,
             CurriculumPillar::class,
         ] as $model) {
             Gate::policy($model, GlobalContentPolicy::class);

@@ -3,9 +3,11 @@
 namespace Tests\Feature;
 
 use App\Filament\Resources\ContactMessages\ContactMessageResource;
+use App\Filament\Resources\ContactMessages\Pages\ListContactMessages;
 use App\Livewire\ContactForm;
 use App\Mail\ContactMessageReceived;
 use App\Models\ContactMessage;
+use App\Models\Role;
 use App\Models\User;
 use chillerlan\QRCode\QRCode;
 use Database\Seeders\ReferenceDataSeeder;
@@ -14,6 +16,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Exceptions;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
+use Livewire\Exceptions\PublicPropertyNotFoundException;
 use Livewire\Livewire;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Mailer\Exception\TransportException;
@@ -108,9 +111,9 @@ class ContactFormTest extends TestCase
     public static function whatsappContactLocales(): array
     {
         return [
-            'English' => ['', 'School Admissions WhatsApp', 'Mandarin Center WhatsApp', 'Choose a WhatsApp contact'],
-            'Indonesian' => ['/id', 'WhatsApp Pendaftaran Sekolah', 'WhatsApp Mandarin Center', 'Pilih kontak WhatsApp'],
-            'Traditional Chinese' => ['/zh', '招生 WhatsApp', '華語中心 WhatsApp', '選擇 WhatsApp 聯絡單位'],
+            'English' => ['', 'School Admissions WhatsApp', 'Mandarin Center Or TOCFL WhatsApp', 'Choose a WhatsApp contact'],
+            'Indonesian' => ['/id', 'WhatsApp Pendaftaran Sekolah', 'WhatsApp Mandarin Center atau TOCFL', 'Pilih kontak WhatsApp'],
+            'Traditional Chinese' => ['/zh', '招生 WhatsApp', '華語中心或 TOCFL WhatsApp', '選擇 WhatsApp 聯絡單位'],
         ];
     }
 
@@ -154,7 +157,6 @@ class ContactFormTest extends TestCase
             ->set('name', 'Budi Santoso')
             ->set('email', 'budi@example.com')
             ->set('phone', '08123456789')
-            ->set('subject', 'admissions')
             ->set('message', 'Halo, saya ingin menanyakan mengenai pendaftaran siswa baru untuk tahun ajaran mendatang.')
             ->call('submit')
             ->assertHasNoErrors()
@@ -178,10 +180,9 @@ class ContactFormTest extends TestCase
             ->set('name', '')
             ->set('email', '')
             ->set('phone', '')
-            ->set('subject', '')
             ->set('message', '')
             ->call('submit')
-            ->assertHasErrors(['name', 'email', 'phone', 'subject', 'message'])
+            ->assertHasErrors(['name', 'email', 'phone', 'message'])
             ->assertSet('isSuccess', false);
 
         $this->assertDatabaseCount('contact_messages', 0);
@@ -192,7 +193,6 @@ class ContactFormTest extends TestCase
         Livewire::test(ContactForm::class)
             ->set('name', 'Ani')
             ->set('email', 'not-an-email')
-            ->set('subject', 'general')
             ->set('message', 'Short') // min is 10
             ->call('submit')
             ->assertHasErrors(['email', 'message']);
@@ -201,24 +201,16 @@ class ContactFormTest extends TestCase
         Livewire::test(ContactForm::class)
             ->set('name', 'Ani')
             ->set('email', 'ani@example.com')
-            ->set('subject', 'general')
             ->set('message', str_repeat('a', 501))
             ->call('submit')
             ->assertHasErrors(['message']);
     }
 
-    public function test_contact_form_rejects_unknown_subject(): void
+    public function test_visitor_cannot_choose_a_subject(): void
     {
-        Livewire::test(ContactForm::class)
-            ->set('name', 'Ani')
-            ->set('email', 'ani@example.com')
-            ->set('phone', '08123456789')
-            ->set('subject', 'not-a-subject')
-            ->set('message', 'Halo, saya ingin bertanya tentang sekolah.')
-            ->call('submit')
-            ->assertHasErrors(['subject']);
+        $this->expectException(PublicPropertyNotFoundException::class);
 
-        $this->assertDatabaseCount('contact_messages', 0);
+        Livewire::test(ContactForm::class)->set('subject', ContactMessage::SUBJECT_GENERAL);
     }
 
     #[DataProvider('validationMessageLocales')]
@@ -255,7 +247,6 @@ class ContactFormTest extends TestCase
             ->set('name', 'Budi Santoso')
             ->set('email', 'budi@example.com')
             ->set('phone', '08123456789')
-            ->set('subject', 'general')
             ->set('message', 'Halo, saya ingin bertanya tentang sekolah.')
             ->call('submit')
             ->assertSet('isSuccess', false);
@@ -270,7 +261,6 @@ class ContactFormTest extends TestCase
             ->set('name', 'Spam Bot')
             ->set('email', 'bot@example.com')
             ->set('phone', '08123456789')
-            ->set('subject', 'general')
             ->set('message', 'Buy cheap followers now at our website.')
             ->set('website', 'https://spam.example.com')
             ->call('submit')
@@ -280,16 +270,70 @@ class ContactFormTest extends TestCase
         $this->assertDatabaseCount('contact_messages', 0);
     }
 
-    public function test_contact_page_uses_subject_options_from_the_model(): void
+    #[DataProvider('admissionSubjectLocales')]
+    public function test_contact_page_shows_admission_as_the_only_subject(string $prefix, string $subjectText): void
     {
-        $response = $this->get('/contact')->assertOk();
-
-        foreach (ContactMessage::SUBJECTS as $subject) {
-            $response->assertSee('value="'.$subject.'"', false);
-        }
-
-        $response->assertSeeText('Short-Term Mandarin Program / TOCFL')
+        $this->get($prefix.'/contact')->assertOk()
+            ->assertSee('id="contact-subject"', false)
+            ->assertSee('value="'.$subjectText.'"', false)
+            ->assertDontSee('wire:model="subject"', false)
             ->assertDontSee('pages.contact.', false);
+    }
+
+    /**
+     * @return array<string, array{string, string}>
+     */
+    public static function admissionSubjectLocales(): array
+    {
+        return [
+            'English' => ['', 'Admission'],
+            'Indonesian' => ['/id', 'Admission'],
+            'Traditional Chinese' => ['/zh', '入學諮詢 (Admission)'],
+        ];
+    }
+
+    #[DataProvider('contactMessageAccessRoles')]
+    public function test_contact_messages_admin_access_by_role(string $roleCode, bool $canView, bool $canUpdate): void
+    {
+        $user = User::factory()->create([
+            'role_id' => Role::where('code', $roleCode)->value('id'),
+            'is_active' => true,
+        ]);
+        $message = ContactMessage::factory()->create(['status' => ContactMessage::STATUS_UNREAD]);
+
+        $this->actingAs($user);
+
+        $this->get(ContactMessageResource::getUrl('index'))->assertStatus($canView ? 200 : 403);
+        $this->get(ContactMessageResource::getUrl('edit', ['record' => $message]))->assertStatus($canUpdate ? 200 : 403);
+    }
+
+    public function test_viewer_cannot_change_message_status_in_bulk(): void
+    {
+        $viewer = User::factory()->create([
+            'role_id' => Role::where('code', 'viewer')->value('id'),
+            'is_active' => true,
+        ]);
+        ContactMessage::factory()->create();
+
+        $this->actingAs($viewer);
+
+        Livewire::test(ListContactMessages::class)
+            ->assertTableBulkActionHidden('mark_as_read')
+            ->assertTableBulkActionHidden('mark_as_replied');
+    }
+
+    /**
+     * @return array<string, array{string, bool, bool}>
+     */
+    public static function contactMessageAccessRoles(): array
+    {
+        return [
+            'admissions division' => ['admissions', true, true],
+            'content admin' => ['content_admin', true, true],
+            'viewer' => ['viewer', true, false],
+            'academic division' => ['academic', false, false],
+            'mandarin center division' => ['clc', false, false],
+        ];
     }
 
     public function test_submitted_and_updated_contact_messages_are_audited(): void
@@ -298,7 +342,6 @@ class ContactFormTest extends TestCase
             ->set('name', 'Budi Santoso')
             ->set('email', 'budi@example.com')
             ->set('phone', '08123456789')
-            ->set('subject', 'general')
             ->set('message', 'Halo, saya ingin bertanya tentang sekolah.')
             ->call('submit');
 
@@ -317,7 +360,6 @@ class ContactFormTest extends TestCase
             ->set('name', 'Budi Santoso')
             ->set('email', 'budi@example.com')
             ->set('phone', '08123456789')
-            ->set('subject', 'admissions')
             ->set('message', 'Halo, saya ingin bertanya tentang pendaftaran.')
             ->call('submit')
             ->assertSet('isSuccess', true);
@@ -339,7 +381,6 @@ class ContactFormTest extends TestCase
             ->set('name', 'Spam Bot')
             ->set('email', 'bot@example.com')
             ->set('phone', '08123456789')
-            ->set('subject', 'general')
             ->set('message', 'Buy cheap followers now at our website.')
             ->set('website', 'https://spam.example.com')
             ->call('submit');
@@ -356,7 +397,6 @@ class ContactFormTest extends TestCase
             ->set('name', 'Budi Santoso')
             ->set('email', 'budi@example.com')
             ->set('phone', '08123456789')
-            ->set('subject', 'general')
             ->set('message', 'Halo, saya ingin bertanya tentang sekolah.')
             ->call('submit')
             ->assertHasNoErrors()

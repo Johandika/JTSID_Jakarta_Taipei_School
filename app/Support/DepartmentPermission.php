@@ -5,6 +5,7 @@ namespace App\Support;
 use App\Models\AdmissionFee;
 use App\Models\AdmissionForm;
 use App\Models\AnnouncementPopup;
+use App\Models\ContactMessage;
 use App\Models\HeroSlide;
 use App\Models\MandarinProgram;
 use App\Models\Post;
@@ -23,6 +24,7 @@ class DepartmentPermission
             'models' => [
                 AdmissionForm::class,
                 AdmissionFee::class,
+                ContactMessage::class,
                 Post::class,
             ],
             'subject_resource_types' => [],

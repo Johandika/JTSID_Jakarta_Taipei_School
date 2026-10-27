@@ -109,26 +109,15 @@
         {{-- Subjek --}}
         <div>
             <label for="contact-subject" class="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">
-                {{ $page['subject_label'] ?? 'Subjek' }} <span class="text-rose-500">*</span>
+                {{ $page['subject_label'] }}
             </label>
-            <div class="relative">
-                <select
-                    id="contact-subject"
-                    wire:model="subject"
-                    class="w-full px-4 py-3 rounded-xl border text-sm text-slate-900 bg-white appearance-none focus:outline-none focus:ring-2 focus:ring-[#0d6b46]/20 focus:border-[#0d6b46] transition-all cursor-pointer {{ $errors->has('subject') ? 'border-rose-400 bg-rose-50/20' : 'border-slate-200' }}"
-                >
-                    <option value="">{{ $page['subject_placeholder'] ?? 'Pilih subjek' }}</option>
-                    @foreach($subjects as $subject)
-                        <option value="{{ $subject }}">{{ $page['subjects'][$subject] }}</option>
-                    @endforeach
-                </select>
-                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-400">
-                    <x-site-icon name="chevron-down" class="size-4" />
-                </div>
-            </div>
-            @error('subject')
-                <span class="text-xs text-rose-600 mt-1 block">{{ $message }}</span>
-            @enderror
+            <input
+                id="contact-subject"
+                type="text"
+                value="{{ $page['subject_value'] }}"
+                readonly
+                class="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm text-slate-700 bg-slate-50 cursor-default focus:outline-none"
+            />
         </div>
 
         {{-- Pesan with Character Counter --}}

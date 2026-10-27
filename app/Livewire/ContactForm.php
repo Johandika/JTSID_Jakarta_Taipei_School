@@ -7,7 +7,6 @@ use App\Models\ContactMessage;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Throwable;
 
@@ -22,8 +21,6 @@ class ContactForm extends Component
     public string $email = '';
 
     public string $phone = '';
-
-    public string $subject = '';
 
     public string $message = '';
 
@@ -45,7 +42,6 @@ class ContactForm extends Component
             'name' => ['required', 'string', 'min:2', 'max:100'],
             'email' => ['required', 'email', 'max:100'],
             'phone' => ['required', 'string', 'min:6', 'max:30'],
-            'subject' => ['required', 'string', Rule::in(ContactMessage::SUBJECTS)],
             'message' => ['required', 'string', 'min:10', 'max:500'],
         ];
     }
@@ -59,7 +55,6 @@ class ContactForm extends Component
             'name' => __('pages.contact.name_label'),
             'email' => __('pages.contact.email_input_label'),
             'phone' => __('pages.contact.phone_label'),
-            'subject' => __('pages.contact.subject_label'),
             'message' => __('pages.contact.message_label'),
         ];
     }
@@ -91,6 +86,7 @@ class ContactForm extends Component
 
         $contactMessage = ContactMessage::create([
             ...$validated,
+            'subject' => ContactMessage::SUBJECT_ADMISSIONS,
             'status' => ContactMessage::STATUS_UNREAD,
             'ip_address' => $ip,
             'user_agent' => substr((string) request()->userAgent(), 0, 255),
@@ -110,7 +106,6 @@ class ContactForm extends Component
     {
         return view('livewire.contact-form', [
             'page' => __('pages.contact'),
-            'subjects' => ContactMessage::SUBJECTS,
         ]);
     }
 
@@ -128,7 +123,7 @@ class ContactForm extends Component
 
     private function completeSubmission(): void
     {
-        $this->reset(['name', 'email', 'phone', 'subject', 'message', 'website']);
+        $this->reset(['name', 'email', 'phone', 'message', 'website']);
         $this->isSuccess = true;
     }
 }

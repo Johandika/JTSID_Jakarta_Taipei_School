@@ -168,11 +168,13 @@ class ContactMessageResource extends CmsResource
             ])
             ->bulkActions([
                 BulkAction::make('mark_as_read')
+                    ->visible(fn (): bool => static::canManageMessages())
                     ->label(__('admin.actions.mark_as_read'))
                     ->icon('heroicon-o-check')
                     ->action(fn (Collection $records) => $records->each->update(['status' => ContactMessage::STATUS_READ]))
                     ->deselectRecordsAfterCompletion(),
                 BulkAction::make('mark_as_replied')
+                    ->visible(fn (): bool => static::canManageMessages())
                     ->label(__('admin.actions.mark_as_replied'))
                     ->icon('heroicon-o-paper-airplane')
                     ->action(fn (Collection $records) => $records->each->update(['status' => ContactMessage::STATUS_REPLIED]))
@@ -180,6 +182,14 @@ class ContactMessageResource extends CmsResource
                 DeleteBulkAction::make(),
             ])
             ->paginated([15, 25, 50]);
+    }
+
+    /**
+     * Viewers may read the inbox but not change message status.
+     */
+    protected static function canManageMessages(): bool
+    {
+        return auth()->user()?->can('update', new ContactMessage) ?? false;
     }
 
     public static function getPages(): array

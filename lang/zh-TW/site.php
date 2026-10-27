@@ -81,7 +81,7 @@ return [
     'footer_qr_description' => '選擇聯絡單位，再掃描 QR Code 開啟 WhatsApp。',
     'footer_whatsapp_qr_alt' => ':contact QR Code',
     'footer_whatsapp_admissions' => '招生 WhatsApp',
-    'footer_whatsapp_mandarin' => '華語中心 WhatsApp',
+    'footer_whatsapp_mandarin' => '華語中心或 TOCFL WhatsApp',
     'whatsapp_select_contact' => '選擇 WhatsApp 聯絡單位',
     'rights' => '版權所有。',
     'admin' => '教職員登入',
