@@ -30,10 +30,6 @@ return [
                 'url' => 'tel:+62214530535',
             ],
         ],
-        'email' => [
-            'display' => 'jtis.org@gmail.com',
-            'url' => 'mailto:jtis.org@gmail.com',
-        ],
         'whatsapp' => [
             'admissions' => [
                 'display' => '+62 813-8543-5909',

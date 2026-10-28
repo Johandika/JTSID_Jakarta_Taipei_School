@@ -349,7 +349,6 @@ return [
         'contact_info_subtitle' => 'Hubungi kami melalui informasi berikut atau isi formulir di samping.',
         'address_label' => 'Address',
         'telephone_label' => 'Telephone',
-        'email_label' => 'Email',
         'opening_hours_label' => 'Jam Operasional',
         'opening_days' => 'Senin – Jumat',
         'opening_time' => '07:30 – 16:00 WIB',

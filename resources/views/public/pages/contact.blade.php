@@ -78,24 +78,7 @@
                             </div>
                         </div>
 
-                        {{-- 3. Email --}}
-                        <div class="flex items-start gap-4">
-                            <div class="size-11 sm:size-12 rounded-2xl bg-white shadow-xs border border-emerald-900/10 flex items-center justify-center shrink-0 text-[#0d6b46]">
-                                <x-site-icon name="mail" class="size-5 sm:size-6" />
-                            </div>
-                            <div>
-                                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-800">
-                                    {{ $page['email_label'] ?? 'Email' }}
-                                </h3>
-                                <p class="mt-1 text-sm text-slate-600">
-                                    <a href="{{ $contact['email']['url'] }}" class="hover:text-[#0d6b46] font-medium transition-colors">
-                                        {{ $contact['email']['display'] }}
-                                    </a>
-                                </p>
-                            </div>
-                        </div>
-
-                        {{-- 4. Jam Operasional --}}
+                        {{-- 3. Jam Operasional --}}
                         <div class="flex items-start gap-4">
                             <div class="size-11 sm:size-12 rounded-2xl bg-white shadow-xs border border-emerald-900/10 flex items-center justify-center shrink-0 text-[#0d6b46]">
                                 <x-site-icon name="clock" class="size-5 sm:size-6" />

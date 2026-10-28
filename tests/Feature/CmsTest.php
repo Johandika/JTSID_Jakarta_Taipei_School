@@ -311,7 +311,7 @@ class CmsTest extends TestCase
                 ->assertSeeText('JL. Raya Kelapa Hibrida Blok QH, Kelapa Gading Permai, Jakarta 14240, Indonesia')
                 ->assertSeeText('+62 (21) 452 3273')
                 ->assertSeeText('+62 (21) 453 0535')
-                ->assertSeeText('jtis.org@gmail.com');
+                ->assertDontSee('jtis.org@gmail.com', false);
         }
 
         $this->actingAs(User::where('email', 'admin@jts.local')->firstOrFail());

@@ -349,7 +349,6 @@ return [
         'contact_info_subtitle' => '歡迎透過下方資訊與我們聯繫，或直接填寫右側表單。',
         'address_label' => 'Address',
         'telephone_label' => 'Telephone',
-        'email_label' => 'Email',
         'opening_hours_label' => '辦公時間',
         'opening_days' => '週一至週五',
         'opening_time' => '07:30 – 16:00 WIB',

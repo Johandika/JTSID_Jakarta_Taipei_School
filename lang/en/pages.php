@@ -349,7 +349,6 @@ return [
         'contact_info_subtitle' => 'Reach out to us via the contact details below or fill out the inquiry form.',
         'address_label' => 'Address',
         'telephone_label' => 'Telephone',
-        'email_label' => 'Email',
         'opening_hours_label' => 'Opening Hours',
         'opening_days' => 'Monday – Friday',
         'opening_time' => '07:30 – 16:00 WIB',

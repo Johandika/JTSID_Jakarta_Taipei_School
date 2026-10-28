@@ -40,7 +40,6 @@ class ContactFormTest extends TestCase
             ->assertSeeText('Contact Information')
             ->assertSeeText('Address')
             ->assertSeeText('Telephone')
-            ->assertSeeText('Email')
             ->assertSeeText('Opening Hours')
             ->assertSee('google.com/maps/embed', false);
 
@@ -50,7 +49,6 @@ class ContactFormTest extends TestCase
             ->assertSeeText('Contact Information')
             ->assertSeeText('Jam Operasional')
             ->assertSeeText('+62 (21) 452 3273')
-            ->assertSeeText('jtis.org@gmail.com')
             ->assertSee('google.com/maps/embed', false);
 
         $this->get('/zh/contact')
