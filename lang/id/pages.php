@@ -312,9 +312,9 @@ return [
         'levels_note_desc' => 'Jenjang SD, SMP, dan SMA menerapkan kurikulum Tiga Bahasa penuh (Mandarin, Inggris, dan Indonesia). Khusus untuk jenjang TK, proses belajar menggunakan Dua Bahasa (Mandarin dan Inggris) guna menanamkan fondasi komunikasi alami sejak dini.',
         'pillars' => [
             'mandarin' => [
-                'title' => 'Bahasa Mandarin (Immersion)',
+                'title' => 'Taiwan (Immersion)',
                 'badge' => 'Sertifikat Pendidik Taiwan',
-                'desc' => 'Semua guru mempunyai kualifikasi terbaik dan sertifikat pengajar resmi dari Taiwan. Bersama dengan itu, kami menyediakan lingkungan belajar Bahasa Mandarin terbaik dan imersif untuk setiap mata pelajaran.',
+                'desc' => 'Semua guru mempunyai kualifikasi terbaik dan sertifikat pengajar resmi dari Taiwan. Bersama dengan itu, kami menyediakan lingkungan belajar Taiwan terbaik dan imersif untuk setiap mata pelajaran.',
             ],
             'english' => [
                 'title' => 'Bahasa Inggris (Cambridge)',

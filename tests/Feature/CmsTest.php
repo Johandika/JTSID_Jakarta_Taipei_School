@@ -598,7 +598,7 @@ class CmsTest extends TestCase
     {
         Storage::fake('public');
         $this->actingAs(User::where('email', 'admin@jts.local')->first());
-        $form = AdmissionForm::firstOrFail();
+        $form = AdmissionForm::where('school_level', 'tk')->firstOrFail();
 
         Livewire::test(EditAdmissionForm::class, ['record' => $form->id])
             ->fillForm([

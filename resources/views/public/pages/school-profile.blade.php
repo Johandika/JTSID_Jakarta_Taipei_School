@@ -84,7 +84,7 @@
                     <div class="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-6 sm:p-7 shadow-[0_4px_20px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 flex flex-col justify-between min-h-[310px]">
                         {{-- Right Landmark Image with Soft Gradient Fade --}}
                         <div class="absolute right-0 top-0 bottom-0 w-[42%] sm:w-[40%] pointer-events-none select-none overflow-hidden">
-                            <img src="{{ asset('images/trilingual/mandarin.webp') }}" alt="Mandarin Pagoda" class="h-full w-full object-cover object-center transform group-hover:scale-105 transition-transform duration-700" />
+                            <img src="{{ asset('images/trilingual/taiwan-immersion.webp') }}" alt="Taiwan Immersion" class="h-full w-full object-cover object-[74%_35%] origin-[74%_35%] scale-125 transform group-hover:scale-[1.3] transition-transform duration-700" />
                             <div class="absolute inset-0 bg-gradient-to-r from-white via-white/30 to-transparent"></div>
                             <div class="absolute inset-0 bg-gradient-to-t from-white/70 via-transparent to-transparent"></div>
                         </div>
@@ -94,15 +94,14 @@
                             <div class="flex items-center gap-3">
                                 <span class="text-3xl sm:text-4xl font-extrabold tracking-tight text-red-200">01</span>
                                 <span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 text-red-600 px-2.5 py-0.5 text-xs font-bold border border-red-100 shadow-2xs">
-                                    <svg class="h-3 w-4 rounded-2xs shrink-0 shadow-2xs" viewBox="0 0 900 600">
-                                        <rect fill="#de2910" width="900" height="600"/>
-                                        <polygon fill="#ffde00" points="150,50 165,97 215,97 174,126 190,173 150,144 110,173 126,126 85,97 135,97"/>
-                                        <polygon fill="#ffde00" points="300,40 307,59 328,59 311,71 317,90 300,79 283,90 289,71 272,59 293,59"/>
-                                        <polygon fill="#ffde00" points="360,100 367,119 388,119 371,131 377,150 360,139 343,150 349,131 332,119 353,119"/>
-                                        <polygon fill="#ffde00" points="360,180 367,199 388,199 371,211 377,230 360,219 343,230 349,211 332,199 353,199"/>
-                                        <polygon fill="#ffde00" points="300,240 307,259 328,259 311,271 317,290 300,279 283,290 289,271 272,259 293,259"/>
+                                    <svg class="h-3 w-4 rounded-2xs shrink-0 shadow-2xs" viewBox="0 0 900 600" aria-hidden="true">
+                                        <rect fill="#fe0000" width="900" height="600"/>
+                                        <rect fill="#000095" width="450" height="300"/>
+                                        <polygon fill="#ffffff" points="225,90 232.9,120.5 255,98 246.6,128.4 277,120 254.5,142.1 285,150 254.5,157.9 277,180 246.6,171.6 255,202 232.9,179.5 225,210 217.1,179.5 195,202 203.4,171.6 173,180 195.5,157.9 165,150 195.5,142.1 173,120 203.4,128.4 195,98 217.1,120.5"/>
+                                        <circle fill="#000095" cx="225" cy="150" r="34"/>
+                                        <circle fill="#ffffff" cx="225" cy="150" r="29"/>
                                     </svg>
-                                    <span>Mandarin</span>
+                                    <span>Taiwan</span>
                                 </span>
                             </div>
 

@@ -16,13 +16,13 @@
     $primaryLabel = $primaryLabel ?? __('pages.school_profile.cta_admissions');
     $secondaryUrl = $secondaryUrl ?? $site::path('/contact');
     $secondaryLabel = $secondaryLabel ?? __('pages.school_profile.cta_contact');
-    $image = $image ?? asset('images/cta-students.webp');
+    $image = $image ?? asset('images/home-cta-campus.webp');
 @endphp
 
 <div {{ $attributes->merge(['class' => 'relative overflow-hidden rounded-2xl sm:rounded-3xl bg-[#0a4a30] text-white shadow-xl']) }}>
     {{-- Right Landmark / Students Image with Seamless Gradient Overlay --}}
     <div class="absolute inset-y-0 right-0 w-full sm:w-[60%] lg:w-[55%] pointer-events-none select-none overflow-hidden">
-        <img src="{{ $image }}" alt="{{ $title }}" class="size-full object-cover object-center sm:object-right" />
+        <img src="{{ $image }}" alt="{{ $title }}" class="size-full object-cover object-right" />
         <div class="absolute inset-0 bg-gradient-to-r from-[#0a4a30] via-[#0a4a30]/80 to-transparent sm:via-[#0a4a30]/50"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-[#0a4a30]/85 via-[#0a4a30]/30 to-transparent sm:hidden"></div>
     </div>

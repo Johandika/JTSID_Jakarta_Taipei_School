@@ -312,9 +312,9 @@ return [
         'levels_note_desc' => 'Primary (SD), Junior High (SMP), and Senior High (SMA) operate as full Trilingual programs (Mandarin, English, and Indonesian). Kindergarten (TK) is delivered bilingually in Mandarin and English to build early confidence and natural fluency.',
         'pillars' => [
             'mandarin' => [
-                'title' => 'Mandarin Immersion',
+                'title' => 'Taiwan Immersion',
                 'badge' => 'Taiwan MoE Certified',
-                'desc' => 'All teachers possess premier qualifications and official teaching certificates from Taiwan. We offer a vibrant, immersive Mandarin learning environment across subject areas to foster authentic literacy and eloquence.',
+                'desc' => 'All teachers possess premier qualifications and official teaching certificates from Taiwan. We offer a vibrant, immersive Taiwan learning environment across subject areas to foster authentic literacy and eloquence.',
             ],
             'english' => [
                 'title' => 'Cambridge English',
