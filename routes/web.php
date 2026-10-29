@@ -36,6 +36,7 @@ foreach (['en' => '', 'zh' => 'zh', 'id' => 'id'] as $locale => $prefix) {
         Route::get('/academics', [ContentController::class, 'academics'])->name('pages.academics');
         Route::get('/university-admission', [ContentController::class, 'universities'])->name('universities');
         Route::get('/download/admission-form', [DownloadController::class, 'admissionForm'])->name('download.admission-form');
+        Route::get('/download/admission-fee/{admissionFee}', [DownloadController::class, 'admissionFee'])->whereNumber('admissionFee')->name('download.admission-fee');
         Route::get('/download/{kind}/{id}', DownloadController::class)->whereNumber('id')->name('download');
         foreach ($staticPages as $slug) {
             Route::view('/'.$slug, 'public.pages.'.$slug)->name('pages.'.$slug);

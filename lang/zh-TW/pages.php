@@ -142,9 +142,9 @@ return [
                         'bar' => '#ef4444',
                     ],
                     [
-                        'title' => '正體華語教學',
+                        'title' => '臺灣浸潤教學',
                         'desc' => '臺灣專業合格師資沉浸式教學，培育自然流暢的母語表達。',
-                        'icon' => 'flag-cn',
+                        'icon' => 'flag-tw',
                         'color' => 'red',
                         'bar' => '#ef4444',
                     ],
@@ -261,6 +261,7 @@ return [
         ],
         'fees_heading' => '各年級收費標準',
         'fees_subheading' => '公開透明的各學段學雜費用標準，支持孩子優質的三語教育學習歷程。',
+        'fee_file_download' => '下載檔案',
         'fee_type' => '收費項目',
         'levels' => [
             'tk' => ['name' => '幼兒園', 'sub' => '(幼幼, 小, 大班)'],

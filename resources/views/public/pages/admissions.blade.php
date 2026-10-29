@@ -244,6 +244,17 @@
                                         @if(!empty(trim((string)$note)))
                                             <div class="mt-3 w-full max-w-lg rounded-xl bg-[#eef7fd] border border-[#d6ecfb] p-3 text-xs sm:text-sm text-[#0c4a6e] font-medium leading-relaxed whitespace-pre-line shadow-2xs">{{ trim((string)$note) }}</div>
                                         @endif
+
+                                        {{-- Optional Attachment Download --}}
+                                        @if($fee->hasDownloadableFile())
+                                            <a
+                                                href="{{ $site::path('/download/admission-fee/'.$fee->id) }}"
+                                                class="mt-3 inline-flex w-fit items-center gap-2 rounded-lg border border-[#176443]/25 bg-[#eaf4ed] px-3.5 py-2 text-xs sm:text-sm font-semibold text-[#176443] transition-colors hover:bg-[#d5eadc]"
+                                            >
+                                                <x-site-icon name="download" class="size-4" />
+                                                <span>{{ $fee->fileLabel() }}</span>
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
                             @empty

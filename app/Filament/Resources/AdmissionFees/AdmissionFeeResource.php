@@ -6,6 +6,7 @@ use App\Filament\Resources\AdmissionFees\Pages\CreateAdmissionFee;
 use App\Filament\Resources\AdmissionFees\Pages\EditAdmissionFee;
 use App\Filament\Resources\AdmissionFees\Pages\ListAdmissionFees;
 use App\Filament\Resources\CmsResource;
+use App\Filament\Support\CmsFields;
 use App\Models\AdmissionFee;
 use App\Models\GradeLevel;
 use Filament\Actions\DeleteAction;
@@ -85,6 +86,10 @@ class AdmissionFeeResource extends CmsResource
                                                 ->label(__('admin.labels.optional_note_id'))
                                                 ->placeholder(__('admin.placeholders.fee_note'))
                                                 ->rows(3),
+                                            TextInput::make('file_label.id')
+                                                ->label(__('admin.labels.fee_file_label_id'))
+                                                ->placeholder(__('admin.placeholders.fee_file_label'))
+                                                ->maxLength(100),
                                         ]),
 
                                     Tab::make('en')
@@ -102,6 +107,10 @@ class AdmissionFeeResource extends CmsResource
                                                 ->label('Optional Note (EN)')
                                                 ->placeholder("e.g. For second child Rp. 3,500,000,-\nThird child free")
                                                 ->rows(3),
+                                            TextInput::make('file_label.en')
+                                                ->label('Download Button Text (EN)')
+                                                ->placeholder('e.g. Discount terms')
+                                                ->maxLength(100),
                                         ]),
 
                                     Tab::make('zh-TW')
@@ -119,8 +128,15 @@ class AdmissionFeeResource extends CmsResource
                                                 ->label('額外備註 (ZH)')
                                                 ->placeholder("例：第二位子女享優惠...\n第三位子女免費")
                                                 ->rows(3),
+                                            TextInput::make('file_label.zh-TW')
+                                                ->label('下載按鈕文字 (ZH)')
+                                                ->placeholder('例：優惠說明')
+                                                ->maxLength(100),
                                         ]),
                                 ]),
+
+                            CmsFields::document(label: __('admin.labels.fee_attachment'))
+                                ->storeFileNamesIn('file_name'),
                         ]),
                 ])->columnSpan(['default' => 1, 'lg' => 2]),
 

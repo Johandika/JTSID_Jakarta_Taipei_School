@@ -217,6 +217,8 @@ return [
         'url_format' => 'https:// 或 /internal-path',
     ],
     'labels' => [
+        'fee_attachment' => '附加檔案（顯示於備註下方）',
+        'fee_file_label_id' => '下載按鈕文字 (ID)',
         'academic_year_code' => '學年度代碼',
         'academic_year_name' => '學年度名稱',
         'admin_notes' => '管理員備註',
@@ -357,6 +359,7 @@ return [
         'user_name' => '使用者名稱',
     ],
     'placeholders' => [
+        'fee_file_label' => '例：優惠說明（選填）',
         'academic_year_code' => '範例：2025/2026',
         'academic_year_name' => '範例：2025/2026 學年度',
         'admin_notes' => '請在此輸入內部後續處理備註...',

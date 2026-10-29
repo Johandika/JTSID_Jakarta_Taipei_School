@@ -217,6 +217,8 @@ return [
         'url_format' => 'https:// or /internal-path',
     ],
     'labels' => [
+        'fee_attachment' => 'Attachment File (shown below the note)',
+        'fee_file_label_id' => 'Download Button Text (ID)',
         'academic_year_code' => 'Academic Year Code',
         'academic_year_name' => 'Academic Year Name',
         'admin_notes' => 'Admin Notes',
@@ -357,6 +359,7 @@ return [
         'user_name' => 'User Name',
     ],
     'placeholders' => [
+        'fee_file_label' => 'e.g. Discount terms (optional)',
         'academic_year_code' => 'Example: 2025/2026',
         'academic_year_name' => 'Example: Academic Year 2025/2026',
         'admin_notes' => 'Write internal follow-up notes here...',

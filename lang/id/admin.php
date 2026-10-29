@@ -217,6 +217,8 @@ return [
         'url_format' => 'https:// atau /path-internal',
     ],
     'labels' => [
+        'fee_attachment' => 'File Lampiran (tampil di bawah catatan)',
+        'fee_file_label_id' => 'Teks Tombol Download (ID)',
         'academic_year_code' => 'Kode Tahun Ajaran',
         'academic_year_name' => 'Nama Tahun Ajaran',
         'admin_notes' => 'Catatan Admin',
@@ -357,6 +359,7 @@ return [
         'user_name' => 'Nama Pengguna',
     ],
     'placeholders' => [
+        'fee_file_label' => 'mis. Ketentuan diskon (opsional)',
         'academic_year_code' => 'Contoh: 2025/2026',
         'academic_year_name' => 'Contoh: Tahun Ajaran 2025/2026',
         'admin_notes' => 'Tulis catatan tindak lanjut internal di sini...',

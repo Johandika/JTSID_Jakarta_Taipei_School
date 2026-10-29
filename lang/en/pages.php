@@ -142,9 +142,9 @@ return [
                         'bar' => '#ef4444',
                     ],
                     [
-                        'title' => 'Mandarin Language Learning',
-                        'desc' => 'Immersive Mandarin environment taught by certified native teachers from Taiwan.',
-                        'icon' => 'flag-cn',
+                        'title' => 'Taiwan Language Learning',
+                        'desc' => 'Immersive Taiwan learning environment taught by certified native teachers from Taiwan.',
+                        'icon' => 'flag-tw',
                         'color' => 'red',
                         'bar' => '#ef4444',
                     ],
@@ -261,6 +261,7 @@ return [
         ],
         'fees_heading' => 'Tuition & Fee Structure',
         'fees_subheading' => 'Transparent and structured fees to support your child\'s comprehensive trilingual education.',
+        'fee_file_download' => 'Download file',
         'fee_type' => 'Fee Type',
         'levels' => [
             'tk' => ['name' => 'Kindergarten', 'sub' => '(PK, K1, K2)'],

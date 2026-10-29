@@ -142,9 +142,9 @@ return [
                         'bar' => '#ef4444',
                     ],
                     [
-                        'title' => 'Pembelajaran Bahasa Mandarin',
-                        'desc' => 'Lingkungan berbahasa Mandarin dengan guru dari Taiwan untuk penguasaan yang lebih natural.',
-                        'icon' => 'flag-cn',
+                        'title' => 'Pembelajaran Taiwan',
+                        'desc' => 'Lingkungan belajar Taiwan dengan guru dari Taiwan untuk penguasaan yang lebih natural.',
+                        'icon' => 'flag-tw',
                         'color' => 'red',
                         'bar' => '#ef4444',
                     ],
@@ -261,6 +261,7 @@ return [
         ],
         'fees_heading' => 'Rincian Biaya Sekolah',
         'fees_subheading' => 'Struktur biaya transparan dan terencana untuk mendukung pendidikan trilingual putra-putri Anda.',
+        'fee_file_download' => 'Unduh file',
         'fee_type' => 'Jenis Biaya',
         'levels' => [
             'tk' => ['name' => 'Taman Kanak-Kanak', 'sub' => '(PK, K1, K2)'],
